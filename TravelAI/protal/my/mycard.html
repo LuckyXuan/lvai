@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="../../js/mui.min.js"></script>
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<!--<link rel="stylesheet" type="text/css" href="../../css/header.css"/>-->
+		<script src="../../js/jquery-1.7.2.min.js"></script>
+		<script src="../../js/jquery.lazyload.js"></script>
+		<style type="text/css">
+			/*body{background-color: white;}
+			.mui-content{background-color: white;}*/
+			#selectMenu{margin-top: 12px;}
+			#selectMenu li{ margin-bottom: 10px;background: white;}
+			#selectMenu ul{background-color: #EEEEEE}
+		</style>
+		<script type="text/javascript" charset="utf-8">
+			var editor;
+			mui.init();
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			document.addEventListener("plusready", onPlusReady, false);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+					OnBack();
+					OnPreload();
+					MenuInit();
+				}
+				//按钮的监听事件
+
+			function MenuInit() {
+					//头像按钮
+					document.getElementById('editor').addEventListener('tap', function() {
+						mui.fire(editor, 'show', null);
+						setTimeout(function() {
+							mui.openWindow({
+								id: 'editor',
+								show: {
+									aniShow: 'pop-in'
+								},
+								waiting: {
+									autoShow: false
+								},
+								styles: {
+									zindex: 600
+								}
+							});
+						}, 0);
+					});
+				}
+				//预加载
+
+			function OnPreload() {
+				editor = mui.preload({
+					"id": 'editor',
+					"url": 'editor_card.html'
+				});
+			}
+
+			function OnBack() {
+				var old_back = mui.back;
+				var backButtonPress = 0;
+				mui.back = function(event) {
+					backButtonPress++;
+					if (backButtonPress > 1) {
+						plus.runtime.quit();
+					} else {
+						plus.nativeUI.toast('再按一次退出应用');
+					}
+					setTimeout(function() {
+						backButtonPress = 0;
+					}, 1000);
+					return false;
+				};
+			}
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<h1 class="mui-title">我的</h1>
+		</header>
+		<div class="mui-content">
+			<div style=" background-color:#8A6DA9; padding: 5px 10px ;" class="mui-table-view-cell">
+				<a class="mui-navigate-right" href="#">
+					<div style="font-size: 14px;">
+						您还没有完成个人资料，请完善。
+					</div>
+					<div style="font-size: 11px;">
+						描述真实的自己才能找到对的人
+					</div>
+				</a>
+			</div>
+			<div style="background: #FFF;  padding: 10px 10px; " class="mui-table-view-cell">
+				<a id="editor" class="mui-navigate-right" href="#">
+					<img class="lazy" style=" margin-left: 3%; width: 70px; height: 70px; line-height: 50px; text-align: center;    background-color: transparent; border: 1px solid #ddd;
+  border-radius: 50px; float: left;" data-original="http://dcloudio.github.io/mui/assets/img/shuijiao.jpg" width="70px" height="70px">
+					<div style="font-size: 14px; float: left; width: 60%; margin-left: 8%; margin-top: 15px;">
+						ั͡✾ ✎﹏ℳ๓ 蕗笾
+					</div>
+					<div style="font-size: 11px; float: left; width: 60%; margin-left: 8%;">
+						想去
+					</div>
+
+				</a>
+
+			</div>
+			<div style="background: #FFFFFF; height: 55px; ">
+				<div style="float: left; width: 33%; height: 55px; text-align: center; font-size: 14px;">
+					<div style="height: 25px; margin-top: 5px;">
+						<span class="mui-badge mui-badge-warning">456</span>
+					</div>
+					<!--<div style="height: 25px;">
+						<img src="images/iconfont-icon.png" width="25px" height="25px"/>
+					</div>-->
+					金币
+				</div>
+				<div style="float: left; width: 33%; height: 55px; text-align: center; font-size: 14px;">
+					<div style="height: 25px; margin-top: 5px;">
+						<span class="mui-badge mui-badge-red">VIP 7</span>
+					</div>
+					<div style="height: 25px;">
+						会员等级
+					</div>
+				</div>
+				<div style="float: left; width: 33%; height: 55px; text-align: center; font-size: 14px;">
+					<div style="height: 25px; margin-top: 5px;">
+						<span class="mui-badge mui-badge-blue">45</span>
+					</div>
+					<div style="height: 25px;">
+						礼物
+					</div>
+				</div>
+			</div>
+
+			<div id="selectMenu">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							<div class="mui-pull-left" style="margin-right: 10px;">
+								<img src="images/iconfont-icon.png" width="20px" height="20px" />
+							</div>
+							<span>我的金币</span>
+						</a>
+						<span class="mui-badge mui-badge-red">5678</span>
+					</li>
+
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							<div class="mui-pull-left" style="margin-right: 10px;">
+								<img src="images/iconfont-icon.png" width="20px" height="20px" />
+							</div>
+							<span>我的金币</span>
+						</a>
+						<span class="mui-badge mui-badge-red">5678</span>
+					</li>
+
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							<div class="mui-pull-left" style="margin-right: 10px;">
+								<img src="images/iconfont-icon.png" width="20px" height="20px" />
+							</div>
+							<span>我的金币</span>
+						</a>
+						<span class="mui-badge mui-badge-red">5678</span>
+					</li>
+
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right">
+							<div class="mui-pull-left" style="margin-right: 10px;">
+								<img src="images/iconfont-icon.png" width="20px" height="20px" />
+							</div>
+							<span>设置</span>
+						</a>
+						<span class="mui-badge mui-badge-red">5678</span>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</body>
+	<script>
+		$("img.lazy").lazyload();
+	</script>
+
+</html>
