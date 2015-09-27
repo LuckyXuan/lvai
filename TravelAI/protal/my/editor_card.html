@@ -131,53 +131,53 @@
 				<ul class="mui-table-view" style="font-size: 0.8em;">
 					
 						 
-							<li id="nickName" class="mui-table-view-cell">
+							<li class="mui-table-view-cell">
 								<div class="mui-input-row">
 									<label>昵称<span>|</span></label>
-									<input type="text" value="宁大大">
+									<input id="nickName" name="nickName" type="text" value="宁大大">
 								</div>
 							</li> 
 							
-							<li id="age" class="mui-table-view-cell">
+							<li class="mui-table-view-cell">
 								<div class="mui-input-row">
 									<label>年龄<span>|</span></label>
-									<input type="text" value="78">
+									<input id="age" name="age" type="text" value="78">
 								</div>
 							</li>
 							
-							<li id="sex" class="mui-table-view-cell">
+							<li class="mui-table-view-cell">
 								<div class="mui-input-row">
 									<label>性别<span>|</span></label>
-									<input type="text" disabled="ture" value="男">
+									<input id="sex" name = "sex" type="text" disabled="ture" value="男">
 									
 								</div>
 							</li>
 							
-							<li id="height" class="mui-table-view-cell">
+							<li class="mui-table-view-cell">
 								<div class="mui-input-row">
 									<label>身高<span>|</span></label>
-									<input type="text" value="178cm">
+									<input id="height" name = "height" type="text" value="178cm">
 								</div>
 							</li>
 							
-							<li id="weight" class="mui-table-view-cell">
+							<li class="mui-table-view-cell">
 								<div class="mui-input-row">
 									<label>体重<span>|</span></label>
-									<input type="text" value="77kg">
+									<input id="weight" name = "weight" type="text" value="77kg">
 								</div>
 							</li>
 							
-							<li id="resident" class="mui-table-view-cell">
+							<li class="mui-table-view-cell">
 								<div class="mui-input-row">
 									<label>常住<span>|</span></label>
-									<input type="text" value="南昌">
+									<input id="resident" name = "resident" type="text" value="南昌">
 								</div>
 							</li>
 							
-							<li id="income" class="mui-table-view-cell">
+							<li class="mui-table-view-cell">
 								<div class="mui-input-row">
 									<label>收入<span>|</span></label>
-									<input type="text" value="10w/年">
+									<input  id="income" name = "income" type="text" value="10w/年">
 								</div>
 							</li>
 										 
@@ -185,13 +185,15 @@
 			</div>
 			
 		</div>
+		
+		
 	</body>
 	<script>
 		$("img.lazy").lazyload();
 		
 		function fromInit(){
 			document.getElementById("sex").addEventListener('tap',function(){
-				alert();
+				alert(); 
 			});
 		}
 	</script>

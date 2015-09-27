@@ -13,7 +13,6 @@
 
     this.setParas = function (_paras) {
         paras = _paras;
-
     }
 
     //成功返回数据时，执行的函数。
