@@ -31,7 +31,8 @@ var UserDAL=
    	},
    	//检查手机号码是否合理
   	//phone : 手机号
-    checkPhone:function(phone){ 	    
+    checkPhone:function(phone){ 
+    	if(phone==null||phone.length == 0) return false;
 		var re = /^1\d{10}$/;
 		if (re.test(phone)){		
 			return true;
@@ -43,6 +44,7 @@ var UserDAL=
 	//检查手机号码是否合理
   	//code : 验证码
     checkCode:function(code){
+    	if(code==null||code.length == 0) return false;
     	var number = configCodeNumber;//验证码位数
 		var re = new RegExp("^\\d{"+number+"}$");
 		if (re.test(code)){		
@@ -128,6 +130,51 @@ var UserDAL=
     		}
     		
 			
+		},
+		//用户信息的更新
+		//info:    json用户信息
+		updateUserInfo:function(info){ 
+			var ws = new WebService(mui);
+    			ws.setUrl(WebServiceURL);
+    			ws.setOpName("updateUserInfo");
+    			ws.setParas(info);
+    			ws.setCallBack(callback);
+    			ws.setErrorCall(errorCallback);
+    			ws.LoadData();
+    			
+    		//成功的回调
+    		function callback(data){
+    			alert(JSON.stringify(data));
+    		}
+    		
+    		//失败的回调
+    		function errorCallback(e){
+    			alert(JSON.stringify(e));
+    		}
+		},
+		
+		//用户定位功能
+		//tel:手机号
+		//lng，lat ： 经纬度
+		GPSLocation:function(tel,lng,lat){
+			var ws = new WebService(mui);
+    			ws.setUrl(WebServiceURL);
+    			ws.setOpName("GPSLocation");
+    			ws.setParas({tel:tel,lng:lng,lat:lat});
+    			ws.setCallBack(callback);
+    			ws.setErrorCall(errorCallback);
+    			ws.LoadData(); 
+    			
+    			
+    		//成功的回调
+    		function callback(data){
+    			alert(JSON.stringify(data));
+    		}
+    		
+    		//失败的回调
+    		function errorCallback(e){
+    			alert(JSON.stringify(e));
+    		}
 		},
 		
    	

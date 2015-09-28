@@ -33,6 +33,7 @@
     this.LoadData = function () {
         var webUrl = url + opName;
 		var datas = JSON.stringify(paras);
+		alert(datas);
         $.ajax(webUrl,{ 
 	    			type:"post",  
 	    			dataType:"json",

@@ -5,9 +5,19 @@ function MenuInit() {
 		var phone = document.getElementById("phone");
 		var code = document.getElementById("code");
 		UserDAL.validSMSCode(phone.value, code.value);
-		mui.openWindow({
-			url: 'protal/main.html',
-			id: 'main'
-		});
+
+
+		//		mui.openWindow({
+		//			url: 'protal/main.html',
+		//			id: 'main'
+		//		});
+	});
+
+	//获取验证码
+	document.getElementById("getCode").addEventListener('tap', function() {
+
+		var phone = document.getElementById("phone").value;
+		UserDAL.getCode(phone);
+
 	});
 };

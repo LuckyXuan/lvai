@@ -10,6 +10,11 @@
 		<script type="text/javascript" src="../../js/jquery.lazyload.js"></script>
 		<script type="text/javascript" src="../../js/lvai.travel/addlist.js"></script>
 		<script type="text/javascript" src="../../js/lvai.op/webview.js"></script>
+		<style type="text/css">
+			#refreshContainer{
+				
+			}
+		</style>
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<script type="text/javascript" charset="utf-8">
 			var index = null, //主页面
@@ -66,8 +71,13 @@
 	</head>
 
 	<body>
+		
+	<div class="mui-content">
+			
+		
 		<div id="refreshContainer" class="mui-content mui-scroll-wrapper">
 			<div class="mui-scroll">
+				
 				<!--图片轮播-->
 				<div class="mui-slider">
 					<div class="mui-slider-group mui-slider-loop">
@@ -143,7 +153,8 @@
 				</div>
 			</div>
 		</div>
-	</body>
+	</div>
+	</body> 
 	<script>
 		var list = document.getElementById("lists");
 		list.appendChild(createFragment(10));
