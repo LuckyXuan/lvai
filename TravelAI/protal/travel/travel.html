@@ -59,12 +59,12 @@
 						mui.fire(ws.parent(), "menu:open");
 					}
 				});
-				
-				document.querySelector("#Release").addEventListener('tap',function(){
-					alert("打开发布");
+				document.querySelector("#Release").addEventListener('tap', function() {
+					mui.openWindow({
+						url: 'Release.html',
+						id: 'Release'
+					});
 				});
-				
-				
 			};
 
 			function onRefresh() {
@@ -178,9 +178,8 @@
 		</div>
 	</body>
 	<script>
-		document.querySelector("#Release").style.top = $(document).height()- 70 +"px";
-		document.querySelector("#Release").style.left =$(document).width()-70 +"px";
-		
+		document.querySelector("#Release").style.top = $(document).height() - 70 + "px";
+		document.querySelector("#Release").style.left = $(document).width() - 70 + "px";
 		var list = document.getElementById("lists");
 		list.appendChild(createFragment(10));
 		$("img.lazy").lazyload();
