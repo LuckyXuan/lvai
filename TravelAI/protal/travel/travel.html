@@ -59,6 +59,12 @@
 						mui.fire(ws.parent(), "menu:open");
 					}
 				});
+				
+				document.querySelector("#Release").addEventListener('tap',function(){
+					alert("打开发布");
+				});
+				
+				
 			};
 
 			function onRefresh() {
@@ -88,10 +94,12 @@
 	<body>
 
 		<div class="mui-content">
-
+			<a id="Release" style=" background: transparent; position: fixed;  z-index: 1000;">
+				<img class="lazy" style="width: 50px; height: 50px; line-height: 50px; text-align: center;    background-color: transparent; border: 1px solid #ddd;
+	  border-radius: 25px;  " data-original="../../img/travel_4.jpg" width="50px" height="50px">
+			</a>
 			<div id="pullrefresh" class="mui-content mui-scroll-wrapper">
 				<div class="mui-scroll">
-
 					<!--图片轮播-->
 					<div class="mui-slider">
 						<div class="mui-slider-group mui-slider-loop">
@@ -170,6 +178,9 @@
 		</div>
 	</body>
 	<script>
+		document.querySelector("#Release").style.top = $(document).height()- 70 +"px";
+		document.querySelector("#Release").style.left =$(document).width()-70 +"px";
+		
 		var list = document.getElementById("lists");
 		list.appendChild(createFragment(10));
 		$("img.lazy").lazyload();
