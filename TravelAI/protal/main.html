@@ -32,6 +32,14 @@
 
 			function MenuInit() {
 				mui('.mui-bar.mui-bar-tab').on('tap', 'a', function(e) {
+					if(this.id =="travel")
+					{
+						document.querySelector("header").style.visibility = "visible";
+					}
+					else
+					{
+						document.querySelector("header").style.visibility = "hidden";
+					}
 					preateHide(ws, this);
 				},false);
 				
