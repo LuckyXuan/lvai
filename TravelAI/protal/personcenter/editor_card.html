@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/jquery-1.7.2.min.js"></script>
+		<script src="../../js/jquery.lazyload.js"></script>
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			/*去除点击li时候的样式*/ 
+			.mui-table-view-cell.mui-active{
+				background-color: white !important;
+				
+			}
+			.mui-table-view li{ 	
+				height: 50px;
+			}
+			.mui-table-view label{
+				width: 30%; line-height: 25px;
+			}
+			.mui-table-view span{
+				margin-left: 15px;
+				
+			}
+			.mui-table-view input{
+				width: 70%;
+			}
+			.mui-table-view li>div{ 	
+			
+				/*border-radius: 90px;
+				border: 1px gray solid;*/
+			}
+			
+			
+			
+			
+		</style>
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			document.addEventListener("plusready", onPlusReady, false);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+					//去除滚动条
+					plus.webview.currentWebview().setStyle({scrollIndicator:'none'});
+					//按钮的监视
+					MenuInit();
+					fromInit();
+				}
+				//按钮监听
+
+			function MenuInit() {
+				document.getElementById('addPic').addEventListener('tap', function() {
+					var btnArray = [{
+						title: "拍照"
+					}, {
+						title: "选取现有的"
+					}];
+					plus.nativeUI.actionSheet({
+						//title: "头像选取方式",  
+						cancel: "取消",
+						buttons: btnArray
+					}, function(e) {
+						var index = e.index;
+						switch (index) {
+							case 0:
+								{
+									//plus.ui.alert("你选择了取消", "警告", "OK");
+									break;
+								}
+							case 1:
+								{
+									//plus.ui.alert("你选择了拍照", "警告", "OK");							
+									var cmr = plus.camera.getCamera();
+									var res = cmr.supportedImageResolutions[0];
+									var fmt = cmr.supportedImageFormats[0];
+									cmr.captureImage(function(path) {					
+											document.querySelector("#addPic>img").setAttribute('src',plus.io.convertLocalFileSystemURL(path));										
+										},
+										function(error) {
+											alert("Capture image failed: " + error.message);
+										}, {
+											resolution: res,
+											format: fmt
+										}
+									);
+									break;
+								}
+							case 2:
+								{
+									//plus.ui.alert("你选择了选取现有的", "警告", "OK");	
+									plus.gallery.pick( function(path){
+								    	document.querySelector("#addPic>img").setAttribute('src',plus.io.convertLocalFileSystemURL(path));
+								    }, function ( e ) {
+								    	
+								    }, {filter:"image"} );
+									break;
+								}
+						}
+					});
+				});
+			}
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			
+			<button class="mui-btn mui-btn-link mui-btn-nav mui-pull-right">
+				保存
+				<span class="mui-icon mui-icon-right-nav"></span>
+			</button>
+			
+			<h1 class="mui-title">编辑个人资料</h1>
+		</header>
+		<div class="mui-content">
+			<div class="mui-card" style="margin: 5px; margin-top: 10px;">
+				<form class="mui-input-group"> 
+					<div  style="background: #FFF;  padding: 10px 10px; " align="center"  class="mui-table-view-cell">
+						<img  class="lazy" id="addPic"  style="border-radius: 50px; " data-original="http://dcloudio.github.io/mui/assets/img/shuijiao.jpg" width="70px" height="70px">					
+					</div> 
+				</form>
+				
+			</div>
+			
+			<div class="mui-card" style="margin-left:1.5%;margin-right:1.5%; padding-left: 2%;padding-right: 2%;">
+				<ul class="mui-table-view" style="font-size: 0.8em;">
+					
+						 
+							<li id="nickName" class="mui-table-view-cell">
+								<div class="mui-input-row">
+									<label>昵称<span>|</span></label>
+									<input type="text" value="宁大大">
+								</div>
+							</li> 
+							
+							<li id="age" class="mui-table-view-cell">
+								<div class="mui-input-row">
+									<label>年龄<span>|</span></label>
+									<input type="text" value="78">
+								</div>
+							</li>
+							
+							<li id="sex" class="mui-table-view-cell">
+								<div class="mui-input-row">
+									<label>性别<span>|</span></label>
+									<input type="text" disabled="ture" value="男">
+									
+								</div>
+							</li>
+							
+							<li id="height" class="mui-table-view-cell">
+								<div class="mui-input-row">
+									<label>身高<span>|</span></label>
+									<input type="text" value="178cm">
+								</div>
+							</li>
+							
+							<li id="weight" class="mui-table-view-cell">
+								<div class="mui-input-row">
+									<label>体重<span>|</span></label>
+									<input type="text" value="77kg">
+								</div>
+							</li>
+							
+							<li id="resident" class="mui-table-view-cell">
+								<div class="mui-input-row">
+									<label>常住<span>|</span></label>
+									<input type="text" value="南昌">
+								</div>
+							</li>
+							
+							<li id="income" class="mui-table-view-cell">
+								<div class="mui-input-row">
+									<label>收入<span>|</span></label>
+									<input type="text" value="10w/年">
+								</div>
+							</li>
+										 
+				</ul>
+			</div>
+			
+		</div>
+	</body>
+	<script>
+		$("img.lazy").lazyload();
+		
+		function fromInit(){
+			document.getElementById("sex").addEventListener('tap',function(){
+				alert();
+			});
+		}
+	</script>
+	
+</html>

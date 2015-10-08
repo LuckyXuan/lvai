@@ -1,5 +1,5 @@
 //返回键的设置
-function OnBack() {
+function SetBackEvent() {
 	var old_back = mui.back;
 	var backButtonPress = 0;
 	mui.back = function(event) {
@@ -14,4 +14,4 @@ function OnBack() {
 		}, 1000);
 		return false;
 	};
-};
+}

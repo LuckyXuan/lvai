@@ -13,6 +13,7 @@
 
     this.setParas = function (_paras) {
         paras = _paras;
+
     }
 
     //成功返回数据时，执行的函数。
@@ -33,7 +34,6 @@
     this.LoadData = function () {
         var webUrl = url + opName;
 		var datas = JSON.stringify(paras);
-		alert(datas);
         $.ajax(webUrl,{ 
 	    			type:"post",  
 	    			dataType:"json",
