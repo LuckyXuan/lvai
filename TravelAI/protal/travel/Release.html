@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="../../js/mui.min.js"></script>
+		<style type="text/css">
+			.costSelect {
+				border-color: darkorange;
+			}
+			.placeholder{
+			 text-align: right;
+			}
+			::-webkit-input-placeholder { color:; }
+			
+			.mui-right{text-align:right;}
+.mui-size{width: 50px;height: 50px;}
+.mui-float{float: left;}
+.mui-frame{
+	width:20%; 
+	margin: 2px;
+	margin-top: 8px;
+	text-align: center;
+	border: 1px solid #ddd;
+	border-radius: 5px;
+}
+.mui-frame-d1{
+	float: left;
+	display: inline; 
+	margin: 2px;
+	margin-top: 8px;
+	text-align: center;
+	border: 1px solid #ddd;
+	border-radius: 5px;	 
+			
+}
+.mui-frame-d2{
+	float: left;
+	display: inline; 
+	margin: 2px;
+	margin-top: 8px;
+	text-align: center;
+	background-color: #8F8F94;
+	border: 1px solid #ddd;
+	border-radius: 5px;	 
+			
+}
+
+.mui-frame-btn{
+	float: right;
+	border-radius: 5px;
+	margin: 4px;
+	background-color:hotpink;
+}
+		</style>
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<script type="text/javascript" charset="utf-8">
+			var cost = 1;
+			mui.init({
+				swipeBack:true //启用右滑关闭功能
+			});
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			document.addEventListener("plusready", onPlusReady, false);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+				//初始化时间选择器
+				menu();
+				costTap();
+				Theme();
+				Requirements() ;
+									document.getElementById('tijiaoBtn').addEventListener('tap',function () {
+										var faqi = document.getElementById('faqi');
+										//faqi.submit(); 
+										
+									});
+			}
+			//费用
+			function costTap() {
+				mui("#cost").on('tap', 'div', function() {
+					document.getElementById("cost1").style.borderColor = "#ddd";
+					document.getElementById("cost2").style.borderColor = "#ddd";
+					document.getElementById("cost3").style.borderColor = "#ddd";
+					this.style.border = "1px solid darkorange";
+				});
+			}
+			//主题
+			function Theme() {
+				//添加主题
+				mui("#theme").on('tap', 'div', function() {
+					var newNode = document.createElement("div");
+					newNode.innerHTML = this.innerHTML;
+					newNode.className = "mui-frame-d2";
+					document.getElementById("Selectedtheme").appendChild(newNode);
+				});
+				document.getElementById("addBtn").addEventListener('tap', function() {
+					var newNode = document.createElement("div");
+					
+					newNode.innerHTML = document.getElementById("Addtheme").value;
+					newNode.className = "mui-frame-d2";
+					document.getElementById("Selectedtheme").appendChild(newNode);
+				});
+				//删除主题
+				mui("#Selectedtheme").on('tap', 'div', function() {
+					this.parentElement.removeChild(this);
+				});
+			}
+			
+			//对旅伴要求
+			function Requirements() {
+				//添加要求
+				mui("#requirements").on('tap', 'div', function() {
+					var newNode = document.createElement("div");
+					newNode.innerHTML = this.innerHTML;
+					newNode.className = "mui-frame-d2";
+					document.getElementById("selectedrequirements").appendChild(newNode);
+				});
+				document.getElementById("addBtn1").addEventListener('tap', function() {
+					var newNode = document.createElement("div");
+					
+					newNode.innerHTML = document.getElementById("Addrequirements").value;
+					newNode.className = "mui-frame-d2";
+					document.getElementById("selectedrequirements").appendChild(newNode);
+				});
+				//删除要求
+				mui("#selectedrequirements").on('tap', 'div', function() {
+					this.parentElement.removeChild(this);
+				});
+			}
+
+			function menu() {
+				document.getElementById("pickDateTime1").addEventListener('tap', function() {
+					var dDate = new Date();
+					dDate.setFullYear(2015, 7, 16);
+					var minDate = new Date();
+					minDate.setFullYear(0000, 0, 1);
+					var maxDate = new Date();
+					maxDate.setFullYear(9999, 11, 31);
+					plus.nativeUI.pickDate(function(e) {
+						var d = e.date;
+						document.getElementById("pickDateTime1").value = d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日";
+					}, function(e) {
+						this.value = "您没有选择日期";
+					}, {
+						title: "请选择日期",
+						date: dDate,
+						minDate: minDate,
+						maxDate: maxDate
+					});
+				})
+				document.getElementById("pickDateTime2").addEventListener('tap', function() {
+					var dDate = new Date();
+					dDate.setFullYear(2015, 7, 16);
+					var minDate = new Date();
+					minDate.setFullYear(0000, 0, 1);
+					var maxDate = new Date();
+					maxDate.setFullYear(9999, 11, 31);
+					plus.nativeUI.pickDate(function(e) {
+						var d = e.date;
+						document.getElementById("pickDateTime2").value = d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日";
+					}, function(e) {
+						this.value = "您没有选择日期";
+					}, {
+						title: "请选择日期",
+						date: dDate,
+						minDate: minDate,
+						maxDate: maxDate
+					});
+				})
+			}
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">发起旅行</h1>
+		</header>
+		<nav id='tijiaoBtn' class="mui-bar mui-bar-tab" style="background-color: #007AFF;">
+			<button class="mui-btn mui-btn-primary mui-btn-block" style="  border: 0px;height: 100%;">旅行，一触即发</button>
+		</nav>
+
+		<div class="mui-content">
+			<form id="faqi" action="" method="post">
+
+				<div class="mui-search">
+
+					<!--旅途-->
+					<label class="mui-btn mui-btn-block mui-btn-outlined" style="border:0px;">
+						<h4>——旅行——</h4></label>
+					<div class="mui-card">
+						<form class="mui-input-group">
+							<div class="mui-input-row">
+								<label>目的地</label>
+								<input type="text" class="mui-right" placeholder="巴厘岛" >
+							</div>
+							<div class="mui-input-row">
+								<label>出发地</label>
+								<input type="text" class="mui-right" placeholder="上海">
+							</div>
+							<div class="mui-input-row">
+								<label>出发时间</label>
+								<input type="text" id='pickDateTime1' class="mui-right " placeholder="2015年9月20日">
+							</div>
+							<div class="mui-input-row">
+								<label>返回时间</label>
+								<input type="text" id='pickDateTime2' class="mui-right" placeholder="2015年9月20日">
+							</div>
+							<div class="mui-input-row">
+								<label>交通方式</label>
+								<input type="text" class="mui-right" placeholder="飞机">
+							</div>
+							<div id='cost' class="mui-input-row" style="margin: 5px 0 5px 0;">
+								<label class="mui-float">费用说明</label>
+								<div id="cost1" class="mui-float mui-frame" style="border-color: darkorange;">
+									<h5>免费</h5>
+								</div>
+								<div id="cost2" class="mui-float mui-frame">
+									<h5>我来买单</h5>
+								</div>
+								<div id="cost3" class="mui-float mui-frame">
+									<h5>线下AA</h5>
+								</div>
+							</div>
+						</form>
+						<div id="travel" class="mui-input-row">
+							<label class="mui-float">旅行主题</label>
+							<input id="Addtheme" type="text" style="display: block;float:left;width: 40%;background-color:#DDDDDD;border-radius: 5px;" placeholder="">
+							<button class="mui-frame-btn" id='addBtn' type="button">添加</button>
+
+							<div id="theme" style="float: left; width: 100%; margin: 15px;">
+								<div id="theme1" class="mui-frame-d1">好摄之徒</div>
+								<div id="theme2" class="mui-frame-d1" ">穷游</div>
+							<div id="theme3" class="mui-frame-d1" >豪华之旅</div>
+							<div id="theme4" class="mui-frame-d1" >闲装情侣</div>
+						</div>
+						<div id="Selectedtheme" style="float: left; width: 100%; margin: 15px; ">
+							<div id="Selectedtheme1" class="mui-frame-d2" >豪华之旅</div>
+							<div id="Selectedtheme2" class="mui-frame-d2" >闲装情侣</div>
+						</div>
+					</div>					
+				</div>
+				
+				<!--旅伴-->
+				<label class="mui-btn mui-btn-block mui-btn-outlined" style="border:0px; ">
+					<h4>——旅伴——</h4></label>
+				<div class="mui-card ">					
+					<div class="mui-input-row " >
+						<label>旅伴数量</label>
+						<input type="text" class="mui-right " placeholder="1 ">
+					</div>
+					<div class="mui-input-row">
+						<label style="width: 100%; "> 对旅伴的要求?</label>
+						<div style="margin-left: 15px; ">
+							<input id="Addrequirements" type="text" style="display: block;float:left;width: 75%;background-color:#DDDDDD;border-radius: 5px; " placeholder=" ">
+							<button id="addBtn1" class="mui-frame-btn" type="button">添加</button>
+						</div>
+						<div id="requirements" style="float: left; width: 100%; margin-left: 15px;margin-right: 15px; ">
+							<div id=" " class="mui-frame-d1 " >妹纸</div>
+							<div id=" " class="mui-frame-d1 " >汉子</div>
+							<div id=" " class="mui-frame-d1 " >男女均可</div>
+							<div id=" " class="mui-frame-d1 " >颜值报表</div>
+							<div id=" " class="mui-frame-d1 " >挥金如土</div>
+							<div id=" " class="mui-frame-d1 " >八块腹肌</div>
+							<div id=" " class="mui-frame-d1 " >大长腿</div>
+							<div id=" " class="mui-frame-d1 " >小蛮腰</div>
+
+						</div>
+						<div id="selectedrequirements" style="float: left; margin-left: 15px;margin-right: 15px; ">
+							<div id=" " class="mui-frame-d2 " >汉子</div>
+							<div id=" " class="mui-frame-d2 " >八块腹肌</div>
+
+						</div>
+					</div>
+					<form class="mui-input-group ">
+					<div class="mui-input-row ">
+						<label>年收入</label>
+						<input type="text" class="mui-right " placeholder="30万 ">
+					</div>
+					<div class="mui-input-row ">
+						<label>座驾</label>
+						<input type="text" class="mui-right " placeholder="30万以上 ">
+					</div>
+					<div class="mui-input-row ">
+						<label>身高</label>
+						<input type="text" class="mui-right " placeholder="175cm">
+					</div>
+					<div class="mui-input-row ">
+						<label>信用等级</label>
+						<input type="text" class="mui-right " placeholder="5 ">
+					</div>
+					</form>
+				</div>
+
+				<!--礼物-->
+				<label class="mui-btn mui-btn-block mui-btn-outlined " style="border:0px; ">
+					<h4>——礼物——</h4></label>
+				<div class="mui-card ">
+					<h6 class="mui-text-center ">您可以选择本次旅行想得到或者送出什么礼物</h6>
+					<div class="mui-input-row ">
+						<label>我想得到</label>
+						<input type="text" class="mui-right " placeholder="礼物 ">
+					</div>
+				</div>
+
+				<!--图片-->
+				<label class="mui-btn mui-btn-block mui-btn-outlined " style="border:0px; ">
+					<h4>——图片——</h4></label>
+				<div class="mui-card">
+					<h6 class="mui-text-center">您还可以为本次旅行配上几张图片</h6>
+					<ul class="mui-table-view mui-grid-view">
+						<li class="mui-table-view-cell mui-media mui-col-xs-4 ">
+							<img id="photo1" class="mui-size" src="d " />
+						</li>
+					</ul>
+				</div>
+
+				<!--最后一句话-->
+				<label class="mui-btn mui-btn-block mui-btn-outlined " style="border:0px; ">
+					<h4>——最后一句——</h4></label>
+				<div class="mui-card">
+					<h6 class="mui-text-center ">最后说句话吧，让更多人关注你</h6>
+					<div class="mui-input-row " style="margin: 10px 5px; ">
+						<textarea rows="5" placeholder=" "></textarea>
+					</div>
+				</div>
+			</div>
+			</form>
+		</div>
+	</body>
+	
+</html>

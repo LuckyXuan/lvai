@@ -32,8 +32,25 @@
 
 			function MenuInit() {
 				mui('.mui-bar.mui-bar-tab').on('tap', 'a', function(e) {
+					if(this.id =="travel")
+					{
+						document.querySelector("header").style.visibility = "visible";
+					}
+					else
+					{
+						document.querySelector("header").style.visibility = "hidden";
+					}
 					preateHide(ws, this);
 				},false);
+				
+				
+				document.querySelector(".mui-btn").addEventListener('tap',function(){ 
+					plus.geolocation.getCurrentPosition( function ( p ) {
+						alert( "Geolocation\nLatitude:" + p.coords.latitude + "\nLongitude:" + p.coords.longitude + "\nAltitude:" + p.coords.altitude );
+					}, function ( e ) {
+						mui.toast( "Geolocation error: " + e.message );
+					} );
+				});
 //				//点击遮挡布的事件
 //				ws.addEventListener('maskClick', function() {
 //					CloseSideslip(ws, menu);
@@ -47,11 +64,11 @@
 //				});
 			};
 
-
 			function OnPreload() {
-				ws.append(CreatePage("travel/travel.html", "travel","45px","51px",true));
-				ws.append(CreatePage("personcenter/personcenter.html", "mycard","0px","51px",false));
+				
 				ws.append(CreatePage("msg/msgList.html", "msg","0px","51px",false));
+				ws.append(CreatePage("personcenter/personcenter.html", "mycard","0px","51px",false));
+				ws.append(CreatePage("travel/travel.html", "travel","45px","51px",true));
 //				page[0] = plus.webview.create("travel/travel.html", "travel", {
 //					top: "45px",
 //					bottom: "51px"

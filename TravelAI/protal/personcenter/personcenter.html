@@ -15,9 +15,17 @@
 		<style type="text/css">
 			/*body{background-color: white;}
 			.mui-content{background-color: white;}*/
-			#selectMenu{margin-top: 12px;}
-			#selectMenu li{ margin-bottom: 10px;background: white;}
-			#selectMenu ul{background-color: #EEEEEE}
+			
+			#selectMenu {
+				margin-top: 12px;
+			}
+			#selectMenu li {
+				margin-bottom: 10px;
+				background: white;
+			}
+			#selectMenu ul {
+				background-color: #EEEEEE
+			}
 		</style>
 		<script type="text/javascript" charset="utf-8">
 			var editor;
@@ -26,61 +34,41 @@
 			document.addEventListener("plusready", onPlusReady, false);
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
-					var s = new localStorageUtils().getItem("userInfo");
-				    var uinfo=new JsonTools().stringToJson(s);
-				    mui.toast(uinfo.user_telphone);
+				var s = new localStorageUtils().getItem("userInfo");
+				var uinfo = new JsonTools().stringToJson(s);
+				mui.toast(uinfo.user_telphone);
 				
-					OnBack();
-					OnPreload();
-					MenuInit();
-				}
-				//按钮的监听事件
-
+				OnPreload();
+				MenuInit();
+			};
+			 //按钮的监听事件
 			function MenuInit() {
-					//头像按钮
-					document.getElementById('editor').addEventListener('tap', function() {
-						mui.fire(editor, 'show', null);
-						setTimeout(function() {
-							mui.openWindow({
-								id: 'editor',
-								show: {
-									aniShow: 'pop-in'
-								},
-								waiting: {
-									autoShow: false
-								},
-								styles: {
-									zindex: 600
-								}
-							});
-						}, 0);
-					});
-				}
-				//预加载
-
+				//头像按钮
+				document.getElementById('editor').addEventListener('tap', function() {
+					mui.fire(editor, 'show', null);
+					setTimeout(function() {
+						mui.openWindow({
+							id: 'editor',
+							show: {
+								aniShow: 'pop-in'
+							},
+							waiting: {
+								autoShow: false
+							},
+							styles: {
+								zindex: 600
+							}
+						});
+					}, 0);
+				});
+			};
+			 //预加载
 			function OnPreload() {
 				editor = mui.preload({
 					"id": 'editor',
 					"url": 'editor_card.html'
 				});
-			}
-
-			function OnBack() {
-				var old_back = mui.back;
-				var backButtonPress = 0;
-				mui.back = function(event) {
-					backButtonPress++;
-					if (backButtonPress > 1) {
-						plus.runtime.quit();
-					} else {
-						plus.nativeUI.toast('再按一次退出应用');
-					}
-					setTimeout(function() {
-						backButtonPress = 0;
-					}, 1000);
-					return false;
-				};
-			}
+			};
 		</script>
 	</head>
 
@@ -148,7 +136,7 @@
 							<div class="mui-pull-left" style="margin-right: 10px;">
 								<img src="images/iconfont-icon.png" width="20px" height="20px" />
 							</div>
-							<span>我的金币</span>
+							<span>我的相册</span>
 						</a>
 						<span class="mui-badge mui-badge-red">5678</span>
 					</li>
@@ -158,7 +146,7 @@
 							<div class="mui-pull-left" style="margin-right: 10px;">
 								<img src="images/iconfont-icon.png" width="20px" height="20px" />
 							</div>
-							<span>我的金币</span>
+							<span>高级认证</span>
 						</a>
 						<span class="mui-badge mui-badge-red">5678</span>
 					</li>

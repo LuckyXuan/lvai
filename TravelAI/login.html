@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
-    <title></title>
-    <script src="js/mui.min.js"></script>
-    <script type="text/javascript" src="js/lvai.op/UIOp.js" ></script>
-    <script type="text/javascript" src="js/lvai.data/UserDAL.js" ></script>
-    <script type="text/javascript" src="js/lvai.base/Utility.js" ></script>
-    <script type="text/javascript" src="js/lvai.data/config.js" ></script>
-    <script type="text/javascript" src="js/lvai.base/JsonTools.js" ></script>
-    <script type="text/javascript" src="js/lvai.data/WebService2.js" ></script>
-    <script type="text/javascript" src="js/lvai.base/localStorageUtils.js" ></script>
-    <link href="css/mui.min.css" rel="stylesheet"/>
-    <script type="text/javascript" charset="utf-8">
-      	mui.init();
-      	
-      	document.addEventListener("plusready", onPlusReady, false);
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="js/mui.min.js"></script>
+		<script type="text/javascript" src="js/lvai.op/UIOp.js"></script>
+		<script type="text/javascript" src="js/lvai.data/UserDAL.js"></script>
+		<script type="text/javascript" src="js/lvai.base/Utility.js"></script>
+		<script type="text/javascript" src="js/lvai.data/config.js"></script>
+		<script type="text/javascript" src="js/lvai.base/JsonTools.js"></script>
+		<script type="text/javascript" src="js/lvai.data/WebService2.js"></script>
+		<script type="text/javascript" src="js/lvai.base/localStorageUtils.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			document.addEventListener("plusready", onPlusReady, false);
 			 // 扩展API加载
 			mui.plusReady(function() {
 				//仅支持竖屏显示
@@ -29,65 +30,65 @@
 				OnPreload();
 				MenuInit();
 			};
-    function MenuInit() {
-	//打开主界面
-	document.getElementById('btnLogin').addEventListener('tap', function() {
-		var tel = document.getElementById("txtTel").value;
-		var pwd = document.getElementById("txtPwd").value;
-		if(tel==""||pwd=="")
-		{
-			mui.toast("手机号和密码不能为空");
-			return;
-		}
-		
-		if(!Utility.checkPhone(tel))
-		{
-			mui.toast("手机号输入错误");
-			return;
-		}
-		
-		var dal=new UserDAL();
-		dal.faildLoginHandler=function(_args){mui.toast(_args.toString())}
-		dal.successLoginHandler=function(_args)
-		{
-			//mui.toast(_args.toString())
-			mui.toast("登录成功");
-			mui.openWindow({
-			url: 'protal/main.html',
-			id: 'main'
-		});
-		}
-		dal.login(tel,pwd);
-		
-	});
-	//注册按钮
-	document.getElementById('btnReg').addEventListener('tap', function() {
-		mui.fire(reg, 'show', null);
-		setTimeout(function() {
-			mui.openWindow({
-				id: 'reg',
-				show: {
-					aniShow: 'pop-in'
-				},
-				waiting: {
-					autoShow: false
-				}
-			});
-		}, 0);
-	});
-};
-//预加载
-function OnPreload() {
-	reg = mui.preload({
-		"id": 'reg',
-		"url": 'reg.html'
-	});
-};
-      	
-    </script>
-</head>
-<body>
-   		<header class="mui-bar mui-bar-nav">
+
+			function MenuInit() {
+				//打开主界面
+				document.getElementById('btnLogin').addEventListener('tap', function() {
+					var tel = document.getElementById("txtTel").value;
+					var pwd = document.getElementById("txtPwd").value;
+					if (tel == "" || pwd == "") {
+						mui.toast("手机号和密码不能为空");
+						return;
+					}
+					if (!Utility.checkPhone(tel)) {
+						mui.toast("手机号输入错误");
+						return;
+					}
+					var dal = new UserDAL();
+					dal.faildLoginHandler = function(_args) {
+						mui.toast(_args.toString())
+					}
+					dal.successLoginHandler = function(_args) {
+						//mui.toast(_args.toString())
+						mui.toast("登录成功");
+						mui.openWindow({
+							url: 'protal/main.html',
+							id: 'main',
+							show: {
+								aniShow: 'pop-in'
+							}
+						});
+					}
+					dal.login(tel, pwd);
+				});
+				//注册按钮
+				document.getElementById('btnReg').addEventListener('tap', function() {
+					mui.fire(reg, 'show', null);
+					setTimeout(function() {
+						mui.openWindow({
+							id: 'reg',
+							show: {
+								aniShow: 'pop-in'
+							},
+							waiting: {
+								autoShow: false
+							}
+						});
+					}, 0);
+				});
+			};
+			 //预加载
+			function OnPreload() {
+				reg = mui.preload({
+					"id": 'reg',
+					"url": 'reg.html'
+				});
+			};
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
 			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 			<button id="btnReg" class="mui-btn mui-btn-link mui-btn-nav mui-pull-right">
 				注册
@@ -115,5 +116,6 @@ function OnPreload() {
 			</div>
 			<button id="btnLogin" class="mui-btn mui-btn-primary mui-btn-block" style="margin: auto; width: 50%; margin-top: 5%; ">进入旅爱</button>
 		</div>
-</body>
+	</body>
+
 </html>
