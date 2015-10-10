@@ -14,6 +14,7 @@ var Utility = {
 			return query.substring(iStart); //��ȡ��������Ĳ���ֵ  
 		return query.substring(iStart, iEnd); //��ȡ�ڶ��������ֵ  
 	},
+	//检查验证码是否合理
 	//code : 验证码
 	checkValidCode: function(code) {
 		var number = configCodeNumber; //验证码位数

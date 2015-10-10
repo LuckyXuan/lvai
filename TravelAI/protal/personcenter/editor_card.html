@@ -11,6 +11,7 @@
 		<script type="text/javascript" src="../../js/lvai.data/config.js"></script>
 		<script type="text/javascript" src="../../js/lvai.data/WebService2.js"></script>
 		<script type="text/javascript" src="../../js/lvai.data/UserDAL.js"></script>
+		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js" ></script>
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<style type="text/css">
 			.mui-card {
@@ -251,7 +252,7 @@
 			document.getElementById("save").addEventListener('tap', function() {
 				//提交咯，目前还没有做验证
 				var info = {
-					user_phone: "17098631995",
+					user_phone: new localStorageUtils().getItem("userInfo").user_phone,
 					user_sex: document.getElementById("user_sex").value,
 					user_nikeName: document.getElementById("user_nikeName").value,
 					user_photo: "base64code",
@@ -261,9 +262,16 @@
 					user_address: document.getElementById("user_address").value,
 					user_job: document.getElementById("user_job").value,
 					user_income: document.getElementById("user_income").value,
-					user_pwd: "pwdMD5"
+					user_pwd: "123"
 				};
-				UserDAL.updateUserInfo(info);
+				new UserDAL().updateUserInfo(info,function(){
+					//成功
+					mui.toast('个人信息更新成功！');
+				},function(){
+					//失败
+					mui.toast('个人信息更新失败！');
+				});
+				
 			});
 		}
 	</script>

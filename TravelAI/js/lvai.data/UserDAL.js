@@ -12,7 +12,8 @@ var UserDAL = function() {
 	 * 登录失败后处理函数。
 	 */
 	this.faildLoginHandler=null;
-	
+	//登录
+	//tel:手机号          pwd:密码
 	this.login = function(tel, pwd) {
 		var ws = new WebService(mui);
 		ws.setUrl(WebServiceURL);
@@ -78,7 +79,6 @@ var UserDAL = function() {
 		//失败的回调
 		function errorCallback(e) {
 			mui.toast(JSON.stringify(e));
-			
 		}
 	}
 
@@ -118,5 +118,74 @@ var UserDAL = function() {
 			alert(JSON.stringify(e));
 		}
 	}
-
+	//个人信息更新
+	//jsonUserInfo : 个人数据集
+	this.updateUserInfo = function(jsonUserInfo,successHandler,faildHandler){
+		var ws = new WebService(mui);
+			ws.setUrl(WebServiceURL);
+			ws.setOpName("updateUserInfo");
+			ws.setParas({
+				jsonUserInfo:jsonUserInfo
+			});
+			ws.setCallBack(callback);
+			ws.setErrorCall(errorCallback);
+			ws.LoadData();
+			//成功的回调
+			function callback(data) {
+				//alert(JSON.stringify(data));
+				var o=eval(data);
+				o=o.d;
+				msg=new JsonTools().stringToJson(o);
+				if(msg.status=="faild")
+				{
+					faildHandler(msg);
+					return;
+				}
+//				new localStorageUtils().setItem("userInfo",o)
+				successHandler(msg);
+				
+			}
+			//失败的回调
+			function errorCallback(e) {
+				alert(JSON.stringify(e));
+			}
+	}
+	
+	//车辆信息更新
+	//carJsonstring : 车辆信息的json数据
+	this.UpdateCarInfo = function(carJsonstring,successHandler,faildHandler){
+		var ws = new WebService(mui);
+			ws.setUrl(WebServiceURL);
+			ws.setOpName("UpdateCarInfo");
+//			var datas = new JsonTools().jsonObjToString(carJsonstring);
+			//console.log(JSON.stringify(carJsonstring));
+			
+			ws.setParas({
+				carJsonstring:carJsonstring
+			});
+			
+			ws.setCallBack(callback);
+			ws.setErrorCall(errorCallback);
+			
+			ws.LoadData();
+			//成功的回调
+			function callback(data) {
+				//alert(JSON.stringify(data));
+				var o=eval(data);
+				o=o.d;
+				msg=new JsonTools().stringToJson(o);
+				if(msg.status=="faild")
+				{
+					faildHandler(msg);
+					return;
+				}
+//				new localStorageUtils().setItem("userInfo",o)
+				successHandler(msg);
+				
+			}
+			//失败的回调
+			function errorCallback(e) {
+				alert(JSON.stringify(e));
+			}
+	}
 }

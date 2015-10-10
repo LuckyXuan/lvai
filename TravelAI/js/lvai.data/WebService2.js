@@ -2,7 +2,8 @@
     var url = "";
     var opName = "";
     var paras = {};
-
+	
+	
     this.setUrl = function (_url) {
         url = _url;
     }
@@ -15,7 +16,8 @@
         paras = _paras;
 
     }
-
+	
+	
     //成功返回数据时，执行的函数。
     var callBack = null;
 
@@ -32,12 +34,16 @@
 
     //调用功能方法，从服务器取数据的方法。
     this.LoadData = function () {
+    	
         var webUrl = url + opName;
+        
+        
 		var datas = JSON.stringify(paras);
+		console.log(datas);
         $.ajax(webUrl,{ 
 	    			type:"post",  
 	    			dataType:"json",
-	    			contentType: 'application/json',
+	    			contentType: 'application/json; charset=utf-8',
 	    			data:datas,  
 	    			timeout:10000,
 	    			success:callBack,

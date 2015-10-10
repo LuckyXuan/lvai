@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/jquery-1.7.2.min.js"></script>
+		<script src="../../js/jquery.lazyload.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/config.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/WebService2.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/UserDAL.js"></script>
+		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js"></script>
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-card {
+				margin: 0 1.5%;
+			}
+			.mui-table-view li {
+				/*height: 50px;*/
+			}
+			.mui-table-view label {
+				width: 30%;
+				line-height: 1.5em;
+			}
+			.mui-table-view input {
+				width: 70%;
+			}
+			label {
+				font-size: 0.8em;
+			}
+		</style>
+		<script type="text/javascript" charset="utf-8">
+			var Icon;
+			mui.init();
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			document.addEventListener("plusready", onPlusReady, false);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+				//去除滚动条
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+				//预加载
+				OnPreload();
+				//按钮的监视
+				MenuInit();
+				//表单的监视
+				fromInit();
+			};
+
+			function OnPreload() {};
+			 //按钮监听
+			function MenuInit() {
+				document.getElementById('user_photo').addEventListener('tap', function() {
+					var btnArray = [{
+						title: "拍照"
+					}, {
+						title: "选取现有的"
+					}];
+					plus.nativeUI.actionSheet({
+						//title: "头像选取方式",  
+						cancel: "取消",
+						buttons: btnArray
+					}, function(e) {
+						var index = e.index;
+						switch (index) {
+							case 0:
+								{
+									//plus.ui.alert("你选择了取消", "警告", "OK");
+									break;
+								}
+							case 1:
+								{
+									//plus.ui.alert("你选择了拍照", "警告", "OK");							
+									var cmr = plus.camera.getCamera();
+									var res = cmr.supportedImageResolutions[0];
+									var fmt = cmr.supportedImageFormats[0];
+									cmr.captureImage(function(path) {
+											//alert(plus.io.convertLocalFileSystemURL(path));
+											plus.storage.setItem("Icon", plus.io.convertLocalFileSystemURL(path));
+											console.log(plus.storage.getItem("Icon"));
+											mui.openWindow({
+												url: 'editor_photo.html',
+												id: 'Icon',
+												show: {
+													aniShow: 'zoom-out'
+												}
+											});
+											//document.querySelector("#user_photo>img").setAttribute('src', plus.io.convertLocalFileSystemURL(path));
+										},
+										function(error) {
+											alert("Capture image failed: " + error.message);
+										}, {
+											resolution: res,
+											format: fmt
+										}
+									);
+									break;
+								}
+							case 2:
+								{
+									//plus.ui.alert("你选择了选取现有的", "警告", "OK");	
+									plus.gallery.pick(function(path) {
+										document.querySelector("#user_photo>img").setAttribute('src', plus.io.convertLocalFileSystemURL(path));
+									}, function(e) {}, {
+										filter: "image"
+									});
+									break;
+								}
+						}
+					});
+				});
+			};
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+
+			<button id="save" class="mui-btn mui-btn-link mui-btn-nav mui-pull-right">
+				保存
+				<span class="mui-icon mui-icon-right-nav"></span>
+			</button>
+
+			<h1 class="mui-title">基本资料修改</h1>
+		</header>
+		<div class="mui-content">
+			<div>
+				<h5 class="mui-content-padded">基本信息</h5>
+				<div class="mui-card">
+					<ul class="mui-table-view">
+						<li class="mui-table-view-cell" id="user_photo">
+							<span style="line-height: 25px;">头像</span>
+							<img class="mui-pull-right" src="../../img/guide_1.jpg" height="25px" width="25px" style="border: 1px solid gainsboro; border-radius: 90px;" />
+						</li>
+						<li class="mui-table-view-cell">
+							<span>昵称</span>
+							<input id="user_nikeName" name="user_nikeName" class="mui-pull-right" style=" ; height: 25px; margin: 0; padding: 0;" type="text" value="宁大大">
+							<!--<span class="mui-pull-right">乐小姐</span>-->
+						</li>
+						<li class="mui-table-view-cell" id="user_sex">
+							<span>性别</span>
+							<div class="mui-pull-right">女</div>
+						</li>
+						<li class="mui-table-view-cell" id="user_age">
+							<span>年龄</span>
+							<div class="mui-pull-right">22</div>
+						</li>
+						<li class="mui-table-view-cell" id="user_height">
+							<span>身高</span>
+							<div class="mui-pull-right">160</div>
+						</li>
+						<li class="mui-table-view-cell" id="user_weight">
+							<span>体重</span>
+							<div class="mui-pull-right">60kg</div>
+						</li>
+						<li class="mui-table-view-cell" id="user_xueli">
+							<span>学历</span>
+							<div class="mui-pull-right">本科</div>
+						</li>
+						<li class="mui-table-view-cell" id="user_address">
+							<span>所在地</span>
+							<div class="mui-pull-right">北京-朝阳</div>
+						</li>
+						<li class="mui-table-view-cell" id="user_income">
+							<span>收入</span>
+							<div class="mui-pull-right">保密</div>
+						</li>
+						<li class="mui-table-view-cell" id="user_love">
+							<span>感情状态</span>
+							<div class="mui-pull-right">单身</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+		</div>
+
+	</body>
+	<script>
+		$("img.lazy").lazyload();
+
+		function fromInit() {
+//			//性别选择
+//			mui("#sexSelect>li").each(function(key, val) {
+//				val.addEventListener('tap', function() {
+//					document.getElementById("user_sex").value = this.innerText;
+//				});
+//			});
+//			//出生日期选择
+//			document.getElementById("birSelect").addEventListener('tap', function() {
+//				//				var d=new Date();
+//				//				d.setFullYear(2014,11,31);
+//				plus.nativeUI.pickDate(function(e) {
+//					var d = e.date;
+//					document.getElementById("user_birthday").value = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+//				}, function(e) {
+//					mui.toast(e.message);
+//				}, {
+//					title: "请选出生年月日：" //,   
+//						//					maxDate:d 
+//				});
+//			});
+			document.getElementById("save").addEventListener('tap', function() {
+				//提交咯，目前还没有做验证
+				var info = {
+					user_phone: new localStorageUtils().getItem("userInfo").user_phone,
+					user_sex: document.querySelector("#user_sex>div").innerHTML,
+					user_nikeName: document.querySelector("#user_nikeName").value,
+					user_photo: document.querySelector("#user_photo>img").src,//base64
+					user_birthday: "1995-10-22",
+					user_height: document.querySelector("#user_height>div").innerHTML,
+					user_weight: document.querySelector("#user_weight>div").innerHTML,
+					user_address: document.querySelector("#user_address>div").innerHTML,
+					user_job: "猴子",
+					user_income: document.querySelector("#user_income>div").innerHTML,
+					user_pwd: "123"
+				};
+				new UserDAL().updateUserInfo(info,function(){
+					//成功
+					mui.toast('个人信息更新成功！');
+				},function(){
+					//失败
+					mui.toast('个人信息更新失败！');
+				});
+				
+			});
+		}
+	</script>
+
+</html>
