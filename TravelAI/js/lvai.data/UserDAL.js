@@ -11,14 +11,10 @@ var UserDAL = function() {
 	/**
 	 * 登录失败后处理函数。
 	 */
-<<<<<<< HEAD
+
 	this.faildLoginHandler=null;
 	//登录
 	//tel:手机号          pwd:密码
-=======
-	this.faildLoginHandler = null;
-
->>>>>>> origin/master
 	this.login = function(tel, pwd) {
 		var ws = new WebService(mui);
 		ws.setUrl(WebServiceURL);
@@ -82,10 +78,6 @@ var UserDAL = function() {
 		//失败的回调
 		function errorCallback(e) {
 			mui.toast(JSON.stringify(e));
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
 		}
 	}
 
@@ -157,7 +149,7 @@ var UserDAL = function() {
 			alert(JSON.stringify(e));
 		};
 	}
-<<<<<<< HEAD
+
 	//个人信息更新
 	//jsonUserInfo : 个人数据集
 	this.updateUserInfo = function(jsonUserInfo,successHandler,faildHandler){
@@ -228,6 +220,5 @@ var UserDAL = function() {
 				alert(JSON.stringify(e));
 			}
 	}
-=======
->>>>>>> origin/master
+
 }

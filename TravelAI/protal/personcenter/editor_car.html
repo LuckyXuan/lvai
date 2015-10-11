@@ -113,11 +113,11 @@
 			document.getElementById("save").addEventListener('tap', function() {
 				var userInfo = JSON.parse( new localStorageUtils().getItem("userInfo"));
 				var info = { 
+					
 						user_telphone : userInfo.user_telphone,
 						car_level : document.getElementById("car_level").value,
 						car_brand : document.getElementById("car_brand").value,
-						car_type : document.getElementById("car_type").value
-						
+						car_type : document.getElementById("car_type").value	
 				}; 
 				
 				

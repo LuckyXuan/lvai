@@ -14,7 +14,7 @@
 
     this.setParas = function (_paras) {
         paras = _paras;
-
+ 
     }
 	
 	
