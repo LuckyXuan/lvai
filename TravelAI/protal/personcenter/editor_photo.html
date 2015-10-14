@@ -30,6 +30,42 @@
 			document.addEventListener("plusready", onPlusReady, false);
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
+				InitCanvas();
+				MenuInit();
+			};
+			 //menu初始化
+			function MenuInit() {
+				document.querySelector("#btnIcon").addEventListener('tap', function() {
+					var u = new localStorageUtils().getItem("userInfo");
+					var uinfo = new JsonTools().stringToJson(u);
+					var base64 = Icon.cropper("getCroppedCanvas", {
+						"width": 300,
+						"height": 300
+					}).toDataURL();
+					console.log(base64);
+					var temp = base64.substr(base64.indexOf(',') + 1, base64.length - base64.indexOf(','));
+					//console.log(temp);
+					var wt = plus.nativeUI.showWaiting("上传头像中...");
+					new UserDAL().uploadHeadPhoto(uinfo.user_telphone,temp,function(_msg){
+						wt .close();
+						mui.toast("上传成功");
+						var photoObj = new JsonTools().stringToJson(_msg);
+						uinfo.user_photo = photoObj.data;
+						new localStorageUtils().setItem("userInfo",new JsonTools().jsonObjToString(uinfo));
+						new localStorageUtils().setItem("HeadPhotoBase64",base64);
+						plus.webview.currentWebview().close();
+					},function(_msg){
+						wt .close();
+						mui.toast("上传失败，请检查网络");
+						console.log(_msg);
+						plus.webview.currentWebview().close();
+					});
+				});
+			};
+			/***
+			 *初始化画布
+			 */
+			function InitCanvas() {
 				var header_height;
 				var mui_bar_height;
 				var window_height;
@@ -41,29 +77,14 @@
 				document.querySelector(".Icon > img").setAttribute("src", Icons);
 				Icon = $('.Icon > img').cropper({
 					aspectRatio: 1 / 1,
-					autoCropArea: 0.65,
-					strict: true,
-					guides: true,
-					highlight: false,
+					movable: false,
+					zoomable: true,
+					rotatable: false,
+					scalable: false,
+					resizable: false,
+					autoCropArea: 0.5,
 					dragCrop: false,
-					cropBoxMovable: false,
-					cropBoxResizable: false
-				});
-				document.querySelector("#btnIcon").addEventListener('tap', function() {
-					var s = new localStorageUtils().getItem("userInfo");
-					var uinfo = new JsonTools().stringToJson(s);
-					var base64 = Icon.cropper("getCroppedCanvas").toDataURL();
-					//console.log(base64);
-					var temp = base64.substr(base64.indexOf(',')+1,base64.length-base64.indexOf(','));
-					//console.log(temp);
-					new UserDAL().uploadHeadPhoto(
-						uinfo.user_telphone,
-						temp,
-						function(_args) {},
-						function(_args) {
-							mui.toast(_args.msg)
-						} //失败的函数);
-					);
+					background: false
 				});
 			};
 		</script>
@@ -72,7 +93,7 @@
 	<body>
 		<header class="mui-bar mui-bar-nav">
 			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
-			<h1 class="mui-title">移动和缩放</h1>
+			<h1 class="mui-title">移动</h1>
 		</header>
 		<!--底部导航栏-->
 		<nav class="mui-bar mui-bar-tab">

@@ -38,7 +38,7 @@ var UserDAL = function() {
 			var uinfo = msg.data;
 			var s = new JsonTools().jsonObjToString(uinfo);
 			new localStorageUtils().setItem("userInfo", s);
-			that.successLoginHandler(data);
+			that.successLoginHandler(uinfo);
 			//alert(JSON.stringify(data)); 
 		}
 
@@ -118,36 +118,28 @@ var UserDAL = function() {
 		}
 	}
 
-	this.uploadHeadPhoto = function(phone, base64,successHandler, faildHandler) {
-		var ws = new WebService(mui);
-		ws.setUrl(WebServiceURL);
-		ws.setOpName("uploadHeadPhoto");
-		ws.setParas({
-			tel: phone,
-			imgData: base64
-		});
-		ws.setCallBack(callback);
-		ws.setErrorCall(errorCallback);
-		ws.LoadData();
-		//成功的回调
-		function callback(data) {
-			//alert(JSON.stringify(data));
-			var o = eval(data);
-			o = o.d;
-			msg = new JsonTools().stringToJson(o);
-			if (msg.status == "faild") {
-				faildHandler(msg);
-				return;
+	//头像上传
+		//phone 手机号
+		//base64 图片的base64编码
+		//successHandler 成功的消息
+		//faildHandler	失败的消息
+	this.uploadHeadPhoto = function(phone, base64, successHandler, faildHandler) {
+		var task = plus.uploader.createUpload(UploadServer, {
+				method: "POST"
+			},
+			function(t, status) { //上传完成
+				if (status == 200) {
+					successHandler(t.responseText);
+				} else {
+					faildHandler(status);
+				}
 			}
-			//new localStorageUtils().setItem("userInfo", o)
-			successHandler(msg);
-
-		};
-		//失败的回调
-		function errorCallback(e) {
-			alert("ss");
-			alert(JSON.stringify(e));
-		};
+		);
+		task.addData("Action", "uploadHeadPhoto0");
+		task.addData("tel", phone);
+		task.addData("base64", base64);
+		console.log("开始上传");
+		task.start();
 	}
 
 	//个人信息更新

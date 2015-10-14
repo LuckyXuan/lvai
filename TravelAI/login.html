@@ -50,7 +50,8 @@
 					}
 					dal.successLoginHandler = function(_args) {
 						//mui.toast(_args.toString())
-						mui.toast("登录成功");
+						mui.toast("欢迎回来： "+_args.user_nikeName);
+						new localStorageUtils().setItem("HeadPhotoBase64","")
 						mui.openWindow({
 							url: 'protal/main.html',
 							id: 'main',
