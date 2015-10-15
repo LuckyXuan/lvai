@@ -14,6 +14,7 @@
 		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/Utility.js"></script>
+		<script type="text/javascript" src="../../js/extends/extends.js"></script>
 		<!--描述：地域选择 js 以及 css -->
 		<script src="../../js/mui.listpicker.js"></script>
 		<script src="../../js/mui.poppicker.js"></script>
@@ -151,7 +152,7 @@
 			 //信息的读取展示
 			function fromInfo() {
 					user = new JsonTools().stringToJson(new localStorageUtils().getItem("userInfo"));
-					user.user_birthday = Utility.DatetoJs(user.user_birthday);
+					//user.user_birthday = Utility.DatetoJs(user.user_birthday);
 					//console.log(Utility.DatetoJs(user.user_birthday));
 					document.querySelector("#user_sex>div").innerHTML = Boolean(user.user_sex) ? "男" : "女";
 					document.querySelector("#user_nikeName").value = user.user_nikeName;
@@ -328,15 +329,11 @@
 					</ul>
 				</div>
 			</div>
-
 		</div>
-
 	</body>
 	<script>
-		 //	$("img.lazy").lazyload();
 		function fromInit() {
 			document.getElementById("save").addEventListener('tap', function() {
-				//				var user1 = new JsonTools().stringToJson(new localStorageUtils().getItem("userInfo"));
 				user.user_nikeName = document.querySelector("#user_nikeName").value;
 				new UserDAL().updateUserInfo(user, function(data) {
 					//成功

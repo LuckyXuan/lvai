@@ -13,8 +13,9 @@
 		<script src="../../js/jquery.lazyload.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js"></script>
 		<script type="text/javascript" src="../../js/lvai.op/FileTool.js"></script>
+		<script type="text/javascript" src="../../js/lvai.base/Utility.js" ></script>
 		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js"></script>
-
+        <script type="text/javascript" src="../../js/extends/extends.js" ></script>
 		<style type="text/css">
 			/*body{background-color: white;}
 			.mui-content{background-color: white;}*/
@@ -207,7 +208,7 @@
 					}, 0);
 				});
 				//职业认证
-				document.getElementById("ed_job").addEventListener('tap',function(){
+				document.getElementById("ed_job").addEventListener('tap', function() {
 					mui.fire(ed_video, 'show', null);
 					setTimeout(function() {
 						mui.openWindow({
@@ -218,13 +219,12 @@
 							waiting: {
 								autoShow: false
 							},
-							styles: { 
+							styles: {
 								zindex: 600
 							}
 						});
 					}, 0);
 				});
-
 			};
 			 //预加载
 			function OnPreload() {
@@ -273,6 +273,7 @@
 			function fromInfo() {
 				var s = new localStorageUtils().getItem("userInfo");
 				var uinfo = new JsonTools().stringToJson(s);
+				console.log(uinfo.user_birthday);
 				//找到登录时   在服务器  获取到的 用户信息
 				document.querySelector("#txtName").innerHTML = uinfo.user_nikeName;
 				document.querySelector("#user_height").innerHTML = uinfo.user_height;
@@ -280,6 +281,8 @@
 				document.querySelector("#user_income").innerHTML = uinfo.user_income;
 				document.querySelector("#user_address").innerHTML = uinfo.user_address;
 				document.querySelector("#user_job").innerHTML = uinfo.user_job;
+				var Newtime = new Date();
+				document.querySelector("#user_age").innerHTML = Newtime.getFullYear() - new Date(uinfo.user_birthday).getFullYear() +1 +"岁";
 			};
 		</script>
 	</head>

@@ -34,7 +34,7 @@ var Utility = {
 		}
 		return false;
 	},
-	//C# 时间戳  转 正常时间
+/*	//C# 时间戳  转 正常时间
 	//time : 时间戳  如  /Date(1354116249000)/
 	DatetoJs:function(time){
 		time = time.replace("/Date(","").replace(")/","");
@@ -46,7 +46,7 @@ var Utility = {
 		var arr = time.split("-");
 		var new_time = new Date(Date.UTC(arr[0],arr[1]-1,arr[2]));
 		console.log(new_time.getTime());
-		return new_time.getTime();
-	}
+		return "/Date(" + new_time.getTime() +")/";
+	}*/
 
 }

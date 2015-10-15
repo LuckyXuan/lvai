@@ -36,6 +36,7 @@ var UserDAL = function() {
 				return;
 			}
 			var uinfo = msg.data;
+			uinfo.user_birthday = new Date().setCsharpTime(uinfo.user_birthday).toFormatString("yyyy-MM-dd");
 			var s = new JsonTools().jsonObjToString(uinfo);
 			new localStorageUtils().setItem("userInfo", s);
 			that.successLoginHandler(uinfo);
