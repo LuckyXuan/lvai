@@ -12,7 +12,7 @@ var UserDAL = function() {
 	 * 登录失败后处理函数。
 	 */
 
-	this.faildLoginHandler=null;
+	this.faildLoginHandler = null;
 	//登录
 	//tel:手机号          pwd:密码
 	this.login = function(tel, pwd) {
@@ -103,7 +103,7 @@ var UserDAL = function() {
 				//alert(JSON.stringify(data));
 				var o = eval(data);
 				o = o.d;
-				msg = new JsonTools().stringToJson(o);
+				var msg = new JsonTools().stringToJson(o);
 				if (msg.status == "faild") {
 					faildHandler(msg);
 					return;
@@ -120,10 +120,10 @@ var UserDAL = function() {
 	}
 
 	//头像上传
-		//phone 手机号
-		//base64 图片的base64编码
-		//successHandler 成功的消息
-		//faildHandler	失败的消息
+	//phone 手机号
+	//base64 图片的base64编码
+	//successHandler 成功的消息
+	//faildHandler	失败的消息
 	this.uploadHeadPhoto = function(phone, base64, successHandler, faildHandler) {
 		var task = plus.uploader.createUpload(UploadServer, {
 				method: "POST"
@@ -145,75 +145,111 @@ var UserDAL = function() {
 
 	//个人信息更新
 	//jsonUserInfo : 个人数据集
-	this.updateUserInfo = function(jsonUserInfo,successHandler,faildHandler){
+	this.updateUserInfo = function(jsonUserInfo, successHandler, faildHandler) {
 		var ws = new WebService(mui);
-			ws.setUrl(WebServiceURL);
-			ws.setOpName("updateUserInfo");
-			ws.setParas({
-				jsonUserInfo:jsonUserInfo
-			});
-			ws.setCallBack(callback);
-			ws.setErrorCall(errorCallback);
-			ws.LoadData();
-			//成功的回调
-			function callback(data) {
+		ws.setUrl(WebServiceURL);
+		ws.setOpName("updateUserInfo");
+		ws.setParas({
+			jsonUserInfo: jsonUserInfo
+		});
+		ws.setCallBack(callback);
+		ws.setErrorCall(errorCallback);
+		ws.LoadData();
+		//成功的回调
+		function callback(data) {
 				//alert(JSON.stringify(data));
-				var o=eval(data);
-				o=o.d;
-				msg=new JsonTools().stringToJson(o);
-				if(msg.status=="faild")
-				{
+				var o = eval(data);
+				o = o.d;
+				var msg = new JsonTools().stringToJson(o);
+				if (msg.status == "faild") {
 					faildHandler(msg);
 					return;
 				}
-//				new localStorageUtils().setItem("userInfo",o)
+				//				new localStorageUtils().setItem("userInfo",o)
 				successHandler(msg);
-				
+
 			}
 			//失败的回调
-			function errorCallback(e) {
-				alert(JSON.stringify(e));
-			}
+
+		function errorCallback(e) {
+			alert(JSON.stringify(e));
+		}
 	}
-	
-	
-	
+
+	//获取车辆信息
+	//tel   ：  手机号码
+	this.getCarInfo = function(tel, successHandler, faildHandler) {
+		var ws = new WebService(mui);
+		ws.setUrl(WebServiceURL);
+		ws.setOpName("getCarInfo");
+		ws.setParas({
+			tel: tel
+		});
+
+		ws.setCallBack(callback);
+		ws.setErrorCall(errorCallback);
+
+		ws.LoadData();
+		//成功的回调
+		function callback(data) {
+				//alert(JSON.stringify(data));
+				var o = eval(data);
+				o = o.d;
+				new localStorageUtils().setItem("userCar", o);
+				var msg = new JsonTools().stringToJson(o);
+				if (msg.status == "faild") {
+					faildHandler();
+					return;
+				}
+				successHandler();
+
+			}
+			//失败的回调
+
+		function errorCallback(e) {
+			alert(JSON.stringify(e));
+		}
+	}
+
+
 	//车辆信息更新
 	//carJsonstring : 车辆信息的json数据
-	this.UpdateCarInfo = function(carJsonstring,successHandler,faildHandler){
+	this.UpdateCarInfo = function(carJsonstring, successHandler, faildHandler) {
 		var ws = new WebService(mui);
-			ws.setUrl(WebServiceURL);
-			ws.setOpName("UpdateCarInfo");
-//			var datas = new JsonTools().jsonObjToString(carJsonstring);
-			//console.log(JSON.stringify(carJsonstring));
-			
-			ws.setParas({
-				carJsonstring:carJsonstring
-			});
-			
-			ws.setCallBack(callback);
-			ws.setErrorCall(errorCallback);
-			
-			ws.LoadData();
-			//成功的回调
-			function callback(data) {
+		ws.setUrl(WebServiceURL);
+		ws.setOpName("UpdateCarInfo");
+		//			var datas = new JsonTools().jsonObjToString(carJsonstring);
+		//console.log(JSON.stringify(carJsonstring));
+
+		ws.setParas({
+			carJsonstring: carJsonstring
+		});
+
+		ws.setCallBack(callback);
+		ws.setErrorCall(errorCallback);
+
+		ws.LoadData();
+		//成功的回调
+		function callback(data) {
 				//alert(JSON.stringify(data));
-				var o=eval(data);
-				o=o.d;
-				msg=new JsonTools().stringToJson(o);
-				if(msg.status=="faild")
-				{
+				var o = eval(data);
+				o = o.d;
+				var msg = new JsonTools().stringToJson(o);
+				if (msg.status == "faild") {
 					faildHandler(msg);
 					return;
 				}
-//				new localStorageUtils().setItem("userInfo",o)
+				//				new localStorageUtils().setItem("userInfo",o)
 				successHandler(msg);
-				
+
 			}
 			//失败的回调
-			function errorCallback(e) {
-				alert(JSON.stringify(e));
-			}
+
+		function errorCallback(e) {
+			alert(JSON.stringify(e));
+		}
 	}
+
+
 
 }

@@ -12,7 +12,7 @@
 		<script type="text/javascript" src="../../js/lvai.data/WebService2.js"></script>
 		<script type="text/javascript" src="../../js/lvai.data/UserDAL.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js"></script>
-		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js" ></script>
+		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js"></script>
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<style type="text/css">
 			.mui-card {
@@ -28,16 +28,14 @@
 			.mui-table-view input {
 				width: 70%;
 				height: 25px;
-				margin: 0; 
-				padding: 0; 
+				margin: 0;
+				padding: 0;
 				text-align: right;
 				border: 0;
 			}
-			#carImg img{
-
+			#carImg img {
 				margin-left: 3%;
 			}
-			
 		</style>
 		<script type="text/javascript" charset="utf-8">
 			mui.init();
@@ -49,10 +47,17 @@
 				plus.webview.currentWebview().setStyle({
 					scrollIndicator: 'none'
 				});
-				
+				PageShow();
 				fromInit();
-				
 			};
+
+			function PageShow() {
+				var temp = new localStorageUtils().getItem("userCar");
+				var car = new JsonTools().stringToJson(temp)["data"];
+				document.querySelector("#car_brand").value = car.car_brand;
+				document.querySelector("#car_level").value = car.car_level;
+				document.querySelector("#car_type").value = car.car_type;
+			}
 		</script>
 	</head>
 
@@ -67,9 +72,9 @@
 
 			<h1 class="mui-title">车辆资料修改</h1>
 		</header>
-		
+
 		<div class="mui-content">
-			
+
 			<div>
 				<h5 class="mui-content-padded">车辆信息</h5>
 				<div class="mui-card">
@@ -88,21 +93,19 @@
 						</li>
 						<li class="mui-table-view-cell" style="line-height: 50px;" id="carImg">
 							<span>爱车靓照</span>
-							<div>
-								<img src="../../img/guide_1.jpg" width="50px" height="50px"/>
-								<img src="../../img/guide_1.jpg" width="50px" height="50px"/>
-								<img src="../../img/guide_1.jpg" width="50px" height="50px"/>
-								<img src="../../img/guide_1.jpg" width="50px" height="50px"/>
-								<img src="../../img/guide_3.jpg" width="50px" height="50px"/>
+							<div id="loveCarPhoto">
+								<div style="border: 1px dashed;">
+									+
+								</div>
 							</div>
 						</li>
-						
+
 					</ul>
-					
+
 				</div>
-				
+
 			</div>
-			
+
 			<div>
 				<h5 class="mui-content-padded">车辆认证
 							<span style="float: right; border: 1px solid gainsboro; border-radius: 30px; font-size: 0.7em; padding: 0 8px;color: white; background-color: green" >
@@ -111,57 +114,70 @@
 				</h5>
 				<div class="mui-card">
 					<ul class="mui-table-view">
-						
-						<li class="mui-table-view-cell" >
+
+						<li class="mui-table-view-cell">
 							<div>
-								请如下图所示上传车辆行驶证照片。<br />
+								请如下图所示上传车辆行驶证照片。
+								<br />
 								<ul>
 									<li>证件上所有信息清晰可见。</li>
 									<li>照片内容真实有效，不得任何修改。</li>
 								</ul>
-								
+
 							</div>
 							<div style="text-align: center;padding-top: 10px;">
-								<img  src="../../img/guide_1.jpg" width="80px" height="80px" />
-								<img  src="../../img/guide_2.jpg" width="80px" height="80px" />
+								<img src="../../img/guide_1.jpg" width="80px" height="80px" />
+								<img src="../../img/guide_2.jpg" width="80px" height="80px" />
 								<button style="margin-top: 20px; width: 90%;" type="button" class="mui-btn mui-btn-blue">上传认证</button>
 							</div>
 						</li>
 					</ul>
-					
+
 				</div>
-				
+
 			</div>
 
 		</div>
 
 	</body>
 	<script>
+		var width = document.querySelector("#loveCarPhoto").offsetWidth;
+		document.querySelector("#loveCarPhoto div").style.width = width*0.28+"px";
+		document.querySelector("#loveCarPhoto div").style.height = width*0.28+"px";
+		document.querySelector("#loveCarPhoto div").style.textAlign= "center";
+		document.querySelector("#loveCarPhoto div").style.lineHeight = width*0.28+"px";
+		document.querySelector("#loveCarPhoto div").style.background = "#CCC";
+		document.querySelector("#loveCarPhoto div").style.color = "white";
+		document.querySelector("#loveCarPhoto div").style.fontSize = "3em";
 		$("img.lazy").lazyload();
 
 		function fromInit() {
-			
 			document.getElementById("save").addEventListener('tap', function() {
-				var userInfo = JSON.parse( new localStorageUtils().getItem("userInfo"));
-				var info = { 
-					
-						user_telphone : userInfo.user_telphone,
-						car_level : document.getElementById("car_level").value,
-						car_brand : document.getElementById("car_brand").value,
-						car_type : document.getElementById("car_type").value	
-				}; 
-				
-				
-				
-				new UserDAL().UpdateCarInfo(info,function(data){
+				var userInfo = JSON.parse(new localStorageUtils().getItem("userInfo"));
+				var info = {
+					user_telphone: userInfo.user_telphone,
+					car_level: document.getElementById("car_level").value,
+					car_brand: document.getElementById("car_brand").value,
+					car_type: document.getElementById("car_type").value
+				};
+				new UserDAL().UpdateCarInfo(info, function(data) {
 					//成功
 					mui.toast('爱车信息更新成功！');
-					alert(JSON.stringify(data));
-				},function(){
+					var temp = new localStorageUtils().getItem("userCar");
+					var car = new JsonTools().stringToJson(temp)["data"];
+					car.car_level = document.getElementById("car_level").value;
+					car.car_brand = document.getElementById("car_brand").value;
+					car.car_type = document.getElementById("car_type").value;
+					var temp2 = new JsonTools().stringToJson(temp);
+					temp2["data"] = car;
+					new localStorageUtils().setItem("userCar", new JsonTools().jsonObjToString(temp2));
+					
+					console.log("关闭当前页面");
+					mui.back();
+				}, function() {
 					//失败
-					mui.toast('更新失败！'); 
+					mui.toast('更新失败！请检查网络');
 				});
-				
 			});
 		}
 	</script>

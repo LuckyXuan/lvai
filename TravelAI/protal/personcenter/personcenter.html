@@ -13,9 +13,11 @@
 		<script src="../../js/jquery.lazyload.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js"></script>
 		<script type="text/javascript" src="../../js/lvai.op/FileTool.js"></script>
-		<script type="text/javascript" src="../../js/lvai.base/Utility.js" ></script>
+		<script type="text/javascript" src="../../js/lvai.base/Utility.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js"></script>
-        <script type="text/javascript" src="../../js/extends/extends.js" ></script>
+		<script type="text/javascript" src="../../js/extends/extends.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/UserDAL.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/WebService2.js" ></script>
 		<style type="text/css">
 			/*body{background-color: white;}
 			.mui-content{background-color: white;}*/
@@ -56,12 +58,12 @@
 			document.addEventListener("plusready", onPlusReady, false);
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
+				//设置滚动次数
 				mui('.mui-scroll-wrapper').scroll({
 					deceleration: 0.0005 //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
 				});
 				OnPreload();
-				pageHeadDataInit();
-				fromInfo();
+				GetPageData();
 				MenuInit();
 			};
 			 //按钮的监听事件
@@ -69,6 +71,10 @@
 				plus.webview.getWebviewById("editor").addEventListener("hide", function() {
 					console.log("个人资料编辑窗口以关闭");
 					fromInfo();
+				});
+				plus.webview.getWebviewById("ed_car").addEventListener("hide", function() {
+					console.log("车辆编辑窗口以关闭");
+					fromCar();
 				});
 				//头像按钮
 				document.getElementById('editor').addEventListener('tap', function() {
@@ -154,6 +160,7 @@
 						}
 					});
 				});
+				//基本信息按钮
 				document.getElementById('ed').addEventListener('tap', function() {
 					mui.fire(editor, 'show', null);
 					setTimeout(function() {
@@ -245,6 +252,15 @@
 					"url": 'editor_job.html'
 				});
 			};
+			 //获取页面数据为下面显示数据做准备
+			function GetPageData() {
+				//初始化头像并显示
+				pageHeadDataInit();
+				//初始化基本信息并显示
+				fromInfo();
+				//初始化车辆信息
+				GetCarData();
+			};
 			 //初始化页面数据
 			function pageHeadDataInit() {
 				var s = new localStorageUtils().getItem("userInfo");
@@ -282,8 +298,28 @@
 				document.querySelector("#user_address").innerHTML = uinfo.user_address;
 				document.querySelector("#user_job").innerHTML = uinfo.user_job;
 				var Newtime = new Date();
-				document.querySelector("#user_age").innerHTML = Newtime.getFullYear() - new Date(uinfo.user_birthday).getFullYear() +1 +"岁";
+				document.querySelector("#user_age").innerHTML = Newtime.getFullYear() - new Date(uinfo.user_birthday).getFullYear() + 1 + "岁";
 			};
+			 //获取车辆信息
+			function GetCarData() {
+				var s = new localStorageUtils().getItem("userInfo");
+				var uinfo = new JsonTools().stringToJson(s);
+				new UserDAL().getCarInfo(uinfo.user_telphone, function() {
+					//获取车辆成功，显示车辆信息
+					fromCar();
+				}, function() {
+					//获取车辆失败
+					mui.toast("获取您的车辆信息失败，请检查网络");
+				});
+			};
+			function fromCar()
+			{
+				var temp = new localStorageUtils().getItem("userCar");
+				var car = new JsonTools().stringToJson(temp)["data"];
+				document.querySelector("#car_brand").innerHTML = car.car_brand;
+				document.querySelector("#car_level").innerHTML = car.car_level;
+				document.querySelector("#car_type").innerHTML = car.car_type;
+			}
 		</script>
 	</head>
 
@@ -362,9 +398,9 @@
 									<h5 class="mui-content-padded">车辆信息</h5>
 									<div class="card">
 										<div style="background: white; text-align: center;">
-											<span>宝马</span>|
-											<span>X6</span>|
-											<span>40万</span>
+											<span id="car_brand">宝马</span>|
+											<span id="car_type">X6</span>|
+											<span id="car_level">40万</span>
 											<span style="border: 1px solid black; border-radius: 20px; background: gainsboro;">
 												已认证
 											</span>
