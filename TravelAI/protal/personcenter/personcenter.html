@@ -9,7 +9,7 @@
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<!--<link rel="stylesheet" type="text/css" href="../../css/header.css"/>-->
 		<script type="text/javascript" src="../../js/lvai.data/config.js"></script>
-		<script src="../../js/jquery-1.7.2.min.js"></script>
+		<script src="../../js/jquery-1.7.2.min.js"></script> 
 		<script src="../../js/jquery.lazyload.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js"></script>
 		<script type="text/javascript" src="../../js/lvai.op/FileTool.js"></script>
@@ -58,10 +58,13 @@
 			document.addEventListener("plusready", onPlusReady, false);
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
-				//设置滚动次数
+				//去除滚动条
+				mui('#scroll').scroll({indicators: false});
+				//减速系数
 				mui('.mui-scroll-wrapper').scroll({
-					deceleration: 0.0005 //flick 减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+					deceleration: 0.0005 //减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
 				});
+				
 				OnPreload();
 				GetPageData();
 				MenuInit();
@@ -370,9 +373,9 @@
 						<div class="mui-slider-group">
 
 							<div id="item1mobile" style="background-color:gainsboro" class="mui-slider-item mui-control-content mui-active">
-
+ 
 								<div>
-									<span id='ed' class="mui-icon mui-icon-compose mui-pull-right" style="line-height:12px;padding: 1px;"></span>
+									<span id='ed' class="mui-icon mui-icon-compose mui-pull-right" style="line-height:12px;padding: 1px; margin-right: 8px;"></span>
 									<h5 class="mui-content-padded">基本信息</h5>
 									<div class="card">
 										<div style="background: white; text-align: center;">
@@ -394,7 +397,7 @@
 								</div>
 
 								<div>
-									<span id='ed_car' class="mui-icon mui-icon-compose mui-pull-right" style=" line-height:12px; padding: 1px;"></span>
+									<span id='ed_car' class="mui-icon mui-icon-compose mui-pull-right" style=" line-height:12px; padding: 1px;margin-right: 8px;"></span>
 									<h5 class="mui-content-padded">车辆信息</h5>
 									<div class="card">
 										<div style="background: white; text-align: center;">

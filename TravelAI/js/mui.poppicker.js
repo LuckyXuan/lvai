@@ -23,10 +23,12 @@
 			<ul>\
 			</ul>\
 		</div>\
-	</div>';
+	</div>'; 
 
+	
 	//定义弹出选择器类
 	var PopPicker = $.PopPicker = $.Class.extend({
+		
 		//构造函数
 		init: function(options) {
 			var self = this;
@@ -75,8 +77,10 @@
 						nextPicker.setItems(preItem.children);
 					}
 				}, false);
+				
 			}
 		},
+		
 		//填充数据
 		setData: function(data) {
 			var self = this;
@@ -90,16 +94,31 @@
 			for (var i in self.pickers) {
 				var picker = self.pickers[i];
 				items.push(picker.getSelectedItem() || {});
+				
 			}
 			return items;
 		},
 		//显示
-		show: function(callback) {
+		show: function(callback,txt) {
 			var self = this;
+			var arr = txt.split('-');
+			
+			
 			self.callback = callback;
 			self.mask.show();
 			document.body.classList.add($.className('poppicker-active-for-page'));
 			self.panel.classList.add($.className('active'));
+			
+			for(i in arr){
+//				alert(self.pickers[i].getItems()[0].innerHTML);
+				self.pickers[i].setSelectedText(arr[i]); 
+			}
+			
+			
+			
+//			self.pickers[0].setSelectedText("江西省");
+//			
+//			self.pickers[1].setSelectedText("抚州市");
 		},
 		//隐藏
 		hide: function() {

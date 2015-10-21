@@ -318,6 +318,20 @@
 			}
 			return items;
 		},
+		getIndex: function(txt){
+			
+			var self = this;
+			var itemElements = $('li', self.list);		
+			for (index in itemElements) {
+				var itemElement = itemElements[index];
+				if (!itemElement || !itemElement.innerHTML) {
+					continue;
+				}
+				if (itemElement.innerHTML== txt) {
+					return index;
+				}
+			}
+		},
 		getSelectedValue: function() {
 			var self = this;
 			var item = self.getSelectedItem();
@@ -344,6 +358,11 @@
 				}
 			}
 		},
+		setSelectedText: function(txt,noAni){
+
+			this.setSelectedIndex(this.getIndex(txt), noAni);
+			
+		},
 		_applyToBox: function() {
 			var self = this;
 			var memberArray = [
@@ -353,9 +372,11 @@
 				"getSelectedItem",
 				"setItems",
 				"getItems",
+				"getIndex",
 				"getSelectedValue",
 				"getSelectedText",
-				"setSelectedValue"
+				"setSelectedValue",
+				"setSelectedText"
 			];
 			var _clone = function(name) {
 				if (typeof self[name] === 'function') {
