@@ -9,7 +9,7 @@
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<!--<link rel="stylesheet" type="text/css" href="../../css/header.css"/>-->
 		<script type="text/javascript" src="../../js/lvai.data/config.js"></script>
-		<script src="../../js/jquery-1.7.2.min.js"></script> 
+		<script src="../../js/jquery-1.7.2.min.js"></script>
 		<script src="../../js/jquery.lazyload.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js"></script>
 		<script type="text/javascript" src="../../js/lvai.op/FileTool.js"></script>
@@ -17,7 +17,7 @@
 		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js"></script>
 		<script type="text/javascript" src="../../js/extends/extends.js"></script>
 		<script type="text/javascript" src="../../js/lvai.data/UserDAL.js"></script>
-		<script type="text/javascript" src="../../js/lvai.data/WebService2.js" ></script>
+		<script type="text/javascript" src="../../js/lvai.data/WebService2.js"></script>
 		<style type="text/css">
 			/*body{background-color: white;}
 			.mui-content{background-color: white;}*/
@@ -47,30 +47,52 @@
 				width: 100px !important;
 				height: 100px !important;
 			}
+			
+			/*.rp {
+				width: 100%;
+				height: 100%;
+				display: none;
+				text-align: center;
+				position: fixed;
+				top: 0;
+				background: rgba(0,0,0,0.8);
+				z-index: 9999;
+				overflow: hidden;
+			}*/
 		</style>
 		<script type="text/javascript" charset="utf-8">
 			var editor;
 			var ed_car;
 			var ed_video;
 			var ed_job;
-			mui.init();
+			var record=null,t=null,iv=null,w=null;
+			mui.init({
+				gestureConfig:{
+				   hold:true,//默认为false，不监听
+				   release:true//默认为false，不监听
+				}
+			});
 			 // 扩展API加载完毕后调用onPlusReady回调函数 
 			document.addEventListener("plusready", onPlusReady, false);
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
-				//去除滚动条
-				mui('#scroll').scroll({indicators: false});
+				
 				//减速系数
 				mui('.mui-scroll-wrapper').scroll({
 					deceleration: 0.0005 //减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
 				});
+				//去除滚动条
+				mui('#scroll').scroll({indicators: false});
+				
+				record=plus.audio.getRecorder();
 				
 				OnPreload();
-				GetPageData();
+				GetPageData(); 
 				MenuInit();
 			};
 			 //按钮的监听事件
 			function MenuInit() {
+				
 				plus.webview.getWebviewById("editor").addEventListener("hide", function() {
 					console.log("个人资料编辑窗口以关闭");
 					fromInfo();
@@ -79,6 +101,69 @@
 					console.log("车辆编辑窗口以关闭");
 					fromCar();
 				});
+				//录制语音hold
+				document.getElementById("recording").addEventListener('tap',function(){
+					if ( record == null ) {
+						alert( "麦克风未就绪！" );
+						return; 
+					} 
+					
+					var thisr = this;
+					
+					
+					
+					record.record( {filename:"_doc/audio/"}, function ( p ) {
+						plus.io.resolveLocalFileSystemURL( p, function ( entry ) {
+							var confirm = function(){
+								// 弹出提示信息对话框	entry.name
+								plus.nativeUI.confirm(entry.name, function(e){
+									switch(e.index){
+										case 0:                break;//上传
+										case 1:break;//取消
+										case 2:
+											var ww = plus.nativeUI.showWaiting("试听中... ",{background:"rgba(56,12,92,0.8)",back:"none"}); 
+											var play = plus.audio.createPlayer(p);
+											play.play(function(){
+												confirm();
+												ww.close();
+											});
+											
+											break;
+	//									default:mui.toast("fail");break;
+									}
+								}, "是否上传该录音?", ["上传","取消","试听"] );
+							}
+							confirm();						
+						}, function ( e ) {
+							mui.toast( "读取录音文件错误");
+						} );
+					}, function ( e ) {
+						mui.toast( "录音失败");
+					} );
+					
+					w = plus.nativeUI.showWaiting("开始录制 ",{ padding:'6%',background:"rgba(10,92,19,0.7)",back:"none"});
+					
+					t = 0;
+					iv = setInterval( function () {
+						t++;
+						if(t>=5){
+//							mui.trigger(thisr,'release');
+							w.close();
+							clearInterval(iv);
+							record.stop();
+							return;
+						}
+						
+						w.setTitle("剩余:"+(5-t)+"秒");
+					}, 1000 );
+					
+				});
+//				document.getElementById("recording").addEventListener('release',function() {
+//					w.close();
+//					clearInterval(iv);
+//					record.stop();
+//				});
+
 				//头像按钮
 				document.getElementById('editor').addEventListener('tap', function() {
 					var btnArray = [{
@@ -373,7 +458,7 @@
 						<div class="mui-slider-group">
 
 							<div id="item1mobile" style="background-color:gainsboro" class="mui-slider-item mui-control-content mui-active">
- 
+
 								<div>
 									<span id='ed' class="mui-icon mui-icon-compose mui-pull-right" style="line-height:12px;padding: 1px; margin-right: 8px;"></span>
 									<h5 class="mui-content-padded">基本信息</h5>
@@ -389,10 +474,14 @@
 											<span id="user_job">白领</span>
 
 										</div>
-										<div style="text-align: center;">
-											<span class="mui-icon mui-icon-mic" style=" border: 1px solid gray; border-radius: 90px; padding: 10px;"></span>
-											<span>长按左侧mic录制语音</span>
+										
+										<div style="text-align:center">
+											<!--<span class="mui-icon mui-icon-mic" style=" border: 1px solid gray; border-radius: 90px; padding: 10px;"></span>-->
+											<button type="button"  id="recording" class="mui-icon mui-icon-mic" style=" border: 1px solid gray; border-radius: 90px; padding: 10px;"></button>
+											<span style="line-height: 50px;">点击左侧mic录制语音</span>
+											
 										</div>
+
 									</div>
 								</div>
 
@@ -519,6 +608,7 @@
 				</div>
 			</div>
 		</div>
+
 	</body>
 	<script>
 		$("img.lazy").lazyload();
