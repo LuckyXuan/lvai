@@ -349,13 +349,13 @@
 					//成功
 					new localStorageUtils().setItem("userInfo", new JsonTools().jsonObjToString(user));
 					mui.toast('个人信息更新成功！');
-					alert(JSON.stringify(data));
+					//alert(JSON.stringify(data));
 					console.log("关闭当前页面");
 					mui.back();
 				}, function(e) {
 					//失败
 					mui.toast('个人信息更新失败！');
-					alert(JSON.stringify(e));
+					//alert(JSON.stringify(e));
 				});
 			});
 		}

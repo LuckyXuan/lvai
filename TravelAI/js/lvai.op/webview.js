@@ -98,11 +98,13 @@ var preate = {};
  * @param {Object} bottom 底部距离
  * @param {Object} isShow 是否为首页
  */
-function CreatePage(url, id, top, bottom, isShow) {
+function CreatePage(url, id, top, bottom,windowWidth, isShow) {
 	if (!preate[id]) {
 		var w = plus.webview.create(url, id, {
 			top: top,
 			bottom: bottom
+		},{
+			listCarWidth: windowWidth+""
 		});
 		preate[id] = w;
 		if (!isShow) {
@@ -113,7 +115,7 @@ function CreatePage(url, id, top, bottom, isShow) {
 };
 
 /***
- *上拉刷新 
+ *上拉刷新
  * @param {Object} ws 当前页面对象
  * @param {Object} Callback 刷新后执行的函数
  */

@@ -61,9 +61,9 @@
 			};
 
 			function OnPreload() {
-				ws.append(CreatePage("msg/msgList.html", "msg", "0px", "51px", false));
-				ws.append(CreatePage("personcenter/personcenter.html", "mycard", "0px", "51px", false));
-				ws.append(CreatePage("travel/travel.html", "travel", "45px", "51px", true));
+				ws.append(CreatePage("msg/msgList.html", "msg", "0px", "51px",document.body.clientWidth, false));
+				ws.append(CreatePage("personcenter/personcenter.html", "mycard", "0px", "51px",document.body.clientWidth, false));
+				ws.append(CreatePage("travel/travel.html", "travel", "45px", "51px",document.body.clientWidth, true));
 				//				page[0] = plus.webview.create("travel/travel.html", "travel", {
 				//					top: "45px",
 				//					bottom: "51px"

@@ -60,6 +60,11 @@
 			}*/
 		</style>
 		<script type="text/javascript" charset="utf-8">
+			var listCar;
+			var listCarWidth;
+			var carPhoto = new Array(); //车辆地址存放
+			var photoindex = 0;
+			var carPhotoState = 3;
 			var editor;
 			var ed_car;
 			var ed_video;
@@ -75,9 +80,22 @@
 				}
 			});
 			 // 扩展API加载完毕后调用onPlusReady回调函数 
-			document.addEventListener("plusready", onPlusReady, false);
+			document.addEventListener("plusready", onPlusReady);
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
+				listCarWidth = plus.webview.currentWebview().listCarWidth;
+				record = plus.audio.getRecorder();
+				setPageUi();
+				DataShow();
+				loadAsynchronou();
+			};
+			 //设置页面Ui
+			function setPageUi() {
+				systemUi();
+				CarPhotoUi();
+			};
+			 // 系统Ui
+			function systemUi() {
 				//减速系数
 				mui('.mui-scroll-wrapper').scroll({
 					deceleration: 0.0005 //减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
@@ -86,20 +104,251 @@
 				mui('#scroll').scroll({
 					indicators: false
 				});
-				record = plus.audio.getRecorder();
+			};
+			 //车辆图片Ui
+			function CarPhotoUi() {
+				listCar = document.querySelector("#loveCarPhoto");
+				var carPhotoImg = listCar.getElementsByTagName('img');
+				for (var car_index = 0; car_index < carPhotoImg.length; car_index++) {
+					carPhotoImg[car_index].style.width = listCarWidth * 0.3 + "px";
+					carPhotoImg[car_index].style.height = listCarWidth * 0.3 + "px";
+					carPhotoImg[car_index].style.margin = "3px 6px";
+					carPhotoImg[car_index].className = "lazy";
+					carPhotoImg[car_index].style.float = "left";
+					carPhotoImg[car_index].style.display = "none";
+				}
+			};
+			 //数据展示
+			function DataShow() {
+				DataHeadPhotoShow(DataInfoShow());
+				DataCarShow();
+			};
+			 //基本信息的判断及展示
+			function DataInfoShow() {
+				var userInfoTxt = new localStorageUtils().getItem("userInfo");
+				var userInfo = new JsonTools().stringToJson(userInfoTxt);
+				//找到登录时   在服务器  获取到的 用户信息
+				document.querySelector("#txtName").innerHTML = userInfo.user_nikeName;
+				document.querySelector("#user_height").innerHTML = userInfo.user_height;
+				document.querySelector("#user_weight").innerHTML = userInfo.user_weight;
+				document.querySelector("#user_income").innerHTML = userInfo.user_income;
+				document.querySelector("#user_address").innerHTML = userInfo.user_address;
+				document.querySelector("#user_job").innerHTML = userInfo.user_job;
+				var Newtime = new Date();
+				document.querySelector("#user_age").innerHTML = Newtime.getFullYear() - new Date(userInfo.user_birthday).getFullYear() + 1 + "岁";
+				return userInfo;
+			};
+			 //头像的判断及展示
+			function DataHeadPhotoShow(userInfo) {
+				var url = "_doc/HeadPhoto/" + userInfo.user_photo.substring(userInfo.user_photo.lastIndexOf('/') + 1);
+				fileTool.fileExist(url, userInfo.user_photo,
+					function(msg) {
+						ShowHead(msg);
+					},
+					function(msg, _args) {
+						//文件不存在则下载
+						fileTool.fileDown(ResourcesServerUrl + _args, 1, function() {
+							ShowHead(msg);
+						});
+					}
+				);
+			};
+			 //显示头像
+			function ShowHead(url) {
+				//document.querySelector("#editor").removeAttribute("src");
+				document.querySelector("#editor").setAttribute("src", plus.io.convertLocalFileSystemURL(url));
+				//$("img.lazy").lazyload();
+			};
+			 //车辆信息的判断及展示
+			function DataCarShow() {
+				var userCarTxt = new localStorageUtils().getItem("userCar");
+				var car = new JsonTools().stringToJson(userCarTxt)["data"];
+				document.querySelector("#car_brand").innerHTML = car.car_brand;
+				document.querySelector("#car_level").innerHTML = car.car_level;
+				document.querySelector("#car_type").innerHTML = car.car_type;
+				carPhoto[0] = car.car_photo1;
+				carPhoto[1] = car.car_photo2;
+				carPhoto[2] = car.car_photo3;
+				for (var index = 0; index < carPhoto.length; index++) {
+					if (carPhoto[index] != "") {
+						listCar.style.height = listCarWidth * 0.3 + 6 + "px";
+						break;
+					}
+				}
+			};
+			 //异步加载车辆图片及下载数据
+			function loadAsynchronou() {
+				setTimeout(function() {
+					loadCarPhoto();
+				}, 100);
+			};
+			 //载入车辆图片
+			function loadCarPhoto() {
+				photoindex = 0;
+				carPhotoState = 3;
+				for (var index = 0; index < carPhoto.length; index++) {
+					if (carPhoto[index] == "") {
+						carPhotoState--;
+						continue;
+					}
+					var url = "_doc/CarPhoto/thumbCarPhoto/" + carPhoto[index].substring(carPhoto[index].lastIndexOf('/') + 1);
+					fileTool.fileExist(url, carPhoto[index], function(msg) {
+						//文件存在跳过下载显示
+						carPhotoState--;
+						photoindex++;
+						if (carPhotoState == 0) {
+							LoveCarShow();
+						}
+					}, function(msg, _args) {
+						//文件不存在下载再显示
+						fileTool.fileDown(ResourcesServerUrl + _args, 3, function() {
+							//下载完成后显示
+							carPhotoState--;
+							photoindex++;
+							if (carPhotoState == 0) {
+								loadCarPhoto();
+							}
+						});
+					});
+				}
+			};
+			 //显示车辆图片
+			function LoveCarShow() {
+				for (; carPhotoState < photoindex; carPhotoState++) {
+					AddLoveCar(carPhotoState + 1);
+				}
 				OnPreload();
-				GetPageData();
 				MenuInit();
+				webListener();
+				//$("img.lazy").lazyload();
+			};
+			 //添加车辆图片
+			function AddLoveCar(indexs) {
+				var url = "_doc/CarPhoto/thumbCarPhoto/" + carPhoto[indexs - 1].substring(carPhoto[indexs - 1].lastIndexOf('/') + 1);
+				var carPhotoImg = listCar.getElementsByTagName('img');
+				carPhotoImg[indexs - 1].setAttribute("src", plus.io.convertLocalFileSystemURL(url));
+				carPhotoImg[indexs - 1].style.display = "block";
+			};
+			 //预加载
+			function OnPreload() {
+				editor = mui.preload({
+					"id": 'editor',
+					"url": 'editor_card1.html'
+				});
+				ed_car = mui.preload({
+					"id": 'ed_car',
+					"url": 'editor_car.html'
+				});
+				ed_video = mui.preload({
+					"id": 'ed_video',
+					"url": 'editor_video.html'
+				});
+				ed_job = mui.preload({
+					"id": 'ed_job',
+					"url": 'editor_job.html'
+				});
 			};
 			 //按钮的监听事件
 			function MenuInit() {
-				plus.webview.getWebviewById("editor").addEventListener("hide", function() {
-					console.log("个人资料编辑窗口以关闭");
-					fromInfo();
+				//头像按钮
+				document.getElementById('editor').addEventListener('tap', function() {
+					var btnArray = [{
+						title: "拍照"
+					}, {
+						title: "选取现有的"
+					}];
+					plus.nativeUI.actionSheet({
+						//title: "头像选取方式",  
+						cancel: "取消",
+						buttons: btnArray
+					}, function(e) {
+						var index = e.index;
+						switch (index) {
+							case 0:
+								{
+									//plus.ui.alert("你选择了取消", "警告", "OK");
+									break;
+								}
+							case 1:
+								{
+									//plus.ui.alert("你选择了拍照", "警告", "OK");							
+									var cmr = plus.camera.getCamera();
+									var res = cmr.supportedImageResolutions[0];
+									var fmt = cmr.supportedImageFormats[0];
+									cmr.captureImage(function(path) {
+											//alert(plus.io.convertLocalFileSystemURL(path));
+											plus.storage.setItem("Icon", plus.io.convertLocalFileSystemURL(path));
+											console.log(plus.storage.getItem("Icon"));
+											var wvphone = mui.openWindow({
+												url: 'editor_photo.html',
+												id: 'Icon',
+												show: {
+													aniShow: 'fade-in'
+												}
+											});
+											wvphone.addEventListener("close", function() {
+												console.log("裁剪窗口以关闭");
+												var base64 = new localStorageUtils().getItem("HeadPhotoBase64");
+												if (base64 != "") {
+													document.querySelector("#editor").setAttribute("src", base64);
+												}
+											});
+											//document.querySelector("#user_photo>img").setAttribute('src', plus.io.convertLocalFileSystemURL(path));
+										},
+										function(error) {
+											alert("Capture image failed: " + error.message);
+										}, {
+											resolution: res,
+											format: fmt
+										}
+									);
+									break;
+								}
+							case 2:
+								{
+									//plus.ui.alert("你选择了选取现有的", "警告", "OK");	
+									plus.gallery.pick(function(path) {
+										plus.storage.setItem("Icon", plus.io.convertLocalFileSystemURL(path));
+										console.log(plus.storage.getItem("Icon"));
+										var wvphone = mui.openWindow({
+											url: 'editor_photo.html',
+											id: 'Icon',
+											show: {
+												aniShow: 'fade-in'
+											}
+										});
+										wvphone.addEventListener("close", function() {
+											console.log("裁剪窗口以关闭");
+											var base64 = new localStorageUtils().getItem("HeadPhotoBase64");
+											if (base64 != "") {
+												document.querySelector("#editor").setAttribute("src", base64);
+											}
+										});
+									}, function(e) {}, {
+										filter: "image"
+									});
+									break;
+								}
+						}
+					});
 				});
-				plus.webview.getWebviewById("ed_car").addEventListener("hide", function() {
-					console.log("车辆编辑窗口以关闭");
-					fromCar();
+				//基本信息按钮
+				document.getElementById('ed').addEventListener('tap', function() {
+					mui.fire(editor, 'show', null);
+					setTimeout(function() {
+						mui.openWindow({
+							id: 'editor',
+							show: {
+								aniShow: 'pop-in'
+							},
+							waiting: {
+								autoShow: false
+							},
+							styles: {
+								zindex: 600
+							}
+						});
+					}, 0);
 				});
 				//录制语音hold
 				document.getElementById("recording").addEventListener('tap', function() {
@@ -160,115 +409,6 @@
 						w.setTitle("剩余:" + (5 - t) + "秒");
 					}, 1000);
 				});
-				//				document.getElementById("recording").addEventListener('release',function() {
-				//					w.close();
-				//					clearInterval(iv);
-				//					record.stop();
-				//				});
-				//头像按钮
-				document.getElementById('editor').addEventListener('tap', function() {
-					var btnArray = [{
-						title: "拍照"
-					}, {
-						title: "选取现有的"
-					}];
-					plus.nativeUI.actionSheet({
-						//title: "头像选取方式",  
-						cancel: "取消",
-						buttons: btnArray
-					}, function(e) {
-						var index = e.index;
-						switch (index) {
-							case 0:
-								{
-									//plus.ui.alert("你选择了取消", "警告", "OK");
-									break;
-								}
-							case 1:
-								{
-									//plus.ui.alert("你选择了拍照", "警告", "OK");							
-									var cmr = plus.camera.getCamera();
-									var res = cmr.supportedImageResolutions[0];
-									var fmt = cmr.supportedImageFormats[0];
-									cmr.captureImage(function(path) {
-											//alert(plus.io.convertLocalFileSystemURL(path));
-											plus.storage.setItem("Icon", plus.io.convertLocalFileSystemURL(path));
-											console.log(plus.storage.getItem("Icon"));
-											var wvphone = mui.openWindow({
-												url: 'editor_photo.html',
-												id: 'Icon',
-												show: {
-													aniShow: 'fade-in'
-												}
-											});
-											wvphone.addEventListener("close", function() {
-												console.log("编辑窗口以关闭");
-												var base64 = new localStorageUtils().getItem("HeadPhotoBase64");
-												if (base64 != "") {
-													document.querySelector("#editor").removeAttribute("src");
-													document.querySelector("#editor").setAttribute("data-original", base64);
-													$("img.lazy").lazyload();
-												}
-											});
-											//document.querySelector("#user_photo>img").setAttribute('src', plus.io.convertLocalFileSystemURL(path));
-										},
-										function(error) {
-											alert("Capture image failed: " + error.message);
-										}, {
-											resolution: res,
-											format: fmt
-										}
-									);
-									break;
-								}
-							case 2:
-								{
-									//plus.ui.alert("你选择了选取现有的", "警告", "OK");	
-									plus.gallery.pick(function(path) {
-										plus.storage.setItem("Icon", plus.io.convertLocalFileSystemURL(path));
-										console.log(plus.storage.getItem("Icon"));
-										var wvphone = mui.openWindow({
-											url: 'editor_photo.html',
-											id: 'Icon',
-											show: {
-												aniShow: 'fade-in'
-											}
-										});
-										wvphone.addEventListener("close", function() {
-											console.log("编辑窗口以关闭");
-											var base64 = new localStorageUtils().getItem("HeadPhotoBase64");
-											if (base64 != "") {
-												document.querySelector("#editor").removeAttribute("src");
-												document.querySelector("#editor").setAttribute("data-original", base64);
-												$("img.lazy").lazyload();
-											}
-										});
-									}, function(e) {}, {
-										filter: "image"
-									});
-									break;
-								}
-						}
-					});
-				});
-				//基本信息按钮
-				document.getElementById('ed').addEventListener('tap', function() {
-					mui.fire(editor, 'show', null);
-					setTimeout(function() {
-						mui.openWindow({
-							id: 'editor',
-							show: {
-								aniShow: 'pop-in'
-							},
-							waiting: {
-								autoShow: false
-							},
-							styles: {
-								zindex: 600
-							}
-						});
-					}, 0);
-				});
 				//车辆信息按钮
 				document.getElementById("ed_car").addEventListener('tap', function() {
 					mui.fire(ed_car, 'show', null);
@@ -276,7 +416,8 @@
 						mui.openWindow({
 							id: 'ed_car',
 							show: {
-								aniShow: 'pop-in'
+								aniShow: 'zoom-fade-out',
+								duration:300
 							},
 							waiting: {
 								autoShow: false
@@ -324,90 +465,16 @@
 					}, 0);
 				});
 			};
-			 //预加载
-			function OnPreload() {
-				editor = mui.preload({
-					"id": 'editor',
-					"url": 'editor_card1.html'
+			 //webview的监听
+			function webListener() {
+				plus.webview.getWebviewById("editor").addEventListener("hide", function() {
+					console.log("个人资料编辑窗口以关闭");
+					DataInfoShow();
 				});
-				ed_car = mui.preload({
-					"id": 'ed_car',
-					"url": 'editor_car.html'
+				plus.webview.getWebviewById("ed_car").addEventListener("hide", function() {
+					console.log("车辆编辑窗口以关闭");
+					DataCarShow();
 				});
-				ed_video = mui.preload({
-					"id": 'ed_video',
-					"url": 'editor_video.html'
-				});
-				ed_job = mui.preload({
-					"id": 'ed_job',
-					"url": 'editor_job.html'
-				});
-			};
-			 //获取页面数据为下面显示数据做准备
-			function GetPageData() {
-				//初始化头像并显示
-				pageHeadDataInit();
-				//初始化基本信息并显示
-				fromInfo();
-				//初始化车辆信息
-				GetCarData();
-			};
-			 //初始化页面数据
-			function pageHeadDataInit() {
-				var s = new localStorageUtils().getItem("userInfo");
-				var uinfo = new JsonTools().stringToJson(s);
-				var url = "_doc/HeadPhoto/" + uinfo.user_photo.substring(uinfo.user_photo.lastIndexOf('/') + 1);
-				fileTool.fileExist(url, uinfo.user_photo,
-					function(msg) {
-						ShowHead(msg);
-					},
-					function(msg, _args) {
-						//文件不存在则下载
-						fileTool.fileDown(ResourcesServerUrl + _args, 1, function() {
-							ShowHead(msg);
-						});
-					}
-				);
-			};
-			 //显示头像
-			function ShowHead(url) {
-				document.querySelector("#editor").removeAttribute("src");
-				document.querySelector("#editor").setAttribute("data-original", plus.io.convertLocalFileSystemURL(url));
-				$("img.lazy").lazyload();
-			};
-			 //信息的读取展示
-			function fromInfo() {
-				var s = new localStorageUtils().getItem("userInfo");
-				var uinfo = new JsonTools().stringToJson(s);
-				//找到登录时   在服务器  获取到的 用户信息
-				document.querySelector("#txtName").innerHTML = uinfo.user_nikeName;
-				document.querySelector("#user_height").innerHTML = uinfo.user_height;
-				document.querySelector("#user_weight").innerHTML = uinfo.user_weight;
-				document.querySelector("#user_income").innerHTML = uinfo.user_income;
-				document.querySelector("#user_address").innerHTML = uinfo.user_address;
-				document.querySelector("#user_job").innerHTML = uinfo.user_job;
-				var Newtime = new Date();
-				document.querySelector("#user_age").innerHTML = Newtime.getFullYear() - new Date(uinfo.user_birthday).getFullYear() + 1 + "岁";
-			};
-			 //获取车辆信息
-			function GetCarData() {
-				var s = new localStorageUtils().getItem("userInfo");
-				var uinfo = new JsonTools().stringToJson(s);
-				new UserDAL().getCarInfo(uinfo.user_telphone, function() {
-					//获取车辆成功，显示车辆信息
-					fromCar();
-				}, function() {
-					//获取车辆失败
-					mui.toast("获取您的车辆信息失败，请检查网络");
-				});
-			};
-			 //车辆信息的展示
-			function fromCar() {
-				var temp = new localStorageUtils().getItem("userCar");
-				var car = new JsonTools().stringToJson(temp)["data"];
-				document.querySelector("#car_brand").innerHTML = car.car_brand;
-				document.querySelector("#car_level").innerHTML = car.car_level;
-				document.querySelector("#car_type").innerHTML = car.car_type;
 			};
 		</script>
 	</head>
@@ -421,18 +488,14 @@
 
 			<div id="scroll" class="mui-scroll-wrapper">
 				<div class="mui-scroll">
-
 					<div style="text-align: center; margin-bottom: -38px;padding-bottom: 58px; background: no-repeat url(../../img/login_Log.jpg)">
-
 						<div style="height: 44px;">
 							<span style="text-align: center;line-height: 44px;">个人中心</span>
 						</div>
-
 						<img id="editor" class="lazy" style="line-height: 50px; background-color: transparent; border: 1px solid #ddd;
-  border-radius: 50px;" data-original="http://dcloudio.github.io/mui/assets/img/shuijiao.jpg" width="70px" height="70px">
-
+  border-radius: 50px;" src="../../img/travel_2.jpg" width="70px" height="70px">
 						<div>
-							<span id="txtName">大傻</span>
+							<span id="txtName">神秘爱称</span>
 							<div>
 								<img src="../../img/guide_1.jpg" width="10px" height="10px" />
 								<img src="../../img/guide_1.jpg" width="10px" height="10px" />
@@ -465,15 +528,14 @@
 									<h5 class="mui-content-padded">基本信息</h5>
 									<div class="card">
 										<div style="background: white; text-align: center;">
-											<span id="user_age">22岁</span>|
-											<span id="user_height">160cm</span>|
-											<span id="user_weight">60kg</span>|
-											<span id="user_income">年入10万</span>|
+											<span id="user_age">XX岁</span>|
+											<span id="user_height">XXcm~XXcm</span>|
+											<span id="user_weight">XXkg</span>|
+											<span id="user_income">年入XX万</span>|
 											<br />
-											<span id="user_address">北京●朝阳</span>|
+											<span id="user_address">XX省-XX市</span>|
 											<span>单身</span>|
-											<span id="user_job">白领</span>
-
+											<span id="user_job">XX职业</span>
 										</div>
 
 										<div style="text-align:center">
@@ -491,18 +553,16 @@
 									<h5 class="mui-content-padded">车辆信息</h5>
 									<div class="card">
 										<div style="background: white; text-align: center;">
-											<span id="car_brand">宝马</span>|
-											<span id="car_type">X6</span>|
-											<span id="car_level">40万</span>
+											<span id="car_brand">XX车</span>|
+											<span id="car_type">XX级别</span>|
+											<span id="car_level">价值XX万</span>
 											<span style="border: 1px solid black; border-radius: 20px; background: gainsboro;">
 												已认证
 											</span>
-											<div>
-												<img style="width: 50px !important; height: 50px !important ;" src="../../img/travel_2.jpg" />
-												<img style="width: 50px !important; height: 50px !important ;" src="../../img/guide_1.jpg" />
-												<img style="width: 50px !important; height: 50px !important ;" src="../../img/travel_2.jpg" />
-												<img style="width: 50px !important; height: 50px !important ;" src="../../img/guide_1.jpg" />
-												<img style="width: 50px !important; height: 50px !important ;" src="../../img/travel_2.jpg" />
+											<div id="loveCarPhoto">
+												<img src="" />
+												<img src="" />
+												<img src="" />
 											</div>
 										</div>
 									</div>
@@ -609,10 +669,9 @@
 				</div>
 			</div>
 		</div>
-
 	</body>
 	<script>
-		$("img.lazy").lazyload();
+		 //$("img.lazy").lazyload();
 	</script>
 
 </html>

@@ -45,7 +45,8 @@ var UserDAL = function() {
 
 		//失败的回调
 		function errorCallback(e) {
-			mui.toast(JSON.stringify(e));
+			that.faildLoginHandler();
+			//mui.toast(JSON.stringify(e));
 		}
 	}
 
