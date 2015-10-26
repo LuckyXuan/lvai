@@ -216,41 +216,71 @@ var UserDAL = function() {
 	//车辆信息更新
 	//carJsonstring : 车辆信息的json数据
 	this.UpdateCarInfo = function(carJsonstring, successHandler, faildHandler) {
-		var ws = new WebService(mui);
-		ws.setUrl(WebServiceURL);
-		ws.setOpName("UpdateCarInfo");
-		//			var datas = new JsonTools().jsonObjToString(carJsonstring);
-		//console.log(JSON.stringify(carJsonstring));
+			var ws = new WebService(mui);
+			ws.setUrl(WebServiceURL);
+			ws.setOpName("UpdateCarInfo");
+			//			var datas = new JsonTools().jsonObjToString(carJsonstring);
+			//console.log(JSON.stringify(carJsonstring));
 
-		ws.setParas({
-			carJsonstring: carJsonstring
-		});
+			ws.setParas({
+				carJsonstring: carJsonstring
+			});
 
-		ws.setCallBack(callback);
-		ws.setErrorCall(errorCallback);
+			ws.setCallBack(callback);
+			ws.setErrorCall(errorCallback);
 
-		ws.LoadData();
-		//成功的回调
-		function callback(data) {
-				//alert(JSON.stringify(data));
-				var o = eval(data);
-				o = o.d;
-				var msg = new JsonTools().stringToJson(o);
-				if (msg.status == "faild") {
-					faildHandler(msg);
-					return;
+			ws.LoadData();
+			//成功的回调
+			function callback(data) {
+					//alert(JSON.stringify(data));
+					var o = eval(data);
+					o = o.d;
+					var msg = new JsonTools().stringToJson(o);
+					if (msg.status == "faild") {
+						faildHandler(msg);
+						return;
+					}
+					//				new localStorageUtils().setItem("userInfo",o)
+					successHandler(msg);
+
 				}
-				//				new localStorageUtils().setItem("userInfo",o)
-				successHandler(msg);
+				//失败的回调
 
+			function errorCallback(e) {
+				alert(JSON.stringify(e));
 			}
-			//失败的回调
-
-		function errorCallback(e) {
-			alert(JSON.stringify(e));
 		}
+		//车辆图片上传
+		//phone 手机号
+		//index 图片的序号只支持3张图片上传
+		//files 图片文件
+		//successHandler 成功的消息
+		//faildHandler	失败的消息
+	this.uploadCarPhoto = function(phone, index, files, successHandler, faildHandler) {
+		var filess = files;
+		var task = plus.uploader.createUpload(UploadServer, {
+				method: "POST"
+			},
+			function(t, status) { //上传完成
+				if (status == 200) {
+					successHandler(t.responseText);
+				} else {
+					faildHandler(status);
+				}
+			}
+		);
+		task.addData("Action", "uploadCarPhoto0");
+		task.addData("tel", phone);
+		task.addData("index", index.toString());
+		for (var i = 0; i < filess.length; i++) {
+			var f = filess[i];
+			task.addFile(f.path, {
+				key: f.name
+			});
+		}
+		console.log("开始上传");
+		task.start();
 	}
-
 
 
 }

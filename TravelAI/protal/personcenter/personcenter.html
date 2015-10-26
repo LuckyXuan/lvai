@@ -189,6 +189,11 @@
 				for (var index = 0; index < carPhoto.length; index++) {
 					if (carPhoto[index] == "") {
 						carPhotoState--;
+						if (carPhotoState == 0) {
+							OnPreload();
+							MenuInit();
+							webListener();
+						}
 						continue;
 					}
 					var url = "_doc/CarPhoto/thumbCarPhoto/" + carPhoto[index].substring(carPhoto[index].lastIndexOf('/') + 1);
@@ -417,7 +422,7 @@
 							id: 'ed_car',
 							show: {
 								aniShow: 'zoom-fade-out',
-								duration:300
+								duration: 300
 							},
 							waiting: {
 								autoShow: false
@@ -475,7 +480,23 @@
 					console.log("车辆编辑窗口以关闭");
 					DataCarShow();
 				});
+				window.addEventListener("CarPhoto:Change", ChangeCarPhoto);
 			};
+			 //车辆子页面发生改变时所执行的函数
+			function ChangeCarPhoto() {
+				var userCarTxt = new localStorageUtils().getItem("userCar");
+				var car = new JsonTools().stringToJson(userCarTxt)["data"];
+				carPhoto[0] = car.car_photo1;
+				carPhoto[1] = car.car_photo2;
+				carPhoto[2] = car.car_photo3;
+				for (var index = 0; index < carPhoto.length; index++) {
+					if (carPhoto[index] != "") {
+						listCar.style.height = listCarWidth * 0.3 + 6 + "px";
+						break;
+					}
+				}
+				loadAsynchronou();
+			}
 		</script>
 	</head>
 

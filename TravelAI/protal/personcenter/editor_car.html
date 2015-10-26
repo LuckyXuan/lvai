@@ -13,7 +13,7 @@
 		<script type="text/javascript" src="../../js/lvai.data/UserDAL.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js"></script>
-
+		<script type="text/javascript" src="../../js/lvai.op/FileTool.js" ></script>
 		<!--描述：地域选择 js 以及 css -->
 		<script src="../../js/mui.listpicker.js"></script>
 		<script src="../../js/mui.poppicker.js"></script>
@@ -46,6 +46,9 @@
 			}
 		</style>
 		<script type="text/javascript" charset="utf-8">
+			var files = [];
+			var photoindex = 0;
+			var carPhoto = new Array();
 			mui.init();
 			 // 扩展API加载完毕后调用onPlusReady回调函数 
 			document.addEventListener("plusready", onPlusReady, false);
@@ -57,15 +60,108 @@
 				});
 				PageShow();
 				fromInit();
+				MenuInit();
 			};
 
 			function PageShow() {
-				var temp = new localStorageUtils().getItem("userCar");
-				var car = new JsonTools().stringToJson(temp)["data"];
-				document.querySelector("#car_brand").value = car.car_brand;
-				document.querySelector("#car_level>div").innerHTML = car.car_level;
-				document.querySelector("#car_type").value = car.car_type;
-			}
+					var temp = new localStorageUtils().getItem("userCar");
+					var car = new JsonTools().stringToJson(temp)["data"];
+					document.querySelector("#car_brand").value = car.car_brand;
+					document.querySelector("#car_level>div").innerHTML = car.car_level;
+					document.querySelector("#car_type").value = car.car_type;
+					carPhoto[0] = car.car_photo1;
+					carPhoto[1] = car.car_photo2;
+					carPhoto[2] = car.car_photo3;
+					PageShowPhoto();
+				}
+				//下载车辆图片并显示车辆图片
+
+			function PageShowPhoto() {
+				for (var index = 0; index <carPhoto.length; index++) {
+					if (carPhoto[index] == "") {
+						continue;
+					}
+					var url = "_doc/CarPhoto/thumbCarPhoto/" + carPhoto[index].substring(carPhoto[index].lastIndexOf('/') + 1);
+					AddLoveCar(url);
+					photoindex++;
+				}
+			};
+			 //添加爱车靓照照片模型
+			function AddLoveCar(savePath) {
+				var listCar = document.querySelector("#loveCarPhoto");
+				var width = listCar.offsetWidth;
+				var cars = document.createElement("img");
+				cars.style.width = width * 0.3 + "px";
+				cars.style.height = width * 0.3 + "px";
+				cars.className = "lazy";
+				cars.setAttribute("data-original", plus.io.convertLocalFileSystemURL(savePath));
+				cars.style.float = "left";
+				var fragment = document.createDocumentFragment();
+				fragment.appendChild(cars);
+				listCar.insertBefore(fragment, document.querySelector("#loveCarPhoto div"));
+				if (listCar.childNodes.length >= 6) {
+					document.querySelector("#loveCarPhoto div").style.display = "none";
+				}
+				$("img.lazy").lazyload();
+			};
+			 //按钮的监听事件
+			function MenuInit() {
+				//添加爱车靓照按钮
+				document.querySelector("#loveCarPhoto div").addEventListener('tap', function() {
+					plus.gallery.pick(function(path) {
+						var savePath = "_doc/CarPhoto/" + path.substring(path.lastIndexOf('/') + 1);
+						fileTool.ImgFileCompress(path, savePath, function(existPath, savePath) {
+							photoindex++;
+							files[0] = {
+								name: "yuantu" + photoindex,
+								path: existPath
+							};
+							files[1] = {
+								name: "shuolue" + photoindex,
+								path: savePath
+							};
+							var temp = new localStorageUtils().getItem("userCar");
+							var car = new JsonTools().stringToJson(temp)["data"];
+							var wt = plus.nativeUI.showWaiting("上传图片中...");
+							new UserDAL().uploadCarPhoto(car.user_telphone, photoindex, files, function(_msg) {
+								var res = new JsonTools().stringToJson(_msg);
+								switch (photoindex) {
+									case 1:
+										{
+											car.car_photo1 = res.data;
+											break;
+										}
+									case 2:
+										{
+											car.car_photo2 = res.data;
+											break;
+										}
+									case 3:
+										{
+											car.car_photo3 = res.data;
+											break;
+										}
+								}
+								var temp2 = new JsonTools().stringToJson(temp);
+								temp2["data"] = car;
+								new localStorageUtils().setItem("userCar", new JsonTools().jsonObjToString(temp2));
+								wt.close();
+								AddLoveCar(savePath);
+								mui.fire(plus.webview.getWebviewById("mycard"), "CarPhoto:Change");
+							}, function(_msg) {
+								wt.close();
+								mui.toast("上传失败，请检查网络");
+							});
+						}, function() {
+							mui.toast("图片加载失败！请重新选择");
+						});
+					}, function(e) {
+						console.log("用户取消选择图片");
+					}, {
+						filter: "image"
+					});
+				});
+			};
 		</script>
 	</head>
 
@@ -147,13 +243,15 @@
 	</body>
 	<script>
 		var width = document.querySelector("#loveCarPhoto").offsetWidth;
-		document.querySelector("#loveCarPhoto div").style.width = width * 0.28 + "px";
-		document.querySelector("#loveCarPhoto div").style.height = width * 0.28 + "px";
+		document.querySelector("#loveCarPhoto div").style.width = width * 0.3 + "px";
+		document.querySelector("#loveCarPhoto div").style.height = width * 0.3 + "px";
 		document.querySelector("#loveCarPhoto div").style.textAlign = "center";
-		document.querySelector("#loveCarPhoto div").style.lineHeight = width * 0.28 + "px";
+		document.querySelector("#loveCarPhoto div").style.lineHeight = width * 0.3 + "px";
 		document.querySelector("#loveCarPhoto div").style.background = "#CCC";
 		document.querySelector("#loveCarPhoto div").style.color = "white";
 		document.querySelector("#loveCarPhoto div").style.fontSize = "3em";
+		document.querySelector("#loveCarPhoto div").style.float = "left";
+		document.querySelector("#loveCarPhoto div").style.marginLeft = "10px";
 		$("img.lazy").lazyload();
 
 		function fromInit() {
