@@ -425,8 +425,52 @@
 			};
 			 //按钮的监听事件
 			function MenuInit() {
+				//背景按钮
+				document.getElementById("backImg").addEventListener('tap',function(){
+					var this_backImg = this;
+					var btnArray = [{
+						title: "预览原图"
+					}, {
+						title: "更改背景图"
+					}];
+					plus.nativeUI.actionSheet({
+						//title: "头像选取方式",  
+						cancel: "取消",
+						buttons: btnArray
+					}, function(e) {
+						var index = e.index;
+						switch (index) {
+							case 0:
+								{
+									//取消 
+									break;
+								}
+							case 1:
+								{
+									//预览原图
+									break;
+								}
+							case 2:
+								{console.log(this_backImg.style.background ); 
+									//选取现有的
+									plus.gallery.pick(function(path) {
+										var sysPath = plus.io.convertLocalFileSystemURL(path);
+										plus.storage.setItem("backImg",sysPath );
+//										console.log(plus.storage.getItem("backImg"));
+										
+										this_backImg.style.background = "url(file://"+sysPath+") no-repeat center center";
+										this_backImg.style.backgroundSize = "100% 100%"; 
+									}, function(e) {}, {
+										filter: "image"
+									});
+									break;
+								}
+						}
+					});
+				});
 				//头像按钮
-				document.getElementById('editor').addEventListener('tap', function() {
+				document.getElementById('editor').addEventListener('tap', function(e) {
+					e.stopPropagation();
 					var btnArray = [{
 						title: "拍照"
 					}, {
@@ -723,7 +767,7 @@
 
 			<div id="scroll" class="mui-scroll-wrapper">
 				<div class="mui-scroll">
-					<div style="text-align: center; margin-bottom: -38px;padding-bottom: 58px; background: no-repeat url(../../img/login_Log.jpg)">
+					<div id="backImg" style="text-align: center; margin-bottom: -38px;padding-bottom: 58px; background: no-repeat url(../../img/login_Log.jpg)">
 						<div style="height: 44px;">
 							<span style="text-align: center;line-height: 44px;">个人中心</span>
 						</div>
