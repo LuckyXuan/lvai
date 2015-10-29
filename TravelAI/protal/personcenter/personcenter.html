@@ -275,7 +275,10 @@
 			};
 			 //数据展示
 			function DataShow() {
-				DataHeadPhotoShow(DataInfoShow());
+				var userinfo = DataInfoShow();
+				if (userinfo.user_photo) {
+					DataHeadPhotoShow(userinfo);
+				}
 				DataCarShow();
 			};
 			 //基本信息的判断及展示
@@ -283,14 +286,22 @@
 				var userInfoTxt = new localStorageUtils().getItem("userInfo");
 				var userInfo = new JsonTools().stringToJson(userInfoTxt);
 				//找到登录时   在服务器  获取到的 用户信息
-				document.querySelector("#txtName").innerHTML = userInfo.user_nikeName;
-				document.querySelector("#user_height").innerHTML = userInfo.user_height;
-				document.querySelector("#user_weight").innerHTML = userInfo.user_weight;
-				document.querySelector("#user_income").innerHTML = userInfo.user_income;
-				document.querySelector("#user_address").innerHTML = userInfo.user_address;
-				document.querySelector("#user_job").innerHTML = userInfo.user_job;
-				var Newtime = new Date();
-				document.querySelector("#user_age").innerHTML = Newtime.getFullYear() - new Date(userInfo.user_birthday).getFullYear() + 1 + "岁";
+				if (userInfo.user_nikeName) {
+					document.querySelector("#txtName").innerHTML = userInfo.user_nikeName;
+				} else if (userInfo.user_height) {
+					document.querySelector("#user_height").innerHTML = userInfo.user_height;
+				} else if (userInfo.user_weight) {
+					document.querySelector("#user_weight").innerHTML = userInfo.user_weight;
+				} else if (userInfo.user_income) {
+					document.querySelector("#user_income").innerHTML = userInfo.user_income;
+				} else if (userInfo.user_address) {
+					document.querySelector("#user_address").innerHTML = userInfo.user_address;
+				} else if (userInfo.user_job) {
+					document.querySelector("#user_job").innerHTML = userInfo.user_job;
+				} else if (userInfo.user_birthday) {
+					var Newtime = new Date();
+					document.querySelector("#user_age").innerHTML = Newtime.getFullYear() - new Date(userInfo.user_birthday).getFullYear() + 1 + "岁";
+				}
 				return userInfo;
 			};
 			 //头像的判断及展示
@@ -318,9 +329,13 @@
 			function DataCarShow() {
 				var userCarTxt = new localStorageUtils().getItem("userCar");
 				var car = new JsonTools().stringToJson(userCarTxt)["data"];
-				document.querySelector("#car_brand").innerHTML = car.car_brand;
-				document.querySelector("#car_level").innerHTML = car.car_level;
-				document.querySelector("#car_type").innerHTML = car.car_type;
+				if (car.car_brand != "") {
+					document.querySelector("#car_brand").innerHTML = car.car_brand;
+				} else if (car.car_level != "") {
+					document.querySelector("#car_level").innerHTML = car.car_level;
+				} else if (car.car_type) {
+					document.querySelector("#car_type").innerHTML = car.car_type;
+				}
 				carPhoto[0] = car.car_photo1;
 				carPhoto[1] = car.car_photo2;
 				carPhoto[2] = car.car_photo3;
@@ -526,6 +541,24 @@
 								plus.nativeUI.confirm(entry.name, function(e) {
 									switch (e.index) {
 										case 0:
+											var ww = plus.nativeUI.showWaiting("上传中... ", {
+												back: "none"
+											});
+											var u = new localStorageUtils().getItem("userInfo");
+											var uinfo = new JsonTools().stringToJson(u);
+											var files = [];
+											files[0] = {
+												name: "userAudo",
+												path: plus.io.convertLocalFileSystemURL(p)
+											};
+											new UserDAL().uploadUserAudio(uinfo.user_telphone, files, function(_msg) {
+												console.log(_msg);
+												ww.close();
+												mui.toast("上传成功");
+											}, function(_msg) {
+												ww.close();
+												mui.toast("上传失败，请检查网络");
+											});
 											break; //上传
 										case 1:
 											break; //取消
@@ -590,21 +623,47 @@
 				});
 				//视屏认证按钮
 				document.getElementById("ed_video").addEventListener('tap', function() {
-					mui.fire(ed_video, 'show', null);
-					setTimeout(function() {
-						mui.openWindow({
-							id: 'ed_video',
-							show: {
-								aniShow: 'pop-in'
-							},
-							waiting: {
-								autoShow: false
-							},
-							styles: {
-								zindex: 600
-							}
-						});
-					}, 0);
+					var ps = "请控制录制时间在15s内,提高审核效率.";
+					plus.nativeUI.confirm(ps, function(e) {
+						switch (e.index) {
+							case 0:
+								var cmr = plus.camera.getCamera();
+								var res = cmr.supportedVideoResolutions[1];
+								var fmt = cmr.supportedVideoFormats[0];
+								cmr.startVideoCapture(function(path) {
+										var ww = plus.nativeUI.showWaiting("视频上传中... ", {
+											back: "none"
+										});
+										var u = new localStorageUtils().getItem("userInfo");
+										var uinfo = new JsonTools().stringToJson(u);
+										var files = [];
+										files[0] = {
+												name: "userVido",
+												path: plus.io.convertLocalFileSystemURL(path)
+										};
+										new UserDAL().uploadVideo(uinfo.user_telphone, files,".mp4", function(_msg) {
+												console.log(_msg);
+												ww.close();
+												mui.toast("上传成功");
+											}, function(_msg) {
+												ww.close();
+												mui.toast("上传失败，请检查网络");
+											});
+									},
+									function(error) {
+										console.log("Capture video failed: " + error.message);
+									}, {
+										resolution: res,
+										format: fmt,
+										index: '2'
+									}
+								);
+								break;
+							case 1:
+							default:
+								return;
+						}
+					}, "提示", ["开始录制", "取消"]);
 				});
 				//职业认证
 				document.getElementById("ed_job").addEventListener('tap', function() {

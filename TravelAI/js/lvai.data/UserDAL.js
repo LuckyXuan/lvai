@@ -36,7 +36,10 @@ var UserDAL = function() {
 				return;
 			}
 			var uinfo = msg.data;
-			uinfo.user_birthday = new Date().setCsharpTime(uinfo.user_birthday).toFormatString("yyyy-MM-dd");
+			console.log(uinfo.user_birthday);
+			if (uinfo.user_birthday) {
+				uinfo.user_birthday = new Date().setCsharpTime(uinfo.user_birthday).toFormatString("yyyy-MM-dd");
+			}
 			var s = new JsonTools().jsonObjToString(uinfo);
 			new localStorageUtils().setItem("userInfo", s);
 			that.successLoginHandler(uinfo);
@@ -45,7 +48,7 @@ var UserDAL = function() {
 
 		//失败的回调
 		function errorCallback(e) {
-			that.faildLoginHandler();
+			that.faildLoginHandler("网络异常，请检查网络重新登录");
 			//mui.toast(JSON.stringify(e));
 		}
 	}
@@ -278,9 +281,65 @@ var UserDAL = function() {
 				key: f.name
 			});
 		}
-		console.log("开始上传");
 		task.start();
 	}
 
+	//个人音频上传
+	//phone:手机号
+	//files:音频文件
+	this.uploadUserAudio = function(phone, files, successHandler, faildHandler) {
+			var filess = files;
+			var task = plus.uploader.createUpload(UploadServer, {
+					method: "POST"
+				},
+				function(t, status) { //上传完成
+					console.log(status);
+					if (status == 200) {
+						successHandler(t.responseText);
+					} else {
+						faildHandler(status);
+					}
+				}
+			);
+			task.addData("Action", "upUserAudio");
+			task.addData("tel", phone);
+			for (var i = 0; i < filess.length; i++) {
+				var f = filess[i];
+				task.addFile(f.path, {
+					key: f.name
+				});
+			}
+			console.log("开始上传");
+			task.start();
+		}
+		//个人音频上传
+		//phone:手机号
+		//files:音频文件
+	this.uploadVideo = function(phone, files,type, successHandler, faildHandler) {
+		var filess = files;
+		var task = plus.uploader.createUpload(UploadServer, {
+				method: "POST"
+			},
+			function(t, status) { //上传完成
+				console.log(status);
+				if (status == 200) {
+					successHandler(t.responseText);
+				} else {
+					faildHandler(status);
+				}
+			}
+		);
+		task.addData("Action", "uploadVideo");
+		task.addData("tel", phone);
+		task.addData("type", type);
+		for (var i = 0; i < filess.length; i++) {
+			var f = filess[i];
+			task.addFile(f.path, {
+				key: f.name
+			});
+		}
+		console.log("开始上传");
+		task.start();
+	}
 
 }

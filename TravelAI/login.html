@@ -49,7 +49,7 @@
 					}
 					var dal = new UserDAL();
 					dal.faildLoginHandler = function(_args) {
-						mui.toast("网络异常，请检查网络重新登录");
+						mui.toast(_args);
 						wt.close();
 					}
 					dal.successLoginHandler = function(_args) {
@@ -126,7 +126,7 @@
 				<form class="mui-input-group">
 					<div class="mui-input-row">
 						<label style="font-size: 14px; width: 25%; color: #666;">手机号</label>
-						<input id="txtTel" type="text" style="font-size: 14px; width: 70%; " placeholder="请输入您的手机号" value="19999999999">
+						<input id="txtTel" type="text" style="font-size: 14px; width: 70%; " placeholder="请输入您的手机号" value="18296965705">
 					</div>
 					<div class="mui-input-row">
 						<label style="font-size: 14px; width: 25%; color: #666;">密　码</label>

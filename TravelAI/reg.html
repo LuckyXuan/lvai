@@ -49,11 +49,12 @@
 				document.getElementById('btnGetVailCode').addEventListener('tap', function() {
 					var tel = document.getElementById("txtTel").value;
 					if (Utility.checkPhone(tel)) {
-						ShowDownTime();
 						new UserDAL().getCode(tel,
-							function(_args) {}, //成功的函数
 							function(_args) {
-								mui.toast(_args.msg)
+								ShowDownTime();
+							}, //成功的函数
+							function(_args) {
+								mui.toast(_args);
 							} //失败的函数
 						);
 					} else {
