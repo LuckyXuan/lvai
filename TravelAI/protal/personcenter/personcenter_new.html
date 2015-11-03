@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="../../js/mui.min.js"></script>
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<script type="text/javascript" charset="utf-8">
+			mui.init({
+				gestureConfig: {
+					hold: true, //默认为false，不监听
+					release: true //默认为false，不监听
+				}
+			});
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			document.addEventListener("plusready", onPlusReady);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+				setPageUi();
+			};
+			 //设置页面Ui
+			function setPageUi() {
+				systemUi();
+				//CarPhotoUi();
+			};
+			 // 系统Ui
+			function systemUi() {
+				//减速系数
+				mui('.mui-scroll-wrapper').scroll({
+					deceleration: 0.0005 //减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+				});
+				//去除滚动条
+				mui('#scroll').scroll({
+					indicators: false
+				});
+			};
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="display: none;">
+			<h1 class="mui-title">乐小姐</h1>
+		</header>
+		<div class="mui-content">
+			<div id="scroll" class="mui-scroll-wrapper">
+				<div class="mui-scroll">
+					<div id="backImg" style=" text-align: center;  padding-bottom: 30px; background: url(../../img/reg_Log.jpg) no-repeat center center;">
+						<div style="height: 44px; ">
+							<span style="text-align: center;line-height: 44px;">个人中心</span>
+						</div>
+						<img id="editor" class="lazy" style=" line-height: 50px; background-color: transparent; border: 1px solid #ddd;
+  border-radius: 50px;" src="../../img/head.png" width="70px" height="70px" />
+						<div>
+							<span id="txtName">神秘爱称</span>
+							<div style="margin-top: 10px;">
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+							</div>
+						</div>
+					</div>
+					<div id="slider" class="mui-slider">
+						<div id="sliderSegmentedControl" class="mui-slider-indicator mui-segmented-control mui-segmented-control-inverted" style="background-color: transparent !important;">
+							<a class="mui-control-item" href="#item1mobile">
+						资料 
+					</a>
+							<a class="mui-control-item" href="#item2mobile">
+						照片
+					</a>
+							<a class="mui-control-item" href="#item3mobile">
+						旅行
+					</a>
+						</div>
+						<div id="sliderProgressBar" class="mui-slider-progress-bar mui-col-xs-4"></div>
+						<div class="mui-slider-group">
+							<div id="item1mobile" style="background-color:gainsboro" class="mui-slider-item mui-control-content mui-active">
+								<span id='ed' class="mui-pull-right" style="font-size: 1.5em; color:#6f6f6f; margin-right:5px; margin-top: 9px;">编辑</span>
+								<h5 class="mui-content-padded">基本信息</h5>
+								<div style="text-align: center; background-color: #fdd4a8; color: aqua;">
+									您的个人基本信息并没有完善，请点击编辑进行完善
+								</div>
+								<div style="clear: both;" class="card">
+									<div style="background: white; text-align: center;">
+										<span id="user_age">XX岁</span>|
+										<span id="user_height">XXcm~XXcm</span>|
+										<span id="user_weight">XXkg</span>|
+										<span id="user_income">年入XX万</span>|
+										<br />
+										<span id="user_address">XX省-XX市</span>|
+										<span>单身</span>|
+										<span id="user_job">XX职业</span>
+									</div>
+
+									<div style="text-align:center">
+										<!--<span class="mui-icon mui-icon-mic" style=" border: 1px solid gray; border-radius: 90px; padding: 10px;"></span>-->
+										<button type="button" id="recording" class="mui-icon mui-icon-mic" style=" border: 1px solid gray; border-radius: 90px; padding: 10px;"></button>
+										<span style="line-height: 50px;">点击左侧mic录制语音</span>
+									</div>
+								</div>
+							</div>
+							<div id="item2mobile" class="mui-slider-item mui-control-content">
+							</div>
+							<div id="item3mobile" class="mui-slider-item mui-control-content">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>

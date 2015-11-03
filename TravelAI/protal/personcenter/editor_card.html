@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/jquery-1.7.2.min.js"></script>
+		<script src="../../js/jquery.lazyload.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/config.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/WebService2.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/UserDAL.js"></script>
+		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js" ></script>
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-card {
+				margin: 0 1.5%;
+			}
+			.mui-table-view li {
+				/*height: 50px;*/
+			}
+			.mui-table-view label {
+				width: 30%;
+				line-height: 1.5em;
+			}
+			.mui-table-view input {
+				width: 70%;
+			}
+			label {
+				font-size: 0.8em;
+			}
+		</style>
+		<script type="text/javascript" charset="utf-8">
+			var Icon;
+			mui.init();
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			document.addEventListener("plusready", onPlusReady, false);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+				//去除滚动条
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+				//预加载
+				OnPreload();
+				//按钮的监视
+				MenuInit();
+				//表单的监视
+				fromInit();
+			};
+
+			function OnPreload() {};
+			 //按钮监听
+			function MenuInit() {
+				document.getElementById('user_photo').addEventListener('tap', function() {
+					var btnArray = [{
+						title: "拍照"
+					}, {
+						title: "选取现有的"
+					}];
+					plus.nativeUI.actionSheet({
+						//title: "头像选取方式",  
+						cancel: "取消",
+						buttons: btnArray
+					}, function(e) {
+						var index = e.index;
+						switch (index) {
+							case 0:
+								{
+									//plus.ui.alert("你选择了取消", "警告", "OK");
+									break;
+								}
+							case 1: 
+								{
+									//plus.ui.alert("你选择了拍照", "警告", "OK");							
+									var cmr = plus.camera.getCamera();
+									var res = cmr.supportedImageResolutions[0];
+									var fmt = cmr.supportedImageFormats[0];
+									cmr.captureImage(function(path) {
+											//alert(plus.io.convertLocalFileSystemURL(path));
+											plus.storage.setItem("Icon", plus.io.convertLocalFileSystemURL(path));
+											console.log(plus.storage.getItem("Icon"));
+											mui.openWindow({
+												url: 'editor_photo.html',
+												id: 'Icon',
+												show: {
+													aniShow: 'zoom-out'
+												}
+											});
+											//document.querySelector("#user_photo>img").setAttribute('src', plus.io.convertLocalFileSystemURL(path));
+										},
+										function(error) {
+											alert("Capture image failed: " + error.message);
+										}, {
+											resolution: res,
+											format: fmt
+										}
+									);
+									break;
+								}
+							case 2:
+								{
+									//plus.ui.alert("你选择了选取现有的", "警告", "OK");	
+									plus.gallery.pick(function(path) {
+										document.querySelector("#user_photo>img").setAttribute('src', plus.io.convertLocalFileSystemURL(path));
+									}, function(e) {}, {
+										filter: "image"
+									});
+									break;
+								}
+						}
+					});
+				});
+			};
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+
+			<button id="save" class="mui-btn mui-btn-link mui-btn-nav mui-pull-right">
+				保存
+				<span class="mui-icon mui-icon-right-nav"></span>
+			</button>
+
+			<h1 class="mui-title">编辑个人资料</h1>
+		</header>
+		<div class="mui-content">
+
+			<div class="mui-card" style="margin: 5px; margin-top: 10px;">
+				<form class="mui-input-group">
+					<div style="background: #FFF;  padding: 10px 10px; " align="center" class="mui-table-view-cell">
+						<img class="lazy" id="user_photo" style="border-radius: 50px; " data-original="http://dcloudio.github.io/mui/assets/img/shuijiao.jpg" width="70px" height="70px">
+					</div>
+				</form>
+
+			</div>
+
+			<div class="mui-card">
+				<ul id="list" class="mui-table-view mui-table-view-chevron">
+					<li class="mui-table-view-cell">
+						<div class="mui-input-row">
+							<label>昵称<span>|</span></label>
+							<input id="user_nikeName" name="user_nikeName" type="text" value="宁大大">
+						</div>
+					</li>
+
+					<li class="mui-table-view-cell mui-collapse">
+						<a class="mui-navigate-right" href="#">
+							<div class="mui-input-row">
+								<label>性别<span>|</span></label>
+								<input id="user_sex" name="user_sex" type="text" value="男" disabled="true">
+							</div>
+						</a>
+						<ul class="mui-table-view mui-table-view-chevron" id="sexSelect">
+							<li class="mui-table-view-cell">
+								<a class="mui-navigate-right">
+								男
+							</a>
+							</li>
+							<li class="mui-table-view-cell">
+								<a class="mui-navigate-right">
+								女
+							</a>
+							</li>
+						</ul>
+					</li>
+
+					<li class="mui-table-view-cell">
+						<a class="mui-navigate-right" id="birSelect">
+							<div class="mui-input-row">
+								<label>生日<span>|</span></label>
+								<input id="user_birthday" name="user_birthday" type="text" disabled="ture" value="1995-10-22">
+							</div>
+						</a>
+
+					</li>
+
+					<li class="mui-table-view-cell">
+						<div class="mui-input-row">
+							<label>身高<span>|</span></label>
+							<input id="user_height" name="user_height" type="text" value="178cm">
+						</div>
+					</li>
+
+					<li class="mui-table-view-cell">
+						<div class="mui-input-row">
+							<label>体重<span>|</span></label>
+							<input id="user_weight" name="user_weight" type="text" value="77kg">
+						</div>
+					</li>
+
+					<li class="mui-table-view-cell">
+						<div class="mui-input-row">
+							<label>常住<span>|</span></label>
+							<input id="user_address" name="user_address" type="text" value="南昌">
+						</div>
+					</li>
+
+					<li class="mui-table-view-cell">
+						<div class="mui-input-row">
+							<label>职业<span>|</span></label>
+							<input id="user_job" name="user_job" type="text" value="程序员">
+						</div>
+					</li>
+
+					<li class="mui-table-view-cell">
+						<div class="mui-input-row">
+							<label>收入<span>|</span></label>
+							<input id="user_income" name="user_income" type="text" value="10w/年">
+						</div>
+					</li>
+
+					<li class="mui-table-view-cell">
+						<div class="mui-input-row">
+							<label>密码<span>|</span></label>
+							<input id="user_pwd" name="user_pwd" type="text" value="**********">
+						</div>
+					</li>
+
+				</ul>
+			</div>
+		</div>
+
+	</body>
+	<script>
+		$("img.lazy").lazyload();
+
+		function fromInit() {
+			//性别选择
+			mui("#sexSelect>li").each(function(key, val) {
+				val.addEventListener('tap', function() {
+					document.getElementById("user_sex").value = this.innerText;
+				});
+			});
+			//出生日期选择
+			document.getElementById("birSelect").addEventListener('tap', function() {
+				//				var d=new Date();
+				//				d.setFullYear(2014,11,31);
+				plus.nativeUI.pickDate(function(e) {
+					var d = e.date;
+					document.getElementById("user_birthday").value = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+				}, function(e) {
+					mui.toast(e.message);
+				}, {
+					title: "请选出生年月日：" //,   
+						//					maxDate:d 
+				});
+			});
+			document.getElementById("save").addEventListener('tap', function() {
+				//提交咯，目前还没有做验证
+				var info = {
+					user_phone: new localStorageUtils().getItem("userInfo").user_phone,
+					user_sex: document.getElementById("user_sex").value,
+					user_nikeName: document.getElementById("user_nikeName").value,
+					user_photo: "base64code",
+					user_birthday: document.getElementById("user_birthday").value,
+					user_height: document.getElementById("user_height").value,
+					user_weight: document.getElementById("user_weight").value,
+					user_address: document.getElementById("user_address").value,
+					user_job: document.getElementById("user_job").value,
+					user_income: document.getElementById("user_income").value,
+					user_pwd: "123"
+				};
+				new UserDAL().updateUserInfo(info,function(){
+					//成功
+					mui.toast('个人信息更新成功！');
+				},function(){
+					//失败
+					mui.toast('个人信息更新失败！');
+				});
+				
+			});
+		}
+	</script>
+
+</html>

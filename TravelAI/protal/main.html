@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="../js/mui.min.js"></script>
+		<script type="text/javascript" src="../js/lvai.op/UIOp.js"></script>
+		<script type="text/javascript" src="../js/lvai.op/webview.js"></script>
+		<script type="text/javascript" src="../js/jquery-1.7.2.min.js" ></script>
+		<link href="../css/mui.min.css" rel="stylesheet" />
+		<script type="text/javascript" charset="utf-8">
+			var ws = null,
+				menu = null,
+				page = new Array();
+			 //mui初始化
+			mui.init();
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			document.addEventListener("plusready", onPlusReady, false);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+				//1页面初始化
+				pageInit();
+				//2页面数据载入
+				pageLoad();
+				//3页面数据展示
+				pageRender();
+				//4加载网络数据
+				loadData();
+				//5显示网络数据
+				renderData();
+			}
+			
+			
+			
+			
+			
+			
+			//1页面初始化
+			function pageInit(){
+				//仅支持竖屏显示
+				plus.screen.lockOrientation("portrait-primary");
+				//退出设置
+				SetBackEvent();
+				//菜单的事件
+				MenuInit();
+				//预加载
+				//OnPreload();
+			}
+			//2页面数据载入
+			function pageLoad(){
+				ws = plus.webview.currentWebview();
+			}
+			
+			//3页面数据展示
+			function pageRender(){
+				//默认加载第一页  
+				document.querySelector("header").style.visibility = "visible";
+				preateHide(ws,{id:"travel/travel.html"}, "45px", "51px",document.body.clientWidth);
+			}
+			
+			//4加载网络数据
+			function loadData(){
+				
+			}
+			//5显示网络数据
+			function renderData(){
+				
+			}
+			 
+			//子页面切换
+			function MenuInit() {
+				mui('.mui-bar.mui-bar-tab').on('tap', 'a', function(e) {
+					var top = '0px',
+						bom = '51px'; 
+					
+					if (this.id == "travel/travel.html") { 
+						document.querySelector("header").style.visibility = "visible";
+					} else {
+						document.querySelector("header").style.visibility = "hidden";
+					}
+					
+					preateHide(ws,this,top,bom,document.body.clientWidth); 
+					
+				}, false);
+				
+				document.querySelector(".mui-btn").addEventListener('tap', function() {
+					plus.geolocation.getCurrentPosition(function(p) {
+						alert("Geolocation\nLatitude:" + p.coords.latitude + "\nLongitude:" + p.coords.longitude + "\nAltitude:" + p.coords.altitude);
+					}, function(e) {
+						mui.toast("Geolocation error: " + e.message);
+					});
+				});
+			};
+
+			function OnPreload() {
+				ws.append(CreatePage("msg/msgList.html", "msg", "0px", "51px",document.body.clientWidth, false));
+				ws.append(CreatePage("personcenter/personcenter.html", "mycard", "0px", "51px",document.body.clientWidth, false));
+				ws.append(CreatePage("travel/travel.html", "travel", "45px", "51px",document.body.clientWidth, true));
+				
+			}
+		</script>
+	</head>
+
+	<body>
+		<!--head-->
+		<header class="mui-bar mui-bar-nav">
+			<span class="mui-icon mui-icon-search mui-pull-left"></span>
+			<button class="mui-btn mui-pull-right">
+				筛选
+				<span class="mui-icon mui-icon-right-nav"></span>
+			</button>
+			<h1 class="mui-title">旅爱</h1>
+		</header>
+		<!--底部导航栏-->
+		<nav class="mui-bar mui-bar-tab" style="box-shadow: 0 0 0 rgba(0,0,0,.85); height: 51px;">
+			<a id="travel/travel.html" class="mui-tab-item mui-active">
+				<span class="mui-icon mui-icon-paperplane"></span>
+				<span class="mui-tab-label">旅行</span>
+			</a>
+			<a id="lvban" class="mui-tab-item">
+				<span class="mui-icon mui-icon-weixin"></span>
+				<span class="mui-tab-label">旅伴</span>
+			</a>
+			<a id="gd" class="mui-tab-item">
+				<span class="mui-icon mui-icon-plus"></span>
+				<span class="mui-tab-label">更多</span>
+			</a>
+			<a id="msg/msgList.html" class="mui-tab-item">
+				<span class="mui-icon mui-icon-chatbubble"></span>
+				<span class="mui-tab-label">消息</span>
+			</a>
+			<a id="personcenter/personcenter.html" class="mui-tab-item">
+				<span class="mui-icon mui-icon-contact"></span>
+				<span class="mui-tab-label">我的</span>
+			</a>
+		</nav>
+	</body>
+</html>

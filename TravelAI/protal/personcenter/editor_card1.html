@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="../../js/mui.min.js"></script>
+		<script src="../../js/jquery-1.7.2.min.js"></script>
+		<script src="../../js/jquery.lazyload.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/config.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/WebService2.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/UserDAL.js"></script>
+		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js"></script>
+		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js"></script>
+		<script type="text/javascript" src="../../js/lvai.base/Utility.js"></script>
+		<script type="text/javascript" src="../../js/extends/extends.js"></script>
+		<!--描述：地域选择 js 以及 css -->
+		<script src="../../js/mui.listpicker.js"></script>
+		<script src="../../js/mui.poppicker.js"></script>
+		<script src="../../js/city.data.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../../js/city.data-3.js" type="text/javascript" charset="utf-8"></script>
+
+		<link href="../../css/mui.listpicker.css" rel="stylesheet" />
+		<link href="../../css/mui.poppicker.css" rel="stylesheet" />
+		<!---->
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			.mui-card {
+				margin: 0 1.5%;
+			}
+			.mui-table-view li {
+				/*height: 50px;*/
+			}
+			.mui-table-view label {
+				width: 30%;
+				line-height: 1.5em;
+			}
+			.mui-table-view input {
+				width: 70%;
+			}
+			label {
+				font-size: 0.8em;
+			}
+		</style>
+		<script type="text/javascript" charset="utf-8">
+			var Icon;
+			var user;
+			var userHeight;
+			var userWeight;
+			var userIncome;
+			var cityPicker;
+			var userJob;
+			mui.init();
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			mui.ready(function() {
+				//身高选择
+				userHeight = new mui.PopPicker();
+				userHeight.setData([{
+					value: '1',
+					text: '150cm'
+				}, {
+					value: '2',
+					text: '155cm'
+				}, {
+					value: '3',
+					text: '160cm'
+				}, {
+					value: '4',
+					text: '165cm'
+				}, {
+					value: '5',
+					text: '170cm'
+				}, {
+					value: '6',
+					text: '175cm'
+				}, {
+					value: '7',
+					text: '180cm'
+				}, {
+					value: '8',
+					text: '185cm'
+				}, {
+					value: '9',
+					text: '190cm'
+				}]);
+				//体重选择
+				userWeight = new mui.PopPicker();
+				userWeight.setData([{
+					value: '1',
+					text: '45kg'
+				}, {
+					value: '2',
+					text: '50kg'
+				}, {
+					value: '3',
+					text: '55kg'
+				}, {
+					value: '4',
+					text: '60kg'
+				}, {
+					value: '5',
+					text: '65kg'
+				}, {
+					value: '6',
+					text: '70kg'
+				}, {
+					value: '6',
+					text: '75kg'
+				}]);
+				//职业选择
+				userJob = new mui.PopPicker();
+				userJob.setData([{
+					value: '学生',
+					text: '学生'
+				}, {
+					value: '白领',
+					text: '白领'
+				}]);
+				//收入选择
+				userIncome = new mui.PopPicker();
+				userIncome.setData([{
+					value: '1',
+					text: '10~20万/年'
+				}, {
+					value: '2',
+					text: '21~30万/年'
+				}, {
+					value: '3',
+					text: '31~40万/年'
+				}]);
+				//地域选择
+				cityPicker = new mui.PopPicker({
+					layer: 2
+				});
+				cityPicker.setData(cityData);
+			});
+			document.addEventListener("plusready", onPlusReady, false);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+				//去除滚动条
+				plus.webview.currentWebview().setStyle({
+					scrollIndicator: 'none'
+				});
+				//信息的读取展示
+				fromInfo();
+				//按钮的监视
+				MenuInit();
+				//表单的监视
+				fromInit();
+			};
+			 //信息的读取展示
+			function fromInfo() {
+					user = new JsonTools().stringToJson(new localStorageUtils().getItem("userInfo"));
+					//user.user_birthday = Utility.DatetoJs(user.user_birthday);
+					//console.log(Utility.DatetoJs(user.user_birthday));
+					document.querySelector("#user_sex>div").innerHTML = Boolean(user.user_sex) ? "男" : "女";
+					document.querySelector("#user_nikeName").value = user.user_nikeName;
+					/*					document.querySelector("#user_photo>img").src = user.user_photo; //base64*/
+					document.querySelector("#user_birthday>div").innerHTML = user.user_birthday;
+					document.querySelector("#user_height>div").innerHTML = user.user_height,
+						document.querySelector("#user_weight>div").innerHTML = user.user_weight,
+						document.querySelector("#user_address>div").innerHTML = user.user_address,
+						document.querySelector("#user_job>div").innerHTML = user.user_job,
+						document.querySelector("#user_income>div").innerHTML = user.user_income,
+						document.querySelector("#user_pwd>div").innerHTML = user.user_pwd; //md5
+				}
+				//按钮监听
+
+			function MenuInit() {
+				//选择性别
+				document.getElementById("user_sex").addEventListener('tap', function() {
+					var btnArray = [{
+						title: "男"
+					}, {
+						title: "女"
+					}];
+					plus.nativeUI.actionSheet({
+						//title: "选择性别",  
+						cancel: "取消",
+						buttons: btnArray
+					}, function(e) {
+						var index = e.index;
+						switch (index) {
+							case 0:
+								{
+									//plus.ui.alert("你选择了取消", "警告", "OK");
+									break;
+								}
+							case 1:
+								{
+									document.querySelector("#user_sex>div").innerHTML = "男";
+									user.user_sex = "true";
+									break;
+								}
+							case 2:
+								{
+									document.querySelector("#user_sex>div").innerHTML = "女";
+									user.user_sex = "false";
+									break;
+								}
+						}
+					});
+				});
+				//身高
+				document.getElementById("user_height").addEventListener('tap', function() {
+					
+					userHeight.show(function(items) {
+						user.user_height = document.querySelector("#user_height>div").innerHTML = items[0].text;
+						//返回 false 可以阻止选择框的关闭
+						//return false;
+						
+					},document.querySelector("#user_height>div").innerHTML);
+				});
+				//体重
+				document.getElementById("user_weight").addEventListener('tap', function() {
+					
+					userWeight.show(function(items) {
+						user.user_weight = document.querySelector("#user_weight>div").innerHTML = items[0].text;
+						//返回 false 可以阻止选择框的关闭
+						//return false;
+					},document.querySelector("#user_weight>div").innerHTML);
+				});
+				//地址
+				document.getElementById("user_address").addEventListener('tap', function() {
+					cityPicker.show(function(items) {
+						user.user_address = document.querySelector("#user_address>div").innerHTML = items[0].text + "-" + items[1].text;
+						//返回 false 可以阻止选择框的关闭
+						//return false;
+					},document.querySelector("#user_address>div").innerHTML);
+				});
+				//职业
+				document.getElementById("user_job").addEventListener('tap', function() {
+					userJob.show(function(items) {
+						user.user_job = document.querySelector("#user_job>div").innerHTML = items[0].text;
+						//返回 false 可以阻止选择框的关闭
+						//return false;
+					},document.querySelector("#user_job>div").innerHTML);
+				});
+				//收入
+				document.getElementById("user_income").addEventListener('tap', function() {
+					
+					userIncome.show(function(items) { 
+						user.user_income = document.querySelector("#user_income>div").innerHTML = items[0].text;
+						//返回 false 可以阻止选择框的关闭  
+						//return false;
+					},document.querySelector("#user_income>div").innerHTML);
+				});
+				//密码
+				document.getElementById("user_pwd").addEventListener('tap', function() {});
+				//出生日期选择
+				document.getElementById("user_birthday").addEventListener('tap', function() {
+					var bir = document.querySelector("#user_birthday>div");
+					var arr = bir.innerHTML.split('-');
+					var date=new Date();
+					date.setFullYear(arr[0],parseInt(arr[1])-1,arr[2]);  
+
+					plus.nativeUI.pickDate(function(e) {
+						var d = e.date;
+						var y = d.getFullYear();
+						var m = d.getMonth()<9?('0'+(d.getMonth()+1)):d.getMonth()+1;
+						var day = d.getDate()<10?('0'+d.getDate()):d.getDate();
+//						user.user_birthday = bir.innerHTML = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+						user.user_birthday = bir.innerHTML = y+"-"+m+"-"+day;
+					}, function(e) {
+//						mui.toast("选择取消"); 
+					}, {
+						title: "请选出生年月日：" ,//,
+					    date: date
+					});
+				});
+			};
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+
+			<button id="save" class="mui-btn mui-btn-link mui-btn-nav mui-pull-right">
+				保存
+				<span class="mui-icon mui-icon-right-nav"></span>
+			</button>
+
+			<h1 class="mui-title">基本资料修改</h1>
+		</header>
+		<div class="mui-content">
+			<div>
+				<h5 class="mui-content-padded">基本信息</h5>
+				<div class="mui-card">
+					<ul class="mui-table-view">
+						<!--<li class="mui-table-view-cell" id="user_photo">
+							<span style="line-height: 25px;">头像</span>
+							<img id="user_HeadPhoto" class="mui-pull-right" src="../../img/guide_1.jpg" height="25px" width="25px" style="border: 1px solid gainsboro; border-radius: 90px;" />
+						</li>-->
+						<li class="mui-table-view-cell">
+							<span>昵称</span>
+							<input id="user_nikeName" name="user_nikeName" class="mui-pull-right" style=" ; height: 25px; margin: 0; padding: 0;border: 0;text-align: right;" type="text" value="">
+							<!--<span class="mui-pull-right">乐小姐</span>-->
+						</li>
+						<li class="mui-table-view-cell" id="user_sex">
+							<span>性别</span>
+							<div class="mui-pull-right"></div>
+						</li>
+						<li class="mui-table-view-cell" id="user_birthday">
+							<span>出生年月</span>
+							<div class="mui-pull-right"></div>
+						</li>
+						<li class="mui-table-view-cell" id="user_height">
+							<span>身高</span>
+							<div class="mui-pull-right"></div>
+						</li>
+						<li class="mui-table-view-cell" id="user_weight">
+							<span>体重</span>
+							<div class="mui-pull-right"></div>
+						</li>
+						<li class="mui-table-view-cell" id="user_job">
+							<span>职业</span>
+							<div class="mui-pull-right"></div>
+						</li>
+						<li class="mui-table-view-cell" id="user_address">
+							<span>所在地</span>
+							<div class="mui-pull-right"></div>
+						</li>
+						<li class="mui-table-view-cell" id="user_income">
+							<span>收入</span>
+							<div class="mui-pull-right"></div>
+						</li>
+
+					</ul>
+
+				</div>
+				<div class="mui-card" style="margin-top: 20px;">
+					<ul class="mui-table-view">
+						<li class="mui-table-view-cell" id="user_pwd">
+							<span>重置密码</span>
+							<div class="mui-pull-right"></div> 
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		function fromInit() {
+			document.getElementById("save").addEventListener('tap', function() {
+				user.user_nikeName = document.querySelector("#user_nikeName").value;
+				new UserDAL().updateUserInfo(user, function(data) {
+					//成功
+					new localStorageUtils().setItem("userInfo", new JsonTools().jsonObjToString(user));
+					mui.toast('个人信息更新成功！');
+					//alert(JSON.stringify(data));
+					console.log("关闭当前页面");
+					mui.back();
+				}, function(e) {
+					//失败
+					mui.toast('个人信息更新失败！');
+					//alert(JSON.stringify(e));
+				});
+			});
+		}
+	</script>
+
+</html>

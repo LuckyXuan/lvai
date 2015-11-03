@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="../../js/mui.min.js"></script>
+		<script type="text/javascript" src="../../js/jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="../../js/jquery.lazyload.js"></script>
+		<script type="text/javascript" src="../../js/lvai.travel/addlist.js"></script>
+		<script type="text/javascript" src="../../js/lvai.op/webview.js"></script>
+		<style type="text/css">
+			#pullrefresh {}
+		</style>
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<script type="text/javascript" charset="utf-8">
+			var index = null, //主页面
+				list, //下拉及上拉的数据修改处
+				ws; //当前页面对象
+			 //初始化mui
+			mui.init({
+				pullRefresh: {
+					container: "#pullrefresh", //下拉刷新容器标识，querySelector能定位的css选择器均可，比如：id、.class等
+					down: {
+						contentdown: "下拉可以刷新", //可选，在下拉可刷新状态时，下拉刷新控件上显示的标题内容
+						contentover: "释放立即刷新", //可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+						contentrefresh: "正在刷新...", //可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+						callback: onRefresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+					},
+					up: {
+						contentrefresh: "正在加载...", //可选，正在加载状态时，上拉加载控件上显示的标题内容
+						contentnomore: '没有更多数据了', //可选，请求完毕若没有更多数据时显示的提醒内容；
+						callback: pullupRefresh //必选，刷新函数，根据具体业务来编写，比如通过ajax从服务器获取新数据；
+					}
+				}
+			});
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			document.addEventListener("plusready", onPlusReady, false);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+				//仅支持竖屏显示
+				plus.screen.lockOrientation("portrait-primary");
+				//获取当前页面对象
+				ws = plus.webview.currentWebview();
+				//menu初始化
+				MenuInit();
+			};
+			 //按钮及各种监听事件
+			function MenuInit() {
+				// DOM构建完成获取列表元素
+				document.addEventListener("DOMContentLoaded", function() {
+					list = document.getElementById("lists");
+				});
+				//监听右滑事件，若侧滑菜单未显示，右滑要显示菜单；
+				window.addEventListener("swiperight", function(e) {
+					//默认滑动角度在-45度到45度之间，都会触发右滑菜单，为避免误操作，可自定义限制滑动角度；
+					if (Math.abs(e.detail.angle) < 4.5) {
+						mui.fire(ws.parent(), "menu:open");
+					}
+				});
+				document.querySelector("#Release").addEventListener('tap', function() {
+					mui.openWindow({
+						url: 'Release.html',
+						id: 'Release'
+					});
+				});
+			};
+
+			function onRefresh() {
+				setTimeout(function() {
+					if (list) {
+						list.insertBefore(createFragment(1), list.firstChild);
+					}
+					mui('#pullrefresh').pullRefresh().endPulldownToRefresh();
+					$("img.lazy").lazyload();
+				}, 500);
+			};
+			 //上拉加载
+			var count = 0;
+
+			function pullupRefresh() {
+				setTimeout(function() {
+					mui('#pullrefresh').pullRefresh().endPullupToRefresh((++count > 2)); //参数为true代表没有更多数据了。
+					if (list) {
+						list.appendChild(createFragment(1), list.firstChild);
+					}
+					$("img.lazy").lazyload();
+				}, 1500);
+			}
+		</script>
+	</head>
+
+	<body>
+
+		<div class="mui-content">
+			<a id="Release" style=" background: transparent; position: fixed;  z-index: 1000;">
+				<img class="lazy" style="width: 50px; height: 50px; line-height: 50px; text-align: center;    background-color: transparent; border: 1px solid #ddd;
+	  border-radius: 25px;  " data-original="../../img/travel_4.jpg" width="50px" height="50px">
+			</a>
+			<div id="pullrefresh" class="mui-content mui-scroll-wrapper">
+				<div class="mui-scroll">
+					<!--图片轮播-->
+					<div class="mui-slider">
+						<div class="mui-slider-group mui-slider-loop">
+							<!--支持循环，需要重复图片节点-->
+							<div class="mui-slider-item mui-slider-item-duplicate">
+								<a href="#"><img src="../../img/travel_4.jpg" /></a>
+							</div>
+							<div class="mui-slider-item">
+								<a href="#"><img src="../../img/travel_1.jpg" /></a>
+							</div>
+							<div class="mui-slider-item">
+								<a href="#"><img src="../../img/travel_2.jpg" /></a>
+							</div>
+							<div class="mui-slider-item">
+								<a href="#"><img src="../../img/travel_3.jpg" /></a>
+							</div>
+							<div class="mui-slider-item">
+								<a href="#"><img src="../../img/travel_4.jpg" /></a>
+							</div>
+							<!--支持循环，需要重复图片节点-->
+							<div class="mui-slider-item mui-slider-item-duplicate">
+								<a href="#"><img src="../../img/travel_1.jpg" /></a>
+							</div>
+						</div>
+						<div class="mui-slider-indicator">
+							<div class="mui-indicator mui-active"></div>
+							<div class="mui-indicator"></div>
+							<div class="mui-indicator"></div>
+							<div class="mui-indicator"></div>
+						</div>
+					</div>
+					<!--列表-->
+					<div>
+						<ul id="lists" class="mui-table-view">
+							<li id="muban" style="display: none;" class="mui-table-view-cell">
+								<div style="height: 50px;">
+									<img class="lazy" style="width: 50px; height: 50px; line-height: 50px; text-align: center;    background-color: transparent; border: 1px solid #ddd;
+	  border-radius: 25px; float: left;" data-original="" width="50px" height="50px">
+									<div style=" height: 28px; line-height: 28px; float: left; margin-left: 5%; width:50%;">✾ ✎﹏ℳ๓ 蕗笾</div>
+									<div style=" height: 28px; width:15%; float: left; margin-left: 5%;">
+										<button style=" height: 28px;" class="mui-btn mui-pull-right">♂22</button>
+									</div>
+									<div style=" height: 22px; width:75%; float: left; margin-left: 5%;">
+										<label style="font-size: 14px;">想去 马来西亚 </label>
+									</div>
+								</div>
+								<div style="padding-left: 50px; height: 28px;">
+									<div style=" height: 28px;   margin-left: 5%;  ">
+										<button style=" width: 33%; font-size: 10px; height: 28px;" class="mui-btn ">需要一个人</button>
+										<button style=" width: 30%; font-size: 10px; height: 28px;" class="mui-btn ">只限男生</button>
+										<button style="  width: 30%; font-size: 10px; height: 28px;" class="mui-btn ">线下A A</button>
+									</div>
+								</div>
+								<div style="padding-left: 50px; margin-left: 5%; margin-top: 2%; ">
+									<span class="mui-ellipsis-2">我的内容比较多，但也不会超过2行，因为加了.mui-ellipsis-2,mui会自动截断，变成省略号</span>
+								</div>
+								<div style="padding-left: 50px; margin-left: 5%; margin-top: 2%;">
+									<a href="#"><img class="lazy" style="margin-left: 1%;" width="30%" height="15%" data-original="" /></a>
+									<a href="#"><img class="lazy" style="margin-left: 1%;" width="30%" height="15%" data-original="" /></a>
+									<a href="#"><img class="lazy" style="margin-left: 1%;" width="30%" height="15%" data-original="" /></a>
+								</div>
+								<div style=" height: 28px; padding-left: 50px; margin-left: 5%; margin-top: 2%;">
+									<label style="font-size: 14px;">1分钟前 </label>
+									<button style=" margin-left: 5%; width: 33%; font-size: 10px; height: 28px;" class="mui-btn mui-btn-negative">
+										<span class="mui-icon mui-icon-search"></span> 收藏
+									</button>
+									<button style=" width: 33%; font-size: 10px; height: 28px;" class="mui-btn mui-btn-negative">
+										<span class="mui-icon mui-icon-search"></span> 报名
+									</button>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	<script>
+		document.querySelector("#Release").style.top = $(document).height() - 70 + "px";
+		document.querySelector("#Release").style.left = $(document).width() - 70 + "px";
+		 //var list = document.getElementById("lists");
+		 //list.appendChild(createFragment(10));
+		$("img.lazy").lazyload();
+	</script>
+
+</html>
