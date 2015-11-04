@@ -423,5 +423,12 @@ var UserDAL = function() {
 	    var userInfo=	new localStorageUtils().getItem("userInfo");
 	    return new JsonTools().stringToJson(userInfo);
 	}
-
+	/***
+	 * 
+	 */
+	this.getUserCar = function()
+	{
+		var userCar =	new localStorageUtils().getItem("userCar");
+	    return new JsonTools().stringToJson(userCarvar);
+	}
 }
