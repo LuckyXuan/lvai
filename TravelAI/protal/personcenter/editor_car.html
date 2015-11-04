@@ -238,7 +238,7 @@
 					carInfo.car_level = document.querySelector("#car_level>div").innerHTML;
 					carInfo.car_brand = document.getElementById("car_brand").value;
 					carInfo.car_type = document.getElementById("car_type").value;
-					if (carInfo.car_level == "未填") {
+					if (carInfo.car_level == "未选") {
 						mui.toast("请把车辆信息填写完整！");
 						return;
 					}
@@ -297,7 +297,7 @@
 						</li>
 						<li class="mui-table-view-cell" id="car_level">
 							<span>爱车等级</span>
-							<div class="mui-pull-right">未填</div>
+							<div class="mui-pull-right">未选</div>
 						</li>
 
 						<li class="mui-table-view-cell" style="line-height: 50px;" id="carImg">

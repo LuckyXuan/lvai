@@ -122,6 +122,7 @@
 			},
 			"google": {
 				"packagename": "",/*Android应用包名，如io.dcloud.HelloH5*/
+				"ImmersedStatusbar":true,
 				"keystore": "",/*Android应用打包使用的密钥库文件*/
 				"password": "",/*Android应用打包使用密钥库中证书的密码*/
 				"aliasname": "",/*Android应用打包使用密钥库中证书的别名*/
@@ -165,23 +166,20 @@
 			},
 			"splashscreen": {
 				"ios": {
-					"iphone": {"default":"C:/Users/Administrator/Desktop/2.png","retina55":"C:/Users/Administrator/Desktop/2.png","retina47":"C:/Users/Administrator/Desktop/2.png","retina40":"C:/Users/Administrator/Desktop/2.png","retina35":"C:/Users/Administrator/Desktop/2.png","retina55l":"C:/Users/Administrator/Desktop/2.png"
+					"iphone": {
 						 /*iPhone3启动图片选，分辨率：320x480*/
 						/*3.5英寸设备(iPhone4)启动图片，分辨率：640x960*/
 						
 					},
 					"ipad": {
 						"portrait": "C:/Users/Administrator/Desktop/2.png", /*iPad竖屏启动图片，分辨率：768x1004*/
-						"portrait-retina": "C:/Users/Administrator/Desktop/2.png",/*iPad高分屏竖屏图片，分辨率：1536x2008*/
+						/*iPad高分屏竖屏图片，分辨率：1536x2008*/
 						"landscape": "C:/Users/Administrator/Desktop/2.png", /*iPad横屏启动图片，分辨率：1024x748*/
-						"landscape-retina": "C:/Users/Administrator/Desktop/2.png", /*iPad高分屏横屏启动图片，分辨率：2048x1496*/
-						"portrait7": "C:/Users/Administrator/Desktop/2.png", /*iPad iOS7竖屏启动图片，分辨率：768x1024*/
-						"portrait-retina7": "C:/Users/Administrator/Desktop/2.png",/*iPad iOS7高分屏竖屏图片，分辨率：1536x2048*/
-						"landscape7": "C:/Users/Administrator/Desktop/2.png", /*iPad iOS7横屏启动图片，分辨率：1024x768*/
-						"landscape-retina7": "C:/Users/Administrator/Desktop/2.png"
+						 /*iPad高分屏横屏启动图片，分辨率：2048x1496*/
+						"portrait7": "C:/Users/Administrator/Desktop/2.png"
 					}
 				},
-				"android": {"hdpi":"C:/Users/Administrator/Desktop/2.png","ldpi":"C:/Users/Administrator/Desktop/2.png","mdpi":"C:/Users/Administrator/Desktop/2.png","xhdpi":"C:/Users/Administrator/Desktop/2.png","xxhdpi":"C:/Users/Administrator/Desktop/2.png"
+				"android": {
 					 /*普通屏启动图片，分辨率：240x282*/
 					 /*大屏启动图片，分辨率：320x442*/
 					 /*高分屏启动图片，分辨率：480x762*/

@@ -374,6 +374,7 @@
 
 			function LoadUserInfo() {
 				var userInfoTxt = new localStorageUtils().getItem("userInfo");
+				console.log(userInfoTxt);
 				userInfo = new JsonTools().stringToJson(userInfoTxt);
 			};
 			/***
@@ -571,8 +572,10 @@
 													name: plus.io.convertLocalFileSystemURL(savePath),
 													path: plus.io.convertLocalFileSystemURL(savePath)
 												};
-												new UserDAL().uploadBgPhoto(userInfo.user_telphone, files, function(_msg) {
+												new UserDAL().uploadBgPhoto(userInfo.user_telphone, files, function(_msg,fileName) {
 													console.log(_msg);
+													userInfo.personcenter_bg = "/UploadFile/UserCenterBg/" +fileName.substring(fileName.lastIndexOf('/') + 1);
+													new localStorageUtils().setItem("userInfo", new JsonTools().jsonObjToString(userInfo));
 												}, function(_msg) {
 													mui.toast("背景同步失败");
 												});

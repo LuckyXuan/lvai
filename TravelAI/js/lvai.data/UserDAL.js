@@ -364,7 +364,7 @@ var UserDAL = function() {
 			function(t, status) { //上传完成
 				console.log(status);
 				if (status == 200) {
-					successHandler(t.responseText);
+					successHandler(t.responseText,filess[0].name);
 				} else {
 					faildHandler(status);
 				}
@@ -481,5 +481,21 @@ var UserDAL = function() {
 			//mui.toast(JSON.stringify(e));
 			mui.toast("服务器连接失败");
 		}
+	}
+	/**
+	 * 获取当前用户信息。
+	 */
+	this.getUserInfo=function()
+	{
+	    var userInfo=	new localStorageUtils().getItem("userInfo");
+	    return new JsonTools().stringToJson(userInfo);
+	}
+	/***
+	 * 
+	 */
+	this.getUserCar = function()
+	{
+		var userCar =	new localStorageUtils().getItem("userCar");
+	    return new JsonTools().stringToJson(userCarvar);
 	}
 }
