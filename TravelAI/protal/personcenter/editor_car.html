@@ -48,8 +48,8 @@
 			}
 		</style>
 		<script type="text/javascript" charset="utf-8">
-			var carInfo = null;
-			var userInfo = null;
+			var carInfo = {};
+			var userInfo = {};
 			var files = [];
 			var photoindex = 0;
 			var carPhoto = new Array();
@@ -74,7 +74,7 @@
 				plus.webview.currentWebview().setStyle({
 					scrollIndicator: 'none'
 				});
-				AddCarPhotoUi();
+				//AddCarPhotoUi();
 				MenuInit();
 			};
 			/**
@@ -91,11 +91,13 @@
 			};
 			 //车辆信息的判断及展示
 			function LoadCarInfo() {
-					var userCarTxt = new localStorageUtils().getItem("userCar");
-					carInfo = new JsonTools().stringToJson(userCarTxt)["data"];
+				var userCarTxt = new localStorageUtils().getItem("userCar");
+				if (userCarTxt) {
+					carInfo = new JsonTools().stringToJson(userCarTxt);
 				}
-				//基本信息的判断及展示
-
+				
+			};
+			 //基本信息的判断及展示
 			function LoadUserInfo() {
 				var userInfoTxt = new localStorageUtils().getItem("userInfo");
 				userInfo = new JsonTools().stringToJson(userInfoTxt);
@@ -115,19 +117,24 @@
 			}
 
 			function renderCarInfo() {
-				var temp = new localStorageUtils().getItem("userCar");
-				var car = new JsonTools().stringToJson(temp)["data"];
-				document.querySelector("#car_brand").value = car.car_brand;
-				document.querySelector("#car_level>div").innerHTML = car.car_level;
-				document.querySelector("#car_type").value = car.car_type;
-				carPhoto[0] = car.car_photo1;
-				carPhoto[1] = car.car_photo2;
-				carPhoto[2] = car.car_photo3;
+				
+				if (carInfo.car_brand) {
+					document.querySelector("#car_brand").value = carInfo.car_brand;
+				}
+				if (carInfo.car_type) {
+					document.querySelector("#car_type").value = carInfo.car_type;
+				}
+				if (carInfo.car_level) {
+					document.querySelector("#car_level>div").innerHTML = carInfo.car_level;
+				}
+				carPhoto[0] = carInfo.car_photo1;
+				carPhoto[1] = carInfo.car_photo2;
+				carPhoto[2] = carInfo.car_photo3;
 			};
 			 //下载车辆图片并显示车辆图片
 			function PageShowPhoto() {
 				for (var index = 0; index < carPhoto.length; index++) {
-					if (carPhoto[index] == "") {
+					if (!carPhoto[index]) {
 						continue;
 					}
 					var url = "_doc/CarPhoto/thumbCarPhoto/" + carPhoto[index].substring(carPhoto[index].lastIndexOf('/') + 1);
@@ -159,7 +166,7 @@
 				document.querySelector("#loveCarPhoto div").addEventListener('tap', function() {
 					plus.gallery.pick(function(path) {
 						var savePath = "_doc/CarPhoto/thumbCarPhoto/" + userInfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
-						fileTool.ImgFileCompress(path, savePath, function(existPath, savePath) {
+						fileTool.ImgFileCompress(path, savePath,"15%", function(existPath, savePath) {
 							photoindex++;
 							files[0] = {
 								name: savePath,
@@ -185,10 +192,7 @@
 											break;
 										}
 								}
-								var userCarTxt = new localStorageUtils().getItem("userCar");
-								var temp2 = new JsonTools().stringToJson(userCarTxt);
-								temp2["data"] = carInfo;
-								new localStorageUtils().setItem("userCar", new JsonTools().jsonObjToString(temp2));
+								new localStorageUtils().setItem("userCar", new JsonTools().jsonObjToString(carInfo));
 								wt.close();
 								AddLoveCar(savePath);
 							}, function(_msg) {
@@ -229,24 +233,34 @@
 				});
 				//保存按钮的监听
 				document.getElementById("save").addEventListener('tap', function() {
-					var userInfo = JSON.parse(new localStorageUtils().getItem("userInfo"));
-					var info = {
-						user_telphone: userInfo.user_telphone,
-						car_level: document.querySelector("#car_level>div").innerHTML,
-						car_brand: document.getElementById("car_brand").value,
-						car_type: document.getElementById("car_type").value
-					};
-					new UserDAL().UpdateCarInfo(info, function(data) {
+					console.log(userInfo.user_telphone);
+					carInfo.user_telphone = userInfo.user_telphone;
+					carInfo.car_level = document.querySelector("#car_level>div").innerHTML;
+					carInfo.car_brand = document.getElementById("car_brand").value;
+					carInfo.car_type = document.getElementById("car_type").value;
+					if (carInfo.car_level == "未填") {
+						mui.toast("请把车辆信息填写完整！");
+						return;
+					}
+					if (!carInfo.car_brand) {
+						mui.toast("请把车辆信息填写完整！");
+						return;
+					}
+					if (!carInfo.car_type) {
+						mui.toast("请把车辆信息填写完整！");
+						return;
+					}
+					var tempCarInfo = {};
+					tempCarInfo.user_telphone = userInfo.user_telphone;
+					tempCarInfo.car_level = document.querySelector("#car_level>div").innerHTML;
+					tempCarInfo.car_brand = document.getElementById("car_brand").value;
+					tempCarInfo.car_type = document.getElementById("car_type").value;
+					
+					new UserDAL().UpdateCarInfo(tempCarInfo, function(data) {
 						//成功
 						mui.toast('爱车信息更新成功！');
-						var temp = new localStorageUtils().getItem("userCar");
-						var car = new JsonTools().stringToJson(temp)["data"];
-						car.car_level = info.car_level;
-						car.car_brand = info.car_brand;
-						car.car_type = info.car_type;
-						var temp2 = new JsonTools().stringToJson(temp);
-						temp2["data"] = car;
-						new localStorageUtils().setItem("userCar", new JsonTools().jsonObjToString(temp2));
+						console.log(new JsonTools().jsonObjToString(carInfo));
+						new localStorageUtils().setItem("userCar", new JsonTools().jsonObjToString(carInfo));
 						console.log("关闭当前页面");
 						mui.back();
 					}, function() {
@@ -273,18 +287,19 @@
 				<h5 class="mui-content-padded">车辆信息</h5>
 				<div class="mui-card">
 					<ul class="mui-table-view">
-						<li class="mui-table-view-cell" id="car_level">
-							<span>爱车等级</span>
-							<div class="mui-pull-right">100万</div>
-						</li>
 						<li class="mui-table-view-cell">
 							<span>品牌</span>
-							<input id="car_brand" name="car_brand" class="mui-pull-right" type="text" value="宝马">
+							<input id="car_brand" name="car_brand" class="mui-pull-right" type="text" placeholder="请输入您的车辆品牌" value="">
 						</li>
 						<li class="mui-table-view-cell">
 							<span>型号</span>
-							<input id="car_type" name="car_type" class="mui-pull-right" type="text" value="x7">
+							<input id="car_type" name="car_type" class="mui-pull-right" type="text" placeholder="请输入您的车辆型号" value="">
 						</li>
+						<li class="mui-table-view-cell" id="car_level">
+							<span>爱车等级</span>
+							<div class="mui-pull-right">未填</div>
+						</li>
+
 						<li class="mui-table-view-cell" style="line-height: 50px;" id="carImg">
 							<span>爱车靓照</span>
 							<div id="loveCarPhoto">
@@ -298,5 +313,7 @@
 			</div>
 		</div>
 	</body>
-
+	<script>
+		AddCarPhotoUi();
+	</script>
 </html>

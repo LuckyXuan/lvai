@@ -21,6 +21,7 @@
 		<script type="text/javascript" src="../../js/mui.zoom.js"></script>
 		<script type="text/javascript" src="../../js/mui.previewimage.js"></script>
 		<script type="text/javascript" src="../../js/lvai.op/HttpDownLoad.js"></script>
+		<script type="text/javascript" src="../../js/extends/extends.js"></script>
 		<style type="text/css">
 			/*body{background-color: white;}
 			.mui-content{background-color: white;}*/
@@ -229,8 +230,8 @@
 			var fileDownLoad; //文件下载对象。
 			var headPhotoFileInfoIsLoad = false;
 			var carFileInfoIsLoad = false;
-			var userInfo;
-			var carInfo;
+			var userInfo = null;
+			var carInfo = null;
 			var record = null,
 				t = null,
 				iv = null,
@@ -345,7 +346,7 @@
 						}
 					);
 				}
-				if (carInfo == "null") {
+				if (!carInfo) {
 					carFileInfoIsLoad = true;
 					if (carFileInfoIsLoad && headPhotoFileInfoIsLoad) {
 						LoadResource();
@@ -415,19 +416,19 @@
 			 //车辆信息的判断及展示
 			function LoadCarInfo() {
 				var userCarTxt = new localStorageUtils().getItem("userCar");
-				
-				alert(userCarTxt);
-				carInfo = userCarTxt =="" ? "null": new JsonTools().stringToJson(userCarTxt)["data"];
+				if (userCarTxt) {
+					carInfo = new JsonTools().stringToJson(userCarTxt);
+				}
 			}
 
 			function renderCarInfo() {
-				if (carInfo == "null") {
+				if (!carInfo) {
 					return;
 				}
-				if (carInfo.car_brand != "") {
+				if (carInfo.car_brand) {
 					document.querySelector("#car_brand").innerHTML = carInfo.car_brand;
 				}
-				if (carInfo.car_level != "") {
+				if (carInfo.car_level) {
 					document.querySelector("#car_level").innerHTML = carInfo.car_level;
 				}
 				if (carInfo.car_type) {
@@ -441,7 +442,7 @@
 					carPhoto[1] = carInfo.car_photo2;
 					carPhoto[2] = carInfo.car_photo3;
 					for (var index = 0; index < carPhoto.length; index++) {
-						if (carPhoto[index] != "") {
+						if (carPhoto[index]) {
 							listCar.style.height = listCarWidth * 0.3 + 6 + "px";
 							var url = "_doc/CarPhoto/thumbCarPhoto/" + carPhoto[index].substring(carPhoto[index].lastIndexOf('/') + 1);
 							var carPhotoImg = listCar.getElementsByTagName('img');
@@ -461,7 +462,7 @@
 			function loadCarPhotoNetData() {
 				var photoindex = 0;
 				for (var index = 0; index < carPhoto.length; index++) {
-					if (carPhoto[index] == "") {
+					if (!carPhoto[index]) {
 						photoindex++;
 						if (photoindex == 3) {
 							carFileInfoIsLoad = true;
@@ -561,25 +562,27 @@
 									console.log(this_backImg.style.background);
 									//选取现有的
 									plus.gallery.pick(function(path) {
-										var sysPath = plus.io.convertLocalFileSystemURL(path);
-										plus.storage.setItem("backImg", sysPath);
-										this_backImg.style.background = "url(file://" + sysPath + ") no-repeat center center";
-										this_backImg.style.backgroundSize = "100%";
-										var u = new localStorageUtils().getItem("userInfo");
-										var uinfo = new JsonTools().stringToJson(u);
-										var files = [];
-										files[0] = {
-											name: "userBg",
-											path: plus.io.convertLocalFileSystemURL(path)
-										};
-										new UserDAL().uploadBgPhoto(uinfo.user_telphone, files, function(_msg) {
-											console.log(_msg);
-										}, function(_msg) {
-											mui.toast("背景同步失败");
+											var savePath = "_doc/BGPhoto/" + userInfo.user_telphone + "_bg_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
+											fileTool.ImgFileCompress(path, savePath, "30%", function(existPath, savePath) {
+												this_backImg.style.background = "url(file://" + plus.io.convertLocalFileSystemURL(savePath) + ") no-repeat center center";
+												this_backImg.style.backgroundSize = "100%";
+												var files = [];
+												files[0] = {
+													name: plus.io.convertLocalFileSystemURL(savePath),
+													path: plus.io.convertLocalFileSystemURL(savePath)
+												};
+												new UserDAL().uploadBgPhoto(userInfo.user_telphone, files, function(_msg) {
+													console.log(_msg);
+												}, function(_msg) {
+													mui.toast("背景同步失败");
+												});
+											}, function(_msg) {
+												mui.toast("图片文件出错,请重新选择");
+											});
+										},
+										function(e) {}, {
+											filter: "image"
 										});
-									}, function(e) {}, {
-										filter: "image"
-									});
 									break;
 								}
 						}
@@ -881,7 +884,7 @@
 						<img id="editor" class="lazy" style=" line-height: 50px; background-color: transparent; border: 1px solid #ddd;
   border-radius: 50px;" src="../../img/head.png" width="70px" height="70px" />
 						<div>
-							<span id="txtName">神秘爱称</span>
+							<span id="txtName">昵称：未填</span>
 							<div style="margin-top: 10px;">
 								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
 								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
@@ -914,14 +917,14 @@
 									<h5 class="mui-content-padded">基本信息</h5>
 									<div class="card">
 										<div style="background: white; text-align: center;">
-											<span id="user_age">XX岁</span>|
-											<span id="user_height">XXcm~XXcm</span>|
-											<span id="user_weight">XXkg</span>|
-											<span id="user_income">年入XX万</span>|
+											<span id="user_age">年龄：未填</span>|
+											<span id="user_height">身高：未填</span>|
+											<span id="user_weight">体重：未填</span>|
+											<span id="user_income">收入：未填</span>|
 											<br />
-											<span id="user_address">XX省-XX市</span>|
+											<span id="user_address">地址：未填</span>|
 											<span>单身</span>|
-											<span id="user_job">XX职业</span>
+											<span id="user_job">工作：未填</span>
 										</div>
 
 										<div style="text-align:center">
@@ -939,9 +942,9 @@
 									<h5 class="mui-content-padded">车辆信息</h5>
 									<div class="card">
 										<div style="background: white; text-align: center;">
-											<span id="car_brand">XX车</span>|
-											<span id="car_type">XX级别</span>|
-											<span id="car_level">价值XX万</span>
+											<span id="car_brand">车辆：未填</span>|
+											<span id="car_type">级别：未填</span>|
+											<span id="car_level">价值：未填</span>
 											<span style="border: 1px solid black; border-radius: 20px; background: gainsboro;">
 												已认证
 											</span>

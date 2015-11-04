@@ -47,6 +47,7 @@
 					new UserDAL().uploadHeadPhoto(uinfo.user_telphone,temp,function(_msg){
 						wt .close();
 						mui.toast("上传成功");
+						console.log(_msg);
 						var photoObj = new JsonTools().stringToJson(_msg);
 						uinfo.user_photo = photoObj.data;
 						new localStorageUtils().setItem("userInfo",new JsonTools().jsonObjToString(uinfo));

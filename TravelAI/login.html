@@ -14,6 +14,7 @@
 		<script type="text/javascript" src="js/lvai.data/WebService2.js"></script>
 		<script type="text/javascript" src="js/lvai.base/localStorageUtils.js"></script>
 		<script type="text/javascript" src="js/extends/extends.js"></script>
+		<script type="text/javascript" src="js/lvai.base/JsonTools.js" ></script>
 		<link href="css/mui.min.css" rel="stylesheet" />
 		<script type="text/javascript" charset="utf-8">
 			var wt = null;
@@ -85,10 +86,10 @@
 			};
 			 //获取车辆信息
 			function GetCarData(_args) {
+				console.log(_args.user_telphone)
 				new UserDAL().getCarInfo(_args.user_telphone, function() {
 					//获取车辆成功，显示车辆信息
 					mui.toast("欢迎回来： " + _args.user_nikeName);
-					new localStorageUtils().setItem("HeadPhotoBase64", "")
 					mui.openWindow({
 						url: 'protal/main.html',
 						id: 'main',

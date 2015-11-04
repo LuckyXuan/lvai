@@ -84,13 +84,14 @@ var fileTool = {
 	},
 	//图片文件的压缩
 	//existPath：存在的地址 savePath：保存的地址
-	ImgFileCompress: function(existPath, savePath, successHandler, faildHandler) {
+	//width 缩略图片的比例
+	ImgFileCompress: function(existPath, savePath,width, successHandler, faildHandler) {
 		plus.zip.compressImage({
 			quality: 100,
 			overwrite: true,
 			src: existPath,
 			dst: savePath,
-			width: "15%" // 缩小比例
+			width: width // 缩小比例
 		}, function() {
 			successHandler(existPath, savePath);
 		}, function() {

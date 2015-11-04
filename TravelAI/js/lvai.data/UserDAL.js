@@ -107,17 +107,14 @@ var UserDAL = function() {
 				//alert(JSON.stringify(data));
 				var o = eval(data);
 				o = o.d;
-				console.log(o);
 				var msg =new JsonTools().stringToJson(o);
-				alert(msg);
 				if (msg.status == "faild") {
 					faildHandler(msg);
 					return;
 				}
-				
 				var s = new JsonTools().jsonObjToString(msg.data);
 			    new localStorageUtils().setItem("userInfo", s);
-			    new localStorageUtils().setItem("user", s);
+			    new localStorageUtils().setItem("userCar", "");
 				successHandler(msg);
 
 			}
@@ -206,7 +203,14 @@ var UserDAL = function() {
 				//alert(JSON.stringify(data));
 				var o = eval(data);
 				o = o.d;
-				new localStorageUtils().setItem("userCar", o);
+				if(o)
+				{
+					var jsono = new JsonTools().stringToJson(o);
+					new localStorageUtils().setItem("userCar", new JsonTools().jsonObjToString(jsono.data));
+				}else
+				{
+					new localStorageUtils().setItem("userCar", "");
+				}
 				var msg = new JsonTools().stringToJson(o);
 				if (msg.status == "faild") {
 					faildHandler();
@@ -218,6 +222,7 @@ var UserDAL = function() {
 			//失败的回调
 
 		function errorCallback(e) {
+			console.log(11);
 			alert(JSON.stringify(e));
 		}
 	}
@@ -242,7 +247,6 @@ var UserDAL = function() {
 			ws.LoadData();
 			//成功的回调
 			function callback(data) {
-					//alert(JSON.stringify(data));
 					var o = eval(data);
 					o = o.d;
 					var msg = new JsonTools().stringToJson(o);
@@ -250,9 +254,7 @@ var UserDAL = function() {
 						faildHandler(msg);
 						return;
 					}
-					//				new localStorageUtils().setItem("userInfo",o)
 					successHandler(msg);
-
 				}
 				//失败的回调
 
@@ -372,6 +374,7 @@ var UserDAL = function() {
 		task.addData("tel", phone);
 		for (var i = 0; i < filess.length; i++) {
 			var f = filess[i];
+			task.addData("filename",f.name);
 			task.addFile(f.path, {
 				key: f.name
 			});
