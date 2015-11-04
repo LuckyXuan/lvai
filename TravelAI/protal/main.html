@@ -104,12 +104,20 @@
 					var userinfo = userDal.getUserInfo();
 					
 					plus.geolocation.getCurrentPosition(function(p) {
-						userDal.GPSLocation(userinfo.user_telphone,p.coords.longitude,p.coords.latitude,function(_msg){
+					
+						userDal.signlog(userinfo.user_telphone,function(_msg){
 							mui.toast(_msg.msg);
-							
-						},function(_msg){
-							console.log(_msg); 
+						},function(){
+							console.log(_msg);
 						});
+ 
+						 
+//						userDal.GPSLocation(userinfo.user_telphone,p.coords.longitude,p.coords.latitude,function(_msg){
+//							mui.toast(_msg.msg);
+//							
+//						},function(_msg){
+//							console.log(_msg); 
+//						});
 						
 						
 						
