@@ -107,6 +107,7 @@ var UserDAL = function() {
 				//alert(JSON.stringify(data));
 				var o = eval(data);
 				o = o.d;
+				console.log(o);
 				var msg =new JsonTools().stringToJson(o);
 				alert(msg);
 				if (msg.status == "faild") {
@@ -116,6 +117,7 @@ var UserDAL = function() {
 				
 				var s = new JsonTools().jsonObjToString(msg.data);
 			    new localStorageUtils().setItem("userInfo", s);
+			    new localStorageUtils().setItem("user", s);
 				successHandler(msg);
 
 			}

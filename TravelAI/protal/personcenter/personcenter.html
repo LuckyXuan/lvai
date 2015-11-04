@@ -272,7 +272,7 @@
 					renderUserInfoData();
 					RenderHeadPhoto();
 					renderCarInfo();
-					renderCarPhoto();
+					//renderCarPhoto();
 				}
 				/**
 				 * 页面初始化函数，加载HTML，但是不加载数据。
@@ -292,6 +292,7 @@
 						//显示头像和车辆图片。
 					}
 					listCarWidth = plus.webview.currentWebview().listCarWidth;
+					new localStorageUtils().setItem("HeadPhotoBase64", "");
 					systemUi();
 					CarPhotoUi();
 					OnPreload();
@@ -414,7 +415,9 @@
 			 //车辆信息的判断及展示
 			function LoadCarInfo() {
 				var userCarTxt = new localStorageUtils().getItem("userCar");
-				carInfo = new JsonTools().stringToJson(userCarTxt)["data"];
+				
+				alert(userCarTxt);
+				carInfo = userCarTxt =="" ? "null": new JsonTools().stringToJson(userCarTxt)["data"];
 			}
 
 			function renderCarInfo() {

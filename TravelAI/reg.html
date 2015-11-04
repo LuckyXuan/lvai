@@ -31,6 +31,7 @@
 					var code = document.getElementById("txtCode").value;
 					new UserDAL().validSMSCode(tel, code,
 						function(_args) {
+							//new localStorageUtils().setItem("userCar", "");
 							mui.toast("欢迎您新用户，请您尽快补全信息");
 							mui.openWindow({
 								url: 'protal/main.html',
