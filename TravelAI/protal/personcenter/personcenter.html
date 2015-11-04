@@ -830,6 +830,76 @@
 						}
 					}, "提示", ["开始录制", "取消"]);
 				});
+				
+				//上传新照片 按钮
+				document.getElementById("upLoadImg").addEventListener('tap', function() {
+					
+					plus.gallery.pick(function(e) {
+						var u = new localStorageUtils().getItem("userInfo");
+						var uinfo = new JsonTools().stringToJson(u);
+						var files = [];
+						var filenames = "";
+						var w;
+						var l = e.files.length;
+						
+						
+						
+						if(e.files.length>9){
+							l=9;//如果选择的超过9张，就截取前9张
+						}
+						
+						w = plus.nativeUI.showWaiting("正在上传"+l+"张图片");
+						 
+						for(var i=0;i<l;i++){
+					    	var path = plus.io.convertLocalFileSystemURL(e.files[i]);
+					    	var savePath = "_doc/UserAlbum/" + uinfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + "_"+i+".png";
+							
+						
+							fileTool.ImgFileCompress(path, savePath,"15%", function(existPath, savePath) {
+								files.push({
+						    		name : savePath,
+						    		path : savePath
+						    	});
+						    	var fileName = savePath.substring(savePath.lastIndexOf('/') + 1);
+						    	filenames = filenames+fileName+"|";  
+						    	if(files.length==l){ 
+						    		console.log("图片全部处理完成");	
+						    		filenames = filenames.substring(0,filenames.length-1);
+						    		
+						    		//个人相册上传接口
+						    		new UserDAL().uploadAlbum(uinfo.user_telphone,files,filenames,function(_msg){
+						    			if(_msg.Status != "faild"){
+						    				//
+						    				mui.toast("上传成功！");
+						    			}else{
+						    				mui.toast("上传失败！");
+						    			}
+						    			w.close();
+						    		},function(){
+						    			w.close();
+						    			mui.toast("服务器未响应！");
+						    		});
+						    	}
+						    	
+						    	
+							},function(){
+								mui.toast("第"+(i+1)+"张图片读取出错");
+								l--;
+							});
+						
+				    	}
+						
+					}, function(e) {}, {
+						filter: "image",
+						multiple:true//可选择是否多张图片选择
+						
+					});
+					mui.toast("您最多一次可以选择上传9张图片");
+				});
+		
+				
+				
+				
 				//职业认证
 				document.getElementById("ed_job").addEventListener('tap', function() {
 					mui.fire(ed_video, 'show', null);
@@ -848,7 +918,11 @@
 						});
 					}, 0);
 				});
+				
+				
+				
 			};
+			
 			 //webview的监听
 			function webListener() {
 				plus.webview.getWebviewById("editor").addEventListener("hide", function() {
@@ -1005,7 +1079,7 @@
 							<div id="item2mobile" class="mui-slider-item mui-control-content">
 								<h5 class="mui-content-padded">
 								32张相片
-									<span style="float: right; border: 1px solid gainsboro; border-radius: 10px; font-size: 0.9em; padding: 2px 5px;color: white; background-color: green" >
+									<span id="upLoadImg" style="float: right; border: 1px solid gainsboro; border-radius: 10px; font-size: 0.9em; padding: 2px 5px;color: white; background-color: green" >
 										上传新照片
 									</span>
 								</h5>

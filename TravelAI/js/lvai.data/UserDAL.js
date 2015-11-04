@@ -382,5 +382,38 @@ var UserDAL = function() {
 		console.log("开始上传");
 		task.start();
 	}
+	
+	//个人相册上传
+	//
+	this.uploadAlbum = function(phone,files,filenames,successHandler,faildHandler){
+		
+		var filess = files;
+		var task = plus.uploader.createUpload(UploadServer, {
+				method: "POST"
+			},
+			function(t, status) { //上传完成
+				console.log(status);
+				if (status == 200) {
+					successHandler(t.responseText);
+				} else {
+					faildHandler(status);
+				}
+			}
+		);
+		task.addData("Action", "uploadAlbum");
+		task.addData("tel", phone);
+		task.addData("fileNameList",filenames);
+		
+		for (var i = 0; i < filess.length; i++) {
+			var f = filess[i];
+			task.addFile(f.path, { 
+				key: f.name
+			});
+			
+		}
+		console.log("开始上传个人相册");
+		task.start();
+	}
+	
 
 }
