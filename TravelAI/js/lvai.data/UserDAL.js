@@ -364,7 +364,7 @@ var UserDAL = function() {
 			function(t, status) { //上传完成
 				console.log(status);
 				if (status == 200) {
-					successHandler(t.responseText);
+					successHandler(t.responseText,filess[0].name);
 				} else {
 					faildHandler(status);
 				}
