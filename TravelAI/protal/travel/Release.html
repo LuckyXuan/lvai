@@ -169,6 +169,23 @@
 					});
 				})
 			}
+			
+			/**
+			 * 发布旅行。
+			 */
+			function btnReleaseClick()
+			{
+				var travel=new travelModel();
+				travel.car_condition="20万以上";
+				travel.promoter_userid=new UserDAL().getUserInfo().user_telphone;
+				travel.destination="巴里岛";
+				//填好。
+				
+				var travelDAL=new TravelDal();
+				travelDAL.travel=travel;
+				travelDAL.RealseTravel();
+				
+			}
 		</script>
 	</head>
 
@@ -178,7 +195,7 @@
 			<h1 class="mui-title">发起旅行</h1>
 		</header>
 		<nav id='tijiaoBtn' class="mui-bar mui-bar-tab" style="background-color: #007AFF;">
-			<button class="mui-btn mui-btn-primary mui-btn-block" style="  border: 0px;height: 100%;">旅行，一触即发</button>
+			<button onclick="btnReleaseClick()" class="mui-btn mui-btn-primary mui-btn-block" style="  border: 0px;height: 100%;">旅行，一触即发</button>
 		</nav>
 
 		<div class="mui-content">

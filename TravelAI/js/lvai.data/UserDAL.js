@@ -415,5 +415,13 @@ var UserDAL = function() {
 		task.start();
 	}
 	
+	/**
+	 * 获取当前用户信息。
+	 */
+	this.getUserInfo=function()
+	{
+	    var userInfo=	new localStorageUtils().getItem("userInfo");
+	    return new JsonTools().stringToJson(userInfo);
+	}
 
 }
