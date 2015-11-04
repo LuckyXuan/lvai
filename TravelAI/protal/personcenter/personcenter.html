@@ -850,12 +850,12 @@
 						
 						w = plus.nativeUI.showWaiting("正在上传"+l+"张图片");
 						 
-						for(var i=0;i<l;i++){
+						for(var i=0;i<l;i++){  
 					    	var path = plus.io.convertLocalFileSystemURL(e.files[i]);
 					    	var savePath = "_doc/UserAlbum/" + uinfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + "_"+i+".png";
 							
-						
-							fileTool.ImgFileCompress(path, savePath,"15%", function(existPath, savePath) {
+						 
+							fileTool.ImgFileCompress(path, savePath,"50%", function(existPath, savePath) {
 								files.push({
 						    		name : savePath,
 						    		path : savePath

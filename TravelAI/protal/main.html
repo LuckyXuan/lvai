@@ -86,11 +86,24 @@
 				}, false);
 				
 				document.querySelector(".mui-btn").addEventListener('tap', function() {
+					//获取gps定位
+					
 					plus.geolocation.getCurrentPosition(function(p) {
-						alert("Geolocation\nLatitude:" + p.coords.latitude + "\nLongitude:" + p.coords.longitude + "\nAltitude:" + p.coords.altitude);
+						
+						alert(p.address.province+" "+p.address.city);
+						mui.toast("Geolocation\nLatitude:" + p.coords.latitude + "\nLongitude:" + p.coords.longitude + "\nAltitude:" + p.coords.altitude);
+						
 					}, function(e) {
 						mui.toast("Geolocation error: " + e.message);
+					},{
+						geocode:true,
+						provider:'baidu'
 					});
+				});
+				
+				//用户签到
+				document.querySelector("header>h1").addEventListener('tap',function(){
+					alert();
 				});
 			};
 
