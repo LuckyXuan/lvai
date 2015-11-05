@@ -230,6 +230,7 @@
 			var fileDownLoad; //文件下载对象。
 			var headPhotoFileInfoIsLoad = false;
 			var carFileInfoIsLoad = false;
+			var userPhotoBg = false;
 			var userInfo = null;
 			var carInfo = null;
 			var record = null,
@@ -271,6 +272,7 @@
 
 			function PageRender() {
 					renderUserInfoData();
+					RenderUserPhotoBg();
 					RenderHeadPhoto();
 					renderCarInfo();
 					//renderCarPhoto();
@@ -327,7 +329,9 @@
 			};
 			 //数据展示
 			function LoadData() {
-				if (userInfo.user_photo == "") {} else {
+				if (userInfo.user_photo == "") {
+					headPhotoFileInfoIsLoad = true;
+				} else {
 					var url = "_doc/HeadPhoto/" + userInfo.user_photo.substring(userInfo.user_photo.lastIndexOf('/') + 1);
 					fileTool.fileExist(url, userInfo.user_photo,
 						function(msg) {
@@ -340,7 +344,7 @@
 							f.URL = ResourcesServerUrl + userInfo.user_photo;
 							fileDownLoad.AddFile(f);
 							headPhotoFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad) {
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
 								LoadResource();
 							}
 						}
@@ -348,16 +352,18 @@
 				}
 				if (!carInfo) {
 					carFileInfoIsLoad = true;
-					if (carFileInfoIsLoad && headPhotoFileInfoIsLoad) {
+					if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
 						LoadResource();
 					}
 				}
+				loadUserPhotoBgNetData();
 				loadCarPhotoNetData();
 			};
 			/**
 			 * 呈现网络数据
 			 */
 			function RenderData() {
+					RenderUserPhotoBg();
 					RenderHeadPhoto();
 					renderCarPhoto();
 				}
@@ -414,7 +420,20 @@
 			function ShowHead(url) {
 				document.querySelector("#editor").setAttribute("src", plus.io.convertLocalFileSystemURL(url));
 			};
-			 //车辆信息的判断及展示
+
+			function RenderUserPhotoBg() {
+					if (userInfo.personcenter_bg == "") return;
+					var url = "_doc/BGPhoto/" + userInfo.personcenter_bg.substring(userInfo.personcenter_bg.lastIndexOf('/') + 1);
+					fileTool.fileExist(url, userInfo.personcenter_bg,
+						function(msg) {
+							document.querySelector("#backImg").style.background = "url(file://" + plus.io.convertLocalFileSystemURL(msg) + ") no-repeat center center";
+							document.querySelector("#backImg").style.backgroundSize = "100%";
+						},
+						function(msg, _args) {}
+					);
+				}
+				//车辆信息的判断及展示
+
 			function LoadCarInfo() {
 				var userCarTxt = new localStorageUtils().getItem("userCar");
 				if (userCarTxt) {
@@ -459,7 +478,31 @@
 				loadCarPhoto();
 				//}, 100);
 			};
-			 //载入车辆图片
+			 //从网络载入头像区域的背景图片
+			function loadUserPhotoBgNetData() {
+				if (userInfo.personcenter_bg == "") {
+					userPhotoBg = true;
+				} else {
+					var url = "_doc/BGPhoto/" + userInfo.personcenter_bg.substring(userInfo.personcenter_bg.lastIndexOf('/') + 1);
+					fileTool.fileExist(url, userInfo.personcenter_bg,
+						function(msg) {
+							userPhotoBg = true;
+						},
+						function(msg, _args) {
+							var f = new HttpFile();
+							f.FileName = userInfo.personcenter_bg.substring(userInfo.personcenter_bg.lastIndexOf('/') + 1);
+							f.FilePath = "_doc/BGPhoto/";
+							f.URL = ResourcesServerUrl + userInfo.personcenter_bg;
+							fileDownLoad.AddFile(f);
+							userPhotoBg = true;
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
+								LoadResource();
+							}
+						}
+					);
+				}
+			};
+			 //从网络载入车辆图片
 			function loadCarPhotoNetData() {
 				var photoindex = 0;
 				for (var index = 0; index < carPhoto.length; index++) {
@@ -467,7 +510,7 @@
 						photoindex++;
 						if (photoindex == 3) {
 							carFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad) {
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
 								LoadResource();
 							}
 						}
@@ -479,7 +522,7 @@
 						photoindex++;
 						if (photoindex == carPhoto.length) {
 							carFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad) {
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
 								LoadResource();
 							}
 						}
@@ -492,7 +535,7 @@
 						photoindex++;
 						if (photoindex == carPhoto.length) {
 							carFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad) {
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
 								LoadResource();
 							}
 						}
@@ -572,9 +615,9 @@
 													name: plus.io.convertLocalFileSystemURL(savePath),
 													path: plus.io.convertLocalFileSystemURL(savePath)
 												};
-												new UserDAL().uploadBgPhoto(userInfo.user_telphone, files, function(_msg,fileName) {
+												new UserDAL().uploadBgPhoto(userInfo.user_telphone, files, function(_msg, fileName) {
 													console.log(_msg);
-													userInfo.personcenter_bg = "/UploadFile/UserCenterBg/" +fileName.substring(fileName.lastIndexOf('/') + 1);
+													userInfo.personcenter_bg = "/UploadFile/UserCenterBg/" + fileName.substring(fileName.lastIndexOf('/') + 1);
 													new localStorageUtils().setItem("userInfo", new JsonTools().jsonObjToString(userInfo));
 												}, function(_msg) {
 													mui.toast("背景同步失败");
@@ -833,10 +876,8 @@
 						}
 					}, "提示", ["开始录制", "取消"]);
 				});
-				
 				//上传新照片 按钮
 				document.getElementById("upLoadImg").addEventListener('tap', function() {
-					
 					plus.gallery.pick(function(e) {
 						var u = new localStorageUtils().getItem("userInfo");
 						var uinfo = new JsonTools().stringToJson(u);
@@ -844,65 +885,48 @@
 						var filenames = "";
 						var w;
 						var l = e.files.length;
-						
-						
-						
-						if(e.files.length>9){
-							l=9;//如果选择的超过9张，就截取前9张
+						if (e.files.length > 9) {
+							l = 9; //如果选择的超过9张，就截取前9张
 						}
-						
-						w = plus.nativeUI.showWaiting("正在上传"+l+"张图片");
-						 
-						for(var i=0;i<l;i++){  
-					    	var path = plus.io.convertLocalFileSystemURL(e.files[i]);
-					    	var savePath = "_doc/UserAlbum/" + uinfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + "_"+i+".png";
-							
-						 
-							fileTool.ImgFileCompress(path, savePath,"50%", function(existPath, savePath) {
+						w = plus.nativeUI.showWaiting("正在上传" + l + "张图片");
+						for (var i = 0; i < l; i++) {
+							var path = plus.io.convertLocalFileSystemURL(e.files[i]);
+							var savePath = "_doc/UserAlbum/" + uinfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + "_" + i + ".png";
+							fileTool.ImgFileCompress(path, savePath, "15%", function(existPath, savePath) {
 								files.push({
-						    		name : savePath,
-						    		path : savePath
-						    	});
-						    	var fileName = savePath.substring(savePath.lastIndexOf('/') + 1);
-						    	filenames = filenames+fileName+"|";  
-						    	if(files.length==l){ 
-						    		console.log("图片全部处理完成");	
-						    		filenames = filenames.substring(0,filenames.length-1);
-						    		
-						    		//个人相册上传接口
-						    		new UserDAL().uploadAlbum(uinfo.user_telphone,files,filenames,function(_msg){
-						    			if(_msg.Status != "faild"){
-						    				//
-						    				mui.toast("上传成功！");
-						    			}else{
-						    				mui.toast("上传失败！");
-						    			}
-						    			w.close();
-						    		},function(){
-						    			w.close();
-						    			mui.toast("服务器未响应！");
-						    		});
-						    	}
-						    	
-						    	
-							},function(){
-								mui.toast("第"+(i+1)+"张图片读取出错");
+									name: savePath,
+									path: savePath
+								});
+								var fileName = savePath.substring(savePath.lastIndexOf('/') + 1);
+								filenames = filenames + fileName + "|";
+								if (files.length == l) {
+									console.log("图片全部处理完成");
+									filenames = filenames.substring(0, filenames.length - 1);
+									//个人相册上传接口
+									new UserDAL().uploadAlbum(uinfo.user_telphone, files, filenames, function(_msg) {
+										if (_msg.Status != "faild") {
+											//
+											mui.toast("上传成功！");
+										} else {
+											mui.toast("上传失败！");
+										}
+										w.close();
+									}, function() {
+										w.close();
+										mui.toast("服务器未响应！");
+									});
+								}
+							}, function() {
+								mui.toast("第" + (i + 1) + "张图片读取出错");
 								l--;
 							});
-						
-				    	}
-						
+						}
 					}, function(e) {}, {
 						filter: "image",
-						multiple:true//可选择是否多张图片选择
-						
+						multiple: true //可选择是否多张图片选择
 					});
 					mui.toast("您最多一次可以选择上传9张图片");
 				});
-		
-				
-				
-				
 				//职业认证
 				document.getElementById("ed_job").addEventListener('tap', function() {
 					mui.fire(ed_video, 'show', null);
@@ -921,11 +945,7 @@
 						});
 					}, 0);
 				});
-				
-				
-				
 			};
-			
 			 //webview的监听
 			function webListener() {
 				plus.webview.getWebviewById("editor").addEventListener("hide", function() {
@@ -954,7 +974,8 @@
 		<div class="mui-content">
 			<div id="scroll" class="mui-scroll-wrapper">
 				<div class="mui-scroll">
-					<div id="backImg" style=" text-align: center;  padding-bottom: 30px; background: url(../../img/reg_Log.jpg) no-repeat center center;">
+					<div id="backImg" style="  text-align: center;  padding-bottom: 30px; background: url(../../img/reg_Log.jpg) no-repeat center center;">
+
 						<div style="height: 44px; ">
 							<span style="text-align: center;line-height: 44px;">个人中心</span>
 						</div>
