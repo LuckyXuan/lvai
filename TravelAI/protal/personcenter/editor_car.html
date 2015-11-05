@@ -138,19 +138,20 @@
 						continue;
 					}
 					var url = "_doc/CarPhoto/thumbCarPhoto/" + carPhoto[index].substring(carPhoto[index].lastIndexOf('/') + 1);
-					AddLoveCar(url);
 					photoindex++;
+					AddLoveCar(url,photoindex);
 				}
 			};
 			 //添加爱车靓照照片模型
-			function AddLoveCar(savePath) {
+			function AddLoveCar(savePath,LoveIndex) {
 				var listCar = document.querySelector("#loveCarPhoto");
 				var width = listCar.offsetWidth;
 				var cars = document.createElement("img");
+				cars.setAttribute("LoveIndex",LoveIndex+"");
 				cars.style.width = width * 0.3 + "px";
 				cars.style.height = width * 0.3 + "px";
 				cars.className = "lazy";
-				cars.setAttribute("data-original", plus.io.convertLocalFileSystemURL(savePath));
+				cars.setAttribute("src", plus.io.convertLocalFileSystemURL(savePath));
 				cars.style.float = "left";
 				var fragment = document.createDocumentFragment();
 				fragment.appendChild(cars);
@@ -158,16 +159,68 @@
 				if (listCar.childNodes.length >= 6) {
 					document.querySelector("#loveCarPhoto div").style.display = "none";
 				}
-				$("img.lazy").lazyload();
+				//$("img.lazy").lazyload();
 			};
 			 //按钮的监听事件
 			function MenuInit() {
+				//点击已有图片更改图片的事件
+				mui('#loveCarPhoto').on('tap', 'img', function(e) {
+					var loveIndex = Number(this.getAttribute("LoveIndex"));
+					console.log(loveIndex);
+					var that = this;
+					plus.gallery.pick(function(path) {
+						var savePath = "_doc/CarPhoto/thumbCarPhoto/" + userInfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
+						fileTool.ImgFileCompress(path, savePath,"15%", function(existPath, savePath) {
+							files[0] = {
+								name: savePath,
+								path: savePath
+							};
+							var wt = plus.nativeUI.showWaiting("上传图片中...");
+							new UserDAL().uploadCarPhoto(userInfo.user_telphone, loveIndex, files, function(_msg) {
+								console.log(_msg);
+								switch (loveIndex) {
+									case 1:
+										{
+											carInfo.car_photo1 = "/UploadFile/CarPhoto/" + "thumbCarPhoto/" + savePath.substring(savePath.lastIndexOf('/') + 1);
+											break;
+										}
+									case 2:
+										{
+											carInfo.car_photo2 = "/UploadFile/CarPhoto/" + "thumbCarPhoto/" + savePath.substring(savePath.lastIndexOf('/') + 1);
+											break;
+										}
+									case 3:
+										{
+											carInfo.car_photo3 = "/UploadFile/CarPhoto/" + "thumbCarPhoto/" + savePath.substring(savePath.lastIndexOf('/') + 1);
+											break;
+										}
+								}
+								new localStorageUtils().setItem("userCar", new JsonTools().jsonObjToString(carInfo));
+								wt.close();
+								that.setAttribute("src",plus.io.convertLocalFileSystemURL("_doc/CarPhoto/thumbCarPhoto/"+savePath.substring(savePath.lastIndexOf('/') + 1)));
+							}, function(_msg) {
+								wt.close();
+								mui.toast("上传失败，请检查网络");
+							});
+						}, function() {
+							mui.toast("图片加载失败！请重新选择");
+						});
+					}, function(e) {
+						console.log("用户取消选择图片");
+					}, {
+						filter: "image"
+					});
+					
+					
+				}, false);
+				
 				//添加爱车靓照按钮
 				document.querySelector("#loveCarPhoto div").addEventListener('tap', function() {
 					plus.gallery.pick(function(path) {
 						var savePath = "_doc/CarPhoto/thumbCarPhoto/" + userInfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
 						fileTool.ImgFileCompress(path, savePath,"15%", function(existPath, savePath) {
 							photoindex++;
+							console.log(photoindex)
 							files[0] = {
 								name: savePath,
 								path: savePath
@@ -194,7 +247,7 @@
 								}
 								new localStorageUtils().setItem("userCar", new JsonTools().jsonObjToString(carInfo));
 								wt.close();
-								AddLoveCar(savePath);
+								AddLoveCar(savePath,photoindex);
 							}, function(_msg) {
 								wt.close();
 								mui.toast("上传失败，请检查网络");
