@@ -364,7 +364,7 @@ var UserDAL = function() {
 			function(t, status) { //上传完成
 				console.log(status);
 				if (status == 200) {
-					successHandler(t.responseText);
+					successHandler(t.responseText,filess[0].name);
 				} else {
 					faildHandler(status);
 				}
@@ -394,7 +394,7 @@ var UserDAL = function() {
 			function(t, status) { //上传完成
 				console.log(status);
 				if (status == 200) {
-					successHandler(t.responseText);
+					successHandler(t.responseText,filenames);
 				} else {
 					faildHandler(status);
 				}
@@ -414,7 +414,74 @@ var UserDAL = function() {
 		console.log("开始上传个人相册");
 		task.start();
 	}
+	//签到
+	//tel:手机号
+	this.signlog = function(tel,callbackHandler,faildHandler){
+		var ws = new WebService(mui);
+		ws.setUrl(WebServiceURL);
+		ws.setOpName("signlog");
+		ws.setParas({
+			tel: tel
+		});
+		ws.setCallBack(callback);
+		ws.setErrorCall(errorCallback);
+		ws.LoadData();
+
+		//成功的回调
+		function callback(data) {
+			var msg = eval(data);
+			msg = msg.d; 
+			msg = new JsonTools().stringToJson(msg);
+			if (msg.status == "faild") {
+				faildHandler(msg.msg);
+				return;
+			}
+			callbackHandler(msg);
+			//alert(JSON.stringify(data));
+		}
+
+		//失败的提示
+		function errorCallback(e) {
+			//mui.toast(JSON.stringify(e));
+			mui.toast("服务器连接失败");
+		}
+	}
 	
+	//更新GPS信息
+	//tel:手机号
+	//lng  lat   :   经纬度
+	this.GPSLocation = function(tel,lng,lat,callbackHandler,faildHandler){
+		var ws = new WebService(mui);
+		ws.setUrl(WebServiceURL);
+		ws.setOpName("GPSLocation");
+		ws.setParas({
+			tel : tel,
+			lng : lng,
+			lat : lat
+		});
+		ws.setCallBack(callback);
+		ws.setErrorCall(errorCallback);
+		ws.LoadData();
+
+		//成功的回调
+		function callback(data) {
+			var msg = eval(data);
+			msg = msg.d; 
+			msg = new JsonTools().stringToJson(msg);
+			if (msg.status == "faild") {
+				faildHandler(msg.msg);
+				return;
+			}
+			callbackHandler(msg);
+			//alert(JSON.stringify(data));
+		}
+
+		//失败的提示
+		function errorCallback(e) {
+			//mui.toast(JSON.stringify(e));
+			mui.toast("服务器连接失败");
+		}
+	}
 	/**
 	 * 获取当前用户信息。
 	 */
@@ -423,5 +490,45 @@ var UserDAL = function() {
 	    var userInfo=	new localStorageUtils().getItem("userInfo");
 	    return new JsonTools().stringToJson(userInfo);
 	}
+	/***
+	 * 
+	 */
+	this.getUserCar = function()
+	{
+		var userCar =	new localStorageUtils().getItem("userCar");
+	    return new JsonTools().stringToJson(userCarvar);
+	}
+	
+	//获取用户相册
+	this.getUserAlbumInfo = function(tel,callbackHandler,faildHandler){
+		var ws = new WebService(mui);
+		ws.setUrl(WebServiceURL);
+		ws.setOpName("getUserAlbumInfo");
+		ws.setParas({
+			tel : tel
+		});
+		ws.setCallBack(callback);
+		ws.setErrorCall(errorCallback);
+		ws.LoadData();
 
+		//成功的回调
+		function callback(data) {
+			var msg = eval(data);
+			msg = msg.d; 
+			
+			msg = new JsonTools().stringToJson(msg);
+			if (msg.status == "faild") {
+				faildHandler(msg.msg);
+				return;
+			}
+			callbackHandler(msg);
+		}
+
+		//失败的提示
+		function errorCallback(e) {
+			//mui.toast(JSON.stringify(e));
+			mui.toast("相册服务器连接失败");
+		}
+	}
+	
 }

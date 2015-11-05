@@ -1,0 +1,17 @@
+D:\工作\旅爱\lvaiServer\LADS\la\Model\bin\Debug\la.Model.dll
+D:\工作\旅爱\lvaiServer\LADS\la\Model\bin\Debug\la.Model.pdb
+D:\工作\旅爱\lvaiServer\LADS\la\Model\obj\Debug\ResolveAssemblyReference.cache
+D:\工作\旅爱\lvaiServer\LADS\la\Model\obj\Debug\la.Model.dll
+D:\工作\旅爱\lvaiServer\LADS\la\Model\obj\Debug\la.Model.pdb
+G:\旅爱服务器\LADS\la\Model\bin\Debug\la.Model.dll
+G:\旅爱服务器\LADS\la\Model\bin\Debug\la.Model.pdb
+G:\旅爱服务器\LADS\la\Model\obj\Debug\la.Model.dll
+G:\旅爱服务器\LADS\la\Model\obj\Debug\la.Model.pdb
+G:\lvaiServer\la\la\Model\bin\Debug\la.Model.dll
+G:\lvaiServer\la\la\Model\bin\Debug\la.Model.pdb
+G:\lvaiServer\la\la\Model\obj\Debug\la.Model.dll
+G:\lvaiServer\la\la\Model\obj\Debug\la.Model.pdb
+E:\Travel\lvai\la\Model\bin\Debug\la.Model.dll
+E:\Travel\lvai\la\Model\bin\Debug\la.Model.pdb
+E:\Travel\lvai\la\Model\obj\Debug\la.Model.dll
+E:\Travel\lvai\la\Model\obj\Debug\la.Model.pdb

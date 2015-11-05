@@ -16,8 +16,13 @@
 		<script type="text/javascript" src="js/extends/extends.js"></script>
 		<script type="text/javascript" src="js/lvai.base/JsonTools.js" ></script>
 		<link href="css/mui.min.css" rel="stylesheet" />
+		<style>
+			a{text-decoration: none;}
+		</style>
 		<script type="text/javascript" charset="utf-8">
 			var wt = null;
+			var reg = null;
+			var smsLogin = null;
 			mui.init();
 			 // 扩展API加载完毕后调用onPlusReady回调函数 
 			document.addEventListener("plusready", onPlusReady, false);
@@ -76,12 +81,31 @@
 						});
 					}, 0);
 				});
+				//忘记密码时按钮监听
+				document.getElementById("smsLogin").addEventListener('tap',function(){
+					mui.fire(smsLogin, 'show', null);
+					setTimeout(function() {
+						mui.openWindow({
+							id: 'smsLogin',
+							show: {
+								aniShow: 'pop-in'
+							},
+							waiting: {
+								autoShow: false
+							}
+						});
+					}, 0);
+				});
 			};
 			 //预加载
 			function OnPreload() {
 				reg = mui.preload({
 					"id": 'reg',
 					"url": 'reg.html'
+				});
+				smsLogin = mui.preload({
+					"id": 'smsLogin',
+					"url": 'smsLogin.html'
 				});
 			};
 			 //获取车辆信息
@@ -123,7 +147,6 @@
 
 	<body>
 		<header class="mui-bar mui-bar-nav">
-			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 			<button id="btnReg" class="mui-btn mui-btn-link mui-btn-nav mui-pull-right">
 				注册
 				<span class="mui-icon mui-icon-right-nav"></span>
@@ -140,7 +163,7 @@
 				<form class="mui-input-group">
 					<div class="mui-input-row">
 						<label style="font-size: 14px; width: 25%; color: #666;">手机号</label>
-						<input id="txtTel" type="text" style="font-size: 14px; width: 70%; " placeholder="请输入您的手机号">
+						<input id="txtTel" type="tel" style="font-size: 14px; width: 70%; " placeholder="请输入您的手机号">
 					</div>
 					<div class="mui-input-row">
 						<label style="font-size: 14px; width: 25%; color: #666;">密　码</label>
@@ -149,6 +172,9 @@
 				</form>
 			</div>
 			<button id="btnLogin" class="mui-btn mui-btn-primary mui-btn-block" style="margin: auto; width: 50%; margin-top: 5%; ">进入旅爱</button>
+			<div style="text-align: center; margin-top: 10%;">
+				<a id="smsLogin"><span>忘记密码？有账号无密码？</span></a>
+			</div>
 		</div>
 	</body>
 
