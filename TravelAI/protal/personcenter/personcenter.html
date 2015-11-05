@@ -22,6 +22,10 @@
 		<script type="text/javascript" src="../../js/mui.previewimage.js"></script>
 		<script type="text/javascript" src="../../js/lvai.op/HttpDownLoad.js"></script>
 		<script type="text/javascript" src="../../js/extends/extends.js"></script>
+
+		<!--相册模版-->
+		<script type="text/javascript" src="../../js/lvai.data/AblumElement.js"></script>
+
 		<style type="text/css">
 			/*body{background-color: white;}
 			.mui-content{background-color: white;}*/
@@ -45,9 +49,33 @@
 			.card {
 				background-color: white;
 			}
-			.photoShow {} .photoShow img {
+			/*.photoShow {} .photoShow img {
 				float: left;
 				margin: 10px;
+				width: 100px !important;
+				height: 100px !important;
+			}*/
+			
+			.photoShow li {
+				width: 33.33%;
+				margin: 0px;
+				padding: 0px;
+			}
+			.photoShow h3 {
+				float: right;
+				width: 20%;
+				color: cornflowerblue;
+				background: rgba(200, 200, 200, 0.3);
+				margin-top: -23px;
+			}
+			.photoShow h5 {
+				z-index: 10;
+				margin-left: -30px;
+				margin-bottom: -15px;
+				color: greenyellow;
+			}
+			.photoShow img {
+				float: right;
 				width: 100px !important;
 				height: 100px !important;
 			}
@@ -241,6 +269,7 @@
 			mui.init({
 				gestureConfig: {
 					hold: true, //默认为false，不监听
+					longtap: true, //默认为false
 					release: true //默认为false，不监听
 				}
 			});
@@ -555,7 +584,35 @@
 				carPhotoImg[indexs - 1].setAttribute("src", plus.io.convertLocalFileSystemURL(url));
 				carPhotoImg[indexs - 1].style.display = "block";
 			};
-			 //预加载
+			 //本地页面添加相册
+			function AddAblum(_id,_imgs,_time) {
+					var ablum = new ablumElement();
+					ablum.id = _id;
+					ablum.imgs = _imgs.split('|');
+					ablum.time = _time;
+					ablum.initAblumObj();
+					ablum.setFun('tap', function() {
+						//console.log(document.querySelector("#ablum_001 img").src);
+					});
+					ablum.setFun('longtap', function() {
+						plus.nativeUI.confirm('是否删除相册？', function(e) {
+							switch (e.index) {
+								case 0: //确认
+									//1，向服务器发起  删除相册请求      ablum.id为标识符
+									//2成功回调 就删除本地
+									document.getElementById("ablumRoom").removeChild(ablum.getAblumObj());
+									break;
+								case 1: //取消
+									break;
+								default:
+									break;
+							}
+						}, "警告", ["确认", "取消"]);
+					});
+					document.getElementById("ablumRoom").appendChild(ablum.getAblumObj());
+				}
+				//预加载
+
 			function OnPreload() {
 				editor = mui.preload({
 					"id": 'editor',
@@ -892,7 +949,7 @@
 						for (var i = 0; i < l; i++) {
 							var path = plus.io.convertLocalFileSystemURL(e.files[i]);
 							var savePath = "_doc/UserAlbum/" + uinfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + "_" + i + ".png";
-							fileTool.ImgFileCompress(path, savePath, "15%", function(existPath, savePath) {
+							fileTool.ImgFileCompress(path, savePath, "50%", function(existPath, savePath) {
 								files.push({
 									name: savePath,
 									path: savePath
@@ -903,10 +960,11 @@
 									console.log("图片全部处理完成");
 									filenames = filenames.substring(0, filenames.length - 1);
 									//个人相册上传接口
-									new UserDAL().uploadAlbum(uinfo.user_telphone, files, filenames, function(_msg) {
+									new UserDAL().uploadAlbum(uinfo.user_telphone, files, filenames, function(_msg, sysfilenames) {
 										if (_msg.Status != "faild") {
-											//
 											mui.toast("上传成功！");
+											//本地添加
+											AddAblum("001",sysfilenames,"1995-10-22"); 
 										} else {
 											mui.toast("上传失败！");
 										}
@@ -1102,13 +1160,13 @@
 
 							<div id="item2mobile" class="mui-slider-item mui-control-content">
 								<h5 class="mui-content-padded">
-								32张相片
+								10个相册
 									<span id="upLoadImg" style="float: right; border: 1px solid gainsboro; border-radius: 10px; font-size: 0.9em; padding: 2px 5px;color: white; background-color: green" >
 										上传新照片
 									</span>
 								</h5>
-								<hr />
-								<div class="photoShow">
+
+								<!--<div class="photoShow">
 									
 									<img src="../../img/travel_2.jpg" />
 									<div class="mui-slider-item"><a href="#"><img src="travel_2.jpg" /></a></div>
@@ -1125,6 +1183,20 @@
 									<img src="../../img/travel_2.jpg" />
 									<img src="../../img/travel_2.jpg" />
 									<img src="../../img/travel_2.jpg" />
+								</div>-->
+								<div class="photoShow">
+									<ul class="mui-table-view mui-grid-view" id="ablumRoom">
+										<li class="mui-table-view-cell mui-media mui-col-xs-6">
+											<a href="#">
+												<h5>2013-10-22</h5>
+												<img class="mui-media-object" src="../../img/travel_1.jpg">
+												<h3>9</h3>
+
+											</a>
+										</li>
+
+									</ul>
+
 								</div>
 
 								<!--</div>
