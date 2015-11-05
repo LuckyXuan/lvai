@@ -258,7 +258,6 @@
 				 * 呈现网络数据
 				 */
 				//RenderData();
-				//loadAsynchronou();
 			};
 			/**
 			 *页面加载完成发生。
@@ -380,7 +379,6 @@
 
 			function LoadUserInfo() {
 				var userInfoTxt = new localStorageUtils().getItem("userInfo");
-				console.log(userInfoTxt);
 				userInfo = new JsonTools().stringToJson(userInfoTxt);
 			};
 			/***
@@ -471,13 +469,6 @@
 						}
 					}
 				}
-				//异步加载车辆图片及下载数据
-
-			function loadAsynchronou() {
-				//setTimeout(function() {
-				loadCarPhoto();
-				//}, 100);
-			};
 			 //从网络载入头像区域的背景图片
 			function loadUserPhotoBgNetData() {
 				if (userInfo.personcenter_bg == "") {

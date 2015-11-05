@@ -25,17 +25,73 @@ namespace la.Web
         /// <param name="pwd"></param>
         /// <returns></returns>
         [WebMethod]
-        public string login(string tel,string pwd)
+        public string login(string tel, string pwd)
         {
             return UserInfoServer.login(tel, pwd);
         }
+        #region 短信验证登录请求 2015-11-5 凯旋 编写
         /// <summary>
-        /// 发送短信验证码请求。
+        /// 短信验证登录请求
+        /// </summary>
+        /// <param name="tel">手机号</param>
+        /// <returns></returns>
+        [WebMethod]
+        public string applySMSLogin(string tel)
+        {
+            string result = "{\"status\":";
+            if (Util.validSqlInsert(tel))
+            {
+                result = result + "\"faild\",";
+                result = result + "\"msg\":\"含有非法攻击字符\",";
+                result = result + "\"data\":{}}";
+                return result;
+            }
+            //第一步判断该手机号是否存在，不存在返回结果，存在则写入数据库4位随机码
+            if (new BLL.user_tb().GetModel(tel) == null)
+            {
+                result = result + "\"faild\",";
+                result = result + "\"msg\":\"该手机号未注册\",";
+                result = result + "\"data\":{}}";
+                return result;
+            }
+            try
+            {
+                //第二步向短信服务商发出请求。
+                string code = Util.CreateRandomCode(4);
+                //当上线时再将短信开通。
+                // SendSMS.sendSMSCode(tel,code);
+                //向数据库短信验证码写入一条数据。
+                Model.smsCode smscode = new Model.smsCode();
+                smscode.smscode = code;
+                smscode.smscode_sendtime = DateTime.Now;
+                smscode.user_telphone = tel;
+                new BLL.smsCode().Add(smscode);
+                //向数据库短息库写入一条数据，以便进行统计。
+                Model.sms sms = new Model.sms();
+                sms.sms_time = smscode.smscode_sendtime;
+                sms.user_telphone = tel;
+                sms.sms_content = "短信验证码内容：" + code;
+                new BLL.sms().Add(sms);
+            }
+            catch (Exception ex)
+            {
+                result = result + "\"faild\",";
+                result = result + "\"msg\":\"" + ex.Message + "\",";
+                result = result + "\"data\":{}}";
+                return result;
+            }
+            result = result + "\"success\",";
+            result = result + "\"msg\":\"\",";
+            result = result + "\"data\":{}}";
+            return result;
+        }
+        #endregion
+        /// <summary>
+        /// 发送短信验证码注册请求。
         /// </summary>
         /// <param name="tel"></param>
         /// <returns></returns>
         [WebMethod]
-        
         public string applySMS(string tel)
         {
             string result = "{\"status\":";
@@ -67,7 +123,7 @@ namespace la.Web
             //第二步向短信服务商发出请求。
             string code = Util.CreateRandomCode(4);
             //当上线时再将短信开通。
-           // SendSMS.sendSMSCode(tel,code);
+            // SendSMS.sendSMSCode(tel,code);
             //向数据库短信验证码写入一条数据。
             Model.smsCode smscode = new Model.smsCode();
             smscode.smscode = code;
@@ -78,7 +134,7 @@ namespace la.Web
             Model.sms sms = new Model.sms();
             sms.sms_time = smscode.smscode_sendtime;
             sms.user_telphone = tel;
-            sms.sms_content = "短信验证码内容："+code;
+            sms.sms_content = "短信验证码内容：" + code;
             new BLL.sms().Add(sms);
 
             result = result + "\"success\",";
@@ -94,7 +150,7 @@ namespace la.Web
         /// <param name="code"></param>
         /// <returns></returns>
         [WebMethod]
-        public string validSMSCode(string tel,string code)
+        public string validSMSCode(string tel, string code)
         {
             string result = "{\"status\":";
             if (Util.validSqlInsert(tel))
@@ -124,7 +180,7 @@ namespace la.Web
                 return result;
             }
 
-            if (code!=smscode.smscode)
+            if (code != smscode.smscode)
             {
                 result = result + "\"faild\",";
                 result = result + "\"msg\":\"验证码错误\",";
@@ -151,8 +207,8 @@ namespace la.Web
         public string updateUserInfo(object jsonUserInfo)
         {
             Dictionary<string, object> dic = jsonUserInfo as Dictionary<string, object>;
-           
-           // Dictionary<string, object> dic = jsonUserInfo;
+
+            // Dictionary<string, object> dic = jsonUserInfo;
             string result = "{\"status\":";
             //if (Util.validSqlInsert(jsonUserInfo))
             //{
@@ -162,13 +218,13 @@ namespace la.Web
             //    return result;
             //}
 
-            
+
             try
             {
                 Model.user_tb u = new Model.user_tb();
                 //u.user_sex = (bool)dic["user_sex"];
                 //return dic["user_sex"].ToString();
-                u.user_sex = Convert.ToBoolean( dic["user_sex"].ToString());
+                u.user_sex = Convert.ToBoolean(dic["user_sex"].ToString());
                 u.user_nikeName = dic["user_nikeName"].ToString();
                 u.user_photo = dic["user_photo"].ToString();
                 u.user_birthday = Convert.ToDateTime(dic["user_birthday"].ToString());
@@ -185,7 +241,7 @@ namespace la.Web
             catch (Exception e)
             {
                 result = result + "\"faild\",";
-                result = result + "\"msg\":\""+e.Message+"\",";
+                result = result + "\"msg\":\"" + e.Message + "\",";
                 result = result + "\"data\":{}}";
                 return result;
             }
@@ -211,7 +267,7 @@ namespace la.Web
             string dirPath = HttpContext.Current.Server.MapPath("~/UploadFile/HeadPhoto/");
             string fileName = DateTime.Now.ToString("yyyyMMddHHmmssffff") + ".png";
             string filePath = dirPath + fileName;//file.FileName;
-            
+
             BLL.user_tb ubll = new BLL.user_tb();
             Model.user_tb u = ubll.GetModel(tel);
             u.user_photo = "/UploadFile/HeadPhoto/" + fileName;
@@ -219,7 +275,7 @@ namespace la.Web
 
 
             string Pic_Path = filePath;
-           // imgData = imgData.Replace("%2B", "+");
+            // imgData = imgData.Replace("%2B", "+");
             try
             {
                 using (FileStream fs = new FileStream(Pic_Path, FileMode.Create))
@@ -240,7 +296,7 @@ namespace la.Web
 
             string result = "{\"Status\":\"success\",\"Msg\":\"上传成功\",\"data\":{}}";
             return result;
-           
+
         }
 
         /// <summary>
@@ -264,7 +320,7 @@ namespace la.Web
                 return result;
             }
 
-            List< Model.gpslocation> locationlist = new BLL.gpslocation().GetModelList(" user_telphone='" + tel + "'");
+            List<Model.gpslocation> locationlist = new BLL.gpslocation().GetModelList(" user_telphone='" + tel + "'");
             if (locationlist == null || locationlist.Count == 0)
             {
                 Model.gpslocation location = new Model.gpslocation();
@@ -290,7 +346,7 @@ namespace la.Web
 
             result = result + "\"success\",";
             result = result + "\"msg\":\"更新成功\",";
-            result = result + "\"data\":{}";
+            result = result + "\"data\":{}}";
             return result;
 
         }
@@ -312,7 +368,7 @@ namespace la.Web
             string result = "{\"status\":";
             result = result + "\"success\",";
             result = result + "\"msg\":\"更新成功\",";
-            result = result + "\"data\":{}";
+            result = result + "\"data\":{}}";
             return result;
         }
 
@@ -322,7 +378,7 @@ namespace la.Web
         /// <param name="carJsonstring"></param>
         /// <returns></returns>
         [WebMethod]
-        public string UpdateCarInfo(object  carJsonstring)
+        public string UpdateCarInfo(object carJsonstring)
         {
             Dictionary<string, object> dic = carJsonstring as Dictionary<string, object>;
             Model.carInfo info = new Model.carInfo();
@@ -356,15 +412,15 @@ namespace la.Web
                 {
                     temp = ex.Message;
                 }
-                
+
                 //temp = car.user_telphone + "ff" +car.car_id.ToString();
             }
 
             result = result + "\"success\",";
-            result = result + "\"msg\":\""+temp+"\",";
+            result = result + "\"msg\":\"" + temp + "\",";
             result = result + "\"data\":{}}";
             return result;
- 
+
         }
 
         /// <summary>
@@ -401,13 +457,13 @@ namespace la.Web
             catch (Exception ex)
             {
                 result = result + "\"faild\",";
-                result = result + "\"msg\":\""+ex.Message+"\",";
+                result = result + "\"msg\":\"" + ex.Message + "\",";
                 result = result + "\"data\":{}}";
                 return result;
-            
+
             }
 
-            
+
         }
 
         /// <summary>
