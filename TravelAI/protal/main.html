@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-
+ 
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
@@ -9,6 +9,12 @@
 		<script type="text/javascript" src="../js/lvai.op/UIOp.js"></script>
 		<script type="text/javascript" src="../js/lvai.op/webview.js"></script>
 		<script type="text/javascript" src="../js/jquery-1.7.2.min.js" ></script>
+		
+		<script type="text/javascript" src="../js/lvai.data/config.js" ></script>
+		<script type="text/javascript" src="../js/lvai.data/WebService2.js" ></script>
+		<script type="text/javascript" src="../js/lvai.base/JsonTools.js" ></script>
+		<script type="text/javascript" src="../js/lvai.base/localStorageUtils.js" ></script>
+		<script type="text/javascript" src="../js/lvai.data/UserDAL.js" ></script>
 		<link href="../css/mui.min.css" rel="stylesheet" />
 		<script type="text/javascript" charset="utf-8">
 			var ws = null,
@@ -86,20 +92,53 @@
 				}, false);
 				
 				document.querySelector(".mui-btn").addEventListener('tap', function() {
+					//获取gps定位
+					
+					
+				});
+				
+				//用户签到
+				document.querySelector("header>h1").addEventListener('tap',function(){
+					var userDal = new UserDAL();
+					//获取 用户对象
+					var userinfo = userDal.getUserInfo();
+					
 					plus.geolocation.getCurrentPosition(function(p) {
-						alert("Geolocation\nLatitude:" + p.coords.latitude + "\nLongitude:" + p.coords.longitude + "\nAltitude:" + p.coords.altitude);
+					
+						userDal.signlog(userinfo.user_telphone,function(_msg){
+							mui.toast(_msg.msg);
+						},function(){
+							console.log(_msg);
+						});
+ 
+						 
+//						userDal.GPSLocation(userinfo.user_telphone,p.coords.longitude,p.coords.latitude,function(_msg){
+//							mui.toast(_msg.msg);
+//							
+//						},function(_msg){
+//							console.log(_msg); 
+//						});
+						
+						
+						
 					}, function(e) {
 						mui.toast("Geolocation error: " + e.message);
+					},{
+						geocode:true,
+						provider:'baidu'
 					});
+					
+					
+					
 				});
 			};
 
-			function OnPreload() {
-				ws.append(CreatePage("msg/msgList.html", "msg", "0px", "51px",document.body.clientWidth, false));
-				ws.append(CreatePage("personcenter/personcenter.html", "mycard", "0px", "51px",document.body.clientWidth, false));
-				ws.append(CreatePage("travel/travel.html", "travel", "45px", "51px",document.body.clientWidth, true));
-				
-			}
+//			function OnPreload() {
+//				ws.append(CreatePage("msg/msgList.html", "msg", "0px", "51px",document.body.clientWidth, false));
+//				ws.append(CreatePage("personcenter/personcenter.html", "mycard", "0px", "51px",document.body.clientWidth, false));
+//				ws.append(CreatePage("travel/travel.html", "travel", "45px", "51px",document.body.clientWidth, true));
+//				
+//			}
 		</script>
 	</head>
 
