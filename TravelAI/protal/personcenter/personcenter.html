@@ -24,7 +24,7 @@
 		<script type="text/javascript" src="../../js/extends/extends.js"></script>
 
 		<!--相册模版-->
-		<script type="text/javascript" src="../../js/lvai.data/AblumElement.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/AlbumElement.js"></script>
 
 		<style type="text/css">
 			/*body{background-color: white;}
@@ -288,6 +288,7 @@
 				 */
 				//RenderData();
 				//loadAsynchronou();
+				loadAlbumData();
 			};
 			/**
 			 *页面加载完成发生。
@@ -584,23 +585,52 @@
 				carPhotoImg[indexs - 1].setAttribute("src", plus.io.convertLocalFileSystemURL(url));
 				carPhotoImg[indexs - 1].style.display = "block";
 			};
-			 //本地页面添加相册
-			function AddAblum(_id,_imgs,_time) {
-					var ablum = new ablumElement();
-					ablum.id = _id;
-					ablum.imgs = _imgs.split('|');
-					ablum.time = _time;
-					ablum.initAblumObj();
-					ablum.setFun('tap', function() {
-						//console.log(document.querySelector("#ablum_001 img").src);
+			//获取网络上的相册列表
+			function loadAlbumData(){
+				var userDal = new UserDAL();
+				
+				var uinfo = userDal.getUserInfo();
+				
+				userDal.getUserAlbumInfo(uinfo.user_telphone,function(_msg){
+					var d = new Date();
+					var album,imgs,time,paths;
+					for(var i in _msg){
+						album  = _msg[i];
+						imgs = "";
+						time = "";
+						paths = "";
+						for(var j in album.PhotoList){
+							paths = album.PhotoList[j].personphoto_path;
+							paths = paths.substring(paths.lastIndexOf('/')+1);
+							imgs =imgs + paths + "|";
+						}
+						imgs = imgs.substring(0, imgs.length - 1);
+						d.setCsharpTime(album.album_time);
+						time = d.toFormatString('yyyy-MM-dd');
+						
+						AddAlbum(album.album_id,imgs,time);
+					}
+				},function(_msg){
+					mui.toast(_msg);
+				});
+			}
+			//本地页面添加相册
+			function AddAlbum(_id,_imgs,_time) {
+					var Album = new albumElement();
+					Album.id = _id;
+					Album.imgs = _imgs.split('|');
+					Album.time = _time;
+					Album.initAlbumObj();
+					Album.setFun('tap', function() {
+						//console.log(document.querySelector("#Album_001 img").src);
 					});
-					ablum.setFun('longtap', function() {
+					Album.setFun('longtap', function() {
 						plus.nativeUI.confirm('是否删除相册？', function(e) {
 							switch (e.index) {
 								case 0: //确认
-									//1，向服务器发起  删除相册请求      ablum.id为标识符
+									//1，向服务器发起  删除相册请求      Album.id为标识符
 									//2成功回调 就删除本地
-									document.getElementById("ablumRoom").removeChild(ablum.getAblumObj());
+									document.getElementById("AlbumRoom").removeChild(Album.getAlbumObj());  
 									break;
 								case 1: //取消
 									break;
@@ -609,7 +639,7 @@
 							}
 						}, "警告", ["确认", "取消"]);
 					});
-					document.getElementById("ablumRoom").appendChild(ablum.getAblumObj());
+					document.getElementById("AlbumRoom").appendChild(Album.getAlbumObj());
 				}
 				//预加载
 
@@ -964,7 +994,7 @@
 										if (_msg.Status != "faild") {
 											mui.toast("上传成功！");
 											//本地添加
-											AddAblum("001",sysfilenames,"1995-10-22"); 
+											AddAlbum("001",sysfilenames,"1995-10-22"); 
 										} else {
 											mui.toast("上传失败！");
 										}
@@ -1185,7 +1215,7 @@
 									<img src="../../img/travel_2.jpg" />
 								</div>-->
 								<div class="photoShow">
-									<ul class="mui-table-view mui-grid-view" id="ablumRoom">
+									<ul class="mui-table-view mui-grid-view" id="AlbumRoom">
 										<li class="mui-table-view-cell mui-media mui-col-xs-6">
 											<a href="#">
 												<h5>2013-10-22</h5>

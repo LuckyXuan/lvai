@@ -498,4 +498,37 @@ var UserDAL = function() {
 		var userCar =	new localStorageUtils().getItem("userCar");
 	    return new JsonTools().stringToJson(userCarvar);
 	}
+	
+	//获取用户相册
+	this.getUserAlbumInfo = function(tel,callbackHandler,faildHandler){
+		var ws = new WebService(mui);
+		ws.setUrl(WebServiceURL);
+		ws.setOpName("getUserAlbumInfo");
+		ws.setParas({
+			tel : tel
+		});
+		ws.setCallBack(callback);
+		ws.setErrorCall(errorCallback);
+		ws.LoadData();
+
+		//成功的回调
+		function callback(data) {
+			var msg = eval(data);
+			msg = msg.d; 
+			
+			msg = new JsonTools().stringToJson(msg);
+			if (msg.status == "faild") {
+				faildHandler(msg.msg);
+				return;
+			}
+			callbackHandler(msg);
+		}
+
+		//失败的提示
+		function errorCallback(e) {
+			//mui.toast(JSON.stringify(e));
+			mui.toast("相册服务器连接失败");
+		}
+	}
+	
 }
