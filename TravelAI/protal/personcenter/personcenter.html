@@ -24,6 +24,8 @@
 		<script type="text/javascript" src="../../js/extends/extends.js"></script>
 
 		<!--相册模版-->
+		<script type="text/javascript" src="../../js/lvai.data/md5.js" ></script>
+		<script type="text/javascript" src="../../js/lvai.base/ImgTool.js" ></script>
 		<script type="text/javascript" src="../../js/lvai.data/AlbumElement.js"></script>
 
 		<style type="text/css">
@@ -256,11 +258,13 @@
 			var ed_video;
 			var ed_job;
 			var fileDownLoad; //文件下载对象。
-			var headPhotoFileInfoIsLoad = false;
-			var carFileInfoIsLoad = false;
-			var userPhotoBg = false;
-			var userInfo = null;
-			var carInfo = null;
+			var headPhotoFileInfoIsLoad = false,
+				carFileInfoIsLoad = false,
+				userPhotoBg = false,
+				albumInfoIsLoad = false;
+			var userInfo = null,
+				carInfo = null,
+				albumInfo = null;
 			var record = null,
 				t = null,
 				iv = null,
@@ -277,6 +281,7 @@
 			document.addEventListener("plusready", onPlusReady);
 			 // 应用程序入口。
 			function onPlusReady() {
+				
 				/*页面初始化，加载页面元素*/
 				pageInit();
 				pageOnload();
@@ -288,7 +293,6 @@
 				 */
 				//RenderData();
 				//loadAsynchronou();
-				loadAlbumData();
 			};
 			/**
 			 *页面加载完成发生。
@@ -298,6 +302,7 @@
 				//LoadResource();
 				LoadUserInfo();
 				LoadCarInfo();
+				loadAlbumInfo();
 			}
 
 			function PageRender() {
@@ -305,6 +310,7 @@
 					RenderUserPhotoBg();
 					RenderHeadPhoto();
 					renderCarInfo();
+					RenderAlbumInfo();
 					//renderCarPhoto();
 				}
 				/**
@@ -326,6 +332,7 @@
 					}
 					listCarWidth = plus.webview.currentWebview().listCarWidth;
 					new localStorageUtils().setItem("HeadPhotoBase64", "");
+					
 					systemUi();
 					CarPhotoUi();
 					OnPreload();
@@ -374,7 +381,7 @@
 							f.URL = ResourcesServerUrl + userInfo.user_photo;
 							fileDownLoad.AddFile(f);
 							headPhotoFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
 								LoadResource();
 							}
 						}
@@ -382,12 +389,13 @@
 				}
 				if (!carInfo) {
 					carFileInfoIsLoad = true;
-					if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
+					if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
 						LoadResource();
 					}
 				}
 				loadUserPhotoBgNetData();
 				loadCarPhotoNetData();
+				loadAlbumData();
 			};
 			/**
 			 * 呈现网络数据
@@ -396,6 +404,7 @@
 					RenderUserPhotoBg();
 					RenderHeadPhoto();
 					renderCarPhoto();
+					RenderAlbumInfo();
 				}
 				/***
 				 * 载入本页面相关网络资源。
@@ -487,7 +496,7 @@
 				renderCarPhoto();
 			}
 
-			function renderCarPhoto() {
+			function renderCarPhoto() { 
 					carPhoto[0] = carInfo.car_photo1;
 					carPhoto[1] = carInfo.car_photo2;
 					carPhoto[2] = carInfo.car_photo3;
@@ -525,7 +534,7 @@
 							f.URL = ResourcesServerUrl + userInfo.personcenter_bg;
 							fileDownLoad.AddFile(f);
 							userPhotoBg = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
 								LoadResource();
 							}
 						}
@@ -540,7 +549,7 @@
 						photoindex++;
 						if (photoindex == 3) {
 							carFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
 								LoadResource();
 							}
 						}
@@ -552,7 +561,7 @@
 						photoindex++;
 						if (photoindex == carPhoto.length) {
 							carFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
 								LoadResource();
 							}
 						}
@@ -565,7 +574,7 @@
 						photoindex++;
 						if (photoindex == carPhoto.length) {
 							carFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
 								LoadResource();
 							}
 						}
@@ -585,474 +594,594 @@
 				carPhotoImg[indexs - 1].setAttribute("src", plus.io.convertLocalFileSystemURL(url));
 				carPhotoImg[indexs - 1].style.display = "block";
 			};
-			//获取网络上的相册列表
-			function loadAlbumData(){
+			
+		
+		
+		
+		
+			//加载本地相册数据
+			function loadAlbumInfo(){
+				 
+				 var ab = new localStorageUtils().getItem("Album");
+				 if(ab){
+				 	albumInfo = new JsonTools().stringToJson(ab);	
+				 }
+			}
+			
+			//加载网络相册数据  至 本地
+			function newAlbumItem(){
 				var userDal = new UserDAL();
-				
 				var uinfo = userDal.getUserInfo();
-				
 				userDal.getUserAlbumInfo(uinfo.user_telphone,function(_msg){
-					var d = new Date();
-					var album,imgs,time,paths;
-					for(var i in _msg){
-						album  = _msg[i];
-						imgs = "";
-						time = "";
-						paths = "";
-						for(var j in album.PhotoList){
-							paths = album.PhotoList[j].personphoto_path;
-							paths = paths.substring(paths.lastIndexOf('/')+1);
-							imgs =imgs + paths + "|";
-						}
-						imgs = imgs.substring(0, imgs.length - 1);
-						d.setCsharpTime(album.album_time);
-						time = d.toFormatString('yyyy-MM-dd');
-						
-						AddAlbum(album.album_id,imgs,time);
-					}
+					new localStorageUtils().setItem("Album",new JsonTools().jsonObjToString(_msg));
+					
 				},function(_msg){
 					mui.toast(_msg);
 				});
 			}
-			//本地页面添加相册
-			function AddAlbum(_id,_imgs,_time) {
-					var Album = new albumElement();
-					Album.id = _id;
-					Album.imgs = _imgs.split('|');
-					Album.time = _time;
-					Album.initAlbumObj();
-					Album.setFun('tap', function() {
-						//console.log(document.querySelector("#Album_001 img").src);
-					});
-					Album.setFun('longtap', function() {
-						plus.nativeUI.confirm('是否删除相册？', function(e) {
-							switch (e.index) {
-								case 0: //确认
-									//1，向服务器发起  删除相册请求      Album.id为标识符
-									//2成功回调 就删除本地
-									document.getElementById("AlbumRoom").removeChild(Album.getAlbumObj());  
-									break;
-								case 1: //取消
-									break;
-								default:
-									break;
+			 //获取网络上的相册文件
+			function loadAlbumData() {
+				
+						var userDal = new UserDAL();
+						var uinfo = userDal.getUserInfo();
+						userDal.getUserAlbumInfo(uinfo.user_telphone,function(_msg){
+							new localStorageUtils().setItem("Album",new JsonTools().jsonObjToString(_msg));
+							albumInfoIsLoad = true;
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
+								LoadResource();
 							}
-						}, "警告", ["确认", "取消"]);
-					});
-					document.getElementById("AlbumRoom").appendChild(Album.getAlbumObj());
-				}
-				//预加载
-
-			function OnPreload() {
-				editor = mui.preload({
-					"id": 'editor',
-					"url": 'editor_card1.html'
-				});
-				ed_car = mui.preload({
-					"id": 'ed_car',
-					"url": 'editor_car.html'
-				});
-				ed_video = mui.preload({
-					"id": 'ed_video',
-					"url": 'editor_video.html'
-				});
-				ed_job = mui.preload({
-					"id": 'ed_job',
-					"url": 'editor_job.html'
-				});
-			};
-			 //按钮的监听事件
-			function MenuInit() {
-				//背景按钮//背景按钮
-				document.getElementById("backImg").addEventListener('tap', function() {
-					var this_backImg = this;
-					var btnArray = [{
-						title: "预览原图"
-					}, {
-						title: "更改背景图"
-					}];
-					plus.nativeUI.actionSheet({
-						//title: "头像选取方式",  
-						cancel: "取消",
-						buttons: btnArray
-					}, function(e) {
-						var index = e.index;
-						switch (index) {
-							case 0:
-								{
-									//取消 
-									break;
-								}
-							case 1:
-								{
-									//预览原图
-									break;
-								}
-							case 2:
-								{
-									console.log(this_backImg.style.background);
-									//选取现有的
-									plus.gallery.pick(function(path) {
-											var savePath = "_doc/BGPhoto/" + userInfo.user_telphone + "_bg_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
-											fileTool.ImgFileCompress(path, savePath, "30%", function(existPath, savePath) {
-												this_backImg.style.background = "url(file://" + plus.io.convertLocalFileSystemURL(savePath) + ") no-repeat center center";
-												this_backImg.style.backgroundSize = "100%";
-												var files = [];
-												files[0] = {
-													name: plus.io.convertLocalFileSystemURL(savePath),
-													path: plus.io.convertLocalFileSystemURL(savePath)
-												};
-												new UserDAL().uploadBgPhoto(userInfo.user_telphone, files, function(_msg, fileName) {
-													console.log(_msg);
-													userInfo.personcenter_bg = "/UploadFile/UserCenterBg/" + fileName.substring(fileName.lastIndexOf('/') + 1);
-													new localStorageUtils().setItem("userInfo", new JsonTools().jsonObjToString(userInfo));
-												}, function(_msg) {
-													mui.toast("背景同步失败");
-												});
-											}, function(_msg) {
-												mui.toast("图片文件出错,请重新选择");
-											});
-										},
-										function(e) {}, {
-											filter: "image"
-										});
-									break;
-								}
-						}
-					});
-				});
-				//头像按钮
-				document.getElementById('editor').addEventListener('tap', function(e) {
-					e.stopPropagation();
-					var btnArray = [{
-						title: "拍照"
-					}, {
-						title: "选取现有的"
-					}];
-					plus.nativeUI.actionSheet({
-						//title: "头像选取方式",  
-						cancel: "取消",
-						buttons: btnArray
-					}, function(e) {
-						var index = e.index;
-						switch (index) {
-							case 0:
-								{
-									//plus.ui.alert("你选择了取消", "警告", "OK");
-									break;
-								}
-							case 1:
-								{
-									//plus.ui.alert("你选择了拍照", "警告", "OK");							
-									var cmr = plus.camera.getCamera();
-									var res = cmr.supportedImageResolutions[0];
-									var fmt = cmr.supportedImageFormats[0];
-									cmr.captureImage(function(path) {
-											//alert(plus.io.convertLocalFileSystemURL(path));
-											plus.storage.setItem("Icon", plus.io.convertLocalFileSystemURL(path));
-											console.log(plus.storage.getItem("Icon"));
-											var wvphone = mui.openWindow({
-												url: 'editor_photo.html',
-												id: 'Icon',
-												show: {
-													aniShow: 'fade-in'
-												}
-											});
-											wvphone.addEventListener("close", function() {
-												console.log("裁剪窗口以关闭");
-												var base64 = new localStorageUtils().getItem("HeadPhotoBase64");
-												if (base64 != "") {
-													document.querySelector("#editor").setAttribute("src", base64);
-												}
-											});
-											//document.querySelector("#user_photo>img").setAttribute('src', plus.io.convertLocalFileSystemURL(path));
-										},
-										function(error) {
-											alert("Capture image failed: " + error.message);
-										}, {
-											resolution: res,
-											format: fmt
-										}
-									);
-									break;
-								}
-							case 2:
-								{
-									//plus.ui.alert("你选择了选取现有的", "警告", "OK");	
-									plus.gallery.pick(function(path) {
-										plus.storage.setItem("Icon", plus.io.convertLocalFileSystemURL(path));
-										console.log(plus.storage.getItem("Icon"));
-										var wvphone = mui.openWindow({
-											url: 'editor_photo.html',
-											id: 'Icon',
-											show: {
-												aniShow: 'fade-in'
-											}
-										});
-										wvphone.addEventListener("close", function() {
-											console.log("裁剪窗口以关闭");
-											var base64 = new localStorageUtils().getItem("HeadPhotoBase64");
-											if (base64 != "") {
-												document.querySelector("#editor").setAttribute("src", base64);
-											}
-										});
-									}, function(e) {}, {
-										filter: "image"
-									});
-									break;
-								}
-						}
-					});
-				});
-				//基本信息按钮
-				document.getElementById('ed').addEventListener('tap', function() {
-					mui.fire(editor, 'show', null);
-					setTimeout(function() {
-						mui.openWindow({
-							id: 'editor',
-							show: {
-								aniShow: 'pop-in'
-							},
-							waiting: {
-								autoShow: false
-							},
-							styles: {
-								zindex: 600
+						},function(_msg){
+							mui.toast(_msg);
+							albumInfoIsLoad = true;
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
+								LoadResource();
 							}
 						});
-					}, 0);
-				});
-				//录制语音hold
-				document.getElementById("recording").addEventListener('tap', function() {
-					record = plus.audio.getRecorder();
-					if (record == null) {
-						alert("麦克风未就绪！");
-						return;
+						
+//						var album;
+//						var index = 0;
+//						var fileArr = new Array();//本地路径
+//						var serverArr = new Array();//服务器路径
+//						var serverPaths,filePaths;
+//						var url = "_doc/UserAlbum/";
+//						
+//						for(var i in albumInfo){
+//							album = albumInfo[i];
+//							paths = "";
+//							filePaths = "";
+//							for(var j in album.PhotoList){
+//								paths = album.PhotoList[j].personphoto_path;
+//								filePaths = url + paths.substring(paths.lastIndexOf('/') + 1);
+//								serverArr.push(paths);
+//								fileArr.push(filePaths); 
+//							}
+//						}
+//						
+//						for(var i in fileArr){
+//							fileTool.fileExist(fileArr[i],serverArr[i],function(msg){
+//								index++;
+//								if(index == fileArr.length){
+//									albumInfoIsLoad = true;
+//									if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
+//										LoadResource();
+//									}
+//								}
+//							},function(path, serverPath){
+//								var f = new HttpFile();
+//								f.FileName = serverPath.substring(serverPath.lastIndexOf('/') + 1);
+//								f.FilePath = "_doc/UserAlbum/";
+//								f.URL = ResourcesServerUrl + serverPath;
+//								
+//								fileDownLoad.AddFile(f);
+//								index++;
+//								if(index == fileArr.length){
+//									albumInfoIsLoad = true;
+//									if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
+//										LoadResource();
+//									}
+//								}
+//							});
+//							
+//						}
+//						
+//						
+//					}
+				
+				}
+			
+				//显示本地相册数据
+				function RenderAlbumInfo() {
+					console.log("展示本地相册");
+					console.log(albumInfo);
+					var userDal = new UserDAL();
+					
+					var d = new Date(); 
+					var album, imgs, time, paths;
+					for (var i in albumInfo) {
+						album = albumInfo[i];
+						imgs = "";
+						time = "";
+						paths = "";
+						for (var j in album.PhotoList) {
+							paths = album.PhotoList[j].personphoto_path;
+							//paths = paths.substring(paths.lastIndexOf('/') + 1);
+							imgs = imgs + paths + "|";
+						}
+						imgs = imgs.substring(0, imgs.length - 1);
+						d.setCsharpTime(album.album_time);
+						time = d.toFormatString('yyyy-MM-dd');
+						AddAlbum(album.album_id, imgs, time);
 					}
-					var thisr = this;
-					record.record({
-						filename: "_doc/audio/"
-					}, function(p) {
-						plus.io.resolveLocalFileSystemURL(p, function(entry) {
-							var confirm = function() {
-								// 弹出提示信息对话框	entry.name
-								plus.nativeUI.confirm(entry.name, function(e) {
+				}
+					
+					//本地页面添加相册
+					function AddAlbum(_id, _imgs, _time) {
+						    
+							if(document.getElementById("Album_"+_id)){
+								//如果有就不创建
+								return;
+							} 
+							
+							var abLi = null;
+							var abRoom = document.getElementById("AlbumRoom");
+							
+							
+							var ab = new albumElement();
+							ab.id = _id;
+							ab.imgs = _imgs.split('|');
+							ab.time = _time;
+							ab.initAlbumObj();
+							
+							ab.setFun('tap', function() {
+								//alert(this.id); 
+							});
+							ab.setFun('longtap', function() {
+								var that = this;
+								plus.nativeUI.confirm('是否删除相册？', function(e) {
 									switch (e.index) {
-										case 0:
-											var ww = plus.nativeUI.showWaiting("上传中... ", {
-												back: "none"
-											});
-											var u = new localStorageUtils().getItem("userInfo");
-											var uinfo = new JsonTools().stringToJson(u);
-											var files = [];
-											files[0] = {
-												name: "userAudo",
-												path: plus.io.convertLocalFileSystemURL(p)
-											};
-											new UserDAL().uploadUserAudio(uinfo.user_telphone, files, function(_msg) {
-												console.log(_msg);
-												ww.close();
-												mui.toast("上传成功");
-											}, function(_msg) {
-												ww.close();
-												mui.toast("上传失败，请检查网络");
-											});
-											break; //上传
-										case 1:
-											break; //取消
-										case 2:
-											var ww = plus.nativeUI.showWaiting("试听中... ", {
-												background: "rgba(56,12,92,0.8)",
-												back: "none"
-											});
-											var play = plus.audio.createPlayer(p);
-											play.play(function() {
-												confirm();
-												ww.close();
+										case 0: //确认
+											//1，向服务器发起  删除相册请求      Album.id为标识符
+											//2成功回调 就删除本地
+											abRoom.removeChild(that);
+											break;
+										case 1: //取消
+											break;
+										default:
+											break;
+									}
+								}, "警告", ["确认", "取消"]);
+							});
+							
+							abRoom.appendChild(ab.getAlbumLiNode());
+						}
+						//预加载
+
+					function OnPreload() {
+						editor = mui.preload({
+							"id": 'editor',
+							"url": 'editor_card1.html'
+						});
+						ed_car = mui.preload({
+							"id": 'ed_car',
+							"url": 'editor_car.html'
+						});
+						ed_video = mui.preload({
+							"id": 'ed_video',
+							"url": 'editor_video.html'
+						});
+						ed_job = mui.preload({
+							"id": 'ed_job',
+							"url": 'editor_job.html'
+						});
+					};
+					//按钮的监听事件
+					function MenuInit() {
+						//背景按钮//背景按钮
+						document.getElementById("backImg").addEventListener('tap', function() {
+							var this_backImg = this;
+							var btnArray = [{
+								title: "预览原图"
+							}, {
+								title: "更改背景图"
+							}];
+							plus.nativeUI.actionSheet({
+								//title: "头像选取方式",  
+								cancel: "取消",
+								buttons: btnArray
+							}, function(e) {
+								var index = e.index;
+								switch (index) {
+									case 0:
+										{
+											//取消 
+											break;
+										}
+									case 1:
+										{
+											//预览原图
+											break;
+										}
+									case 2:
+										{
+											console.log(this_backImg.style.background);
+											//选取现有的
+											plus.gallery.pick(function(path) {
+													var savePath = "_doc/BGPhoto/" + userInfo.user_telphone + "_bg_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
+													fileTool.ImgFileCompress(path, savePath, "30%", function(existPath, savePath) {
+														this_backImg.style.background = "url(file://" + plus.io.convertLocalFileSystemURL(savePath) + ") no-repeat center center";
+														this_backImg.style.backgroundSize = "100%";
+														var files = [];
+														files[0] = {
+															name: plus.io.convertLocalFileSystemURL(savePath),
+															path: plus.io.convertLocalFileSystemURL(savePath)
+														};
+														new UserDAL().uploadBgPhoto(userInfo.user_telphone, files, function(_msg, fileName) {
+															console.log(_msg);
+															userInfo.personcenter_bg = "/UploadFile/UserCenterBg/" + fileName.substring(fileName.lastIndexOf('/') + 1);
+															new localStorageUtils().setItem("userInfo", new JsonTools().jsonObjToString(userInfo));
+														}, function(_msg) {
+															mui.toast("背景同步失败");
+														});
+													}, function(_msg) {
+														mui.toast("图片文件出错,请重新选择");
+													});
+												},
+												function(e) {}, {
+													filter: "image"
+												});
+											break;
+										}
+								}
+							});
+						});
+						//头像按钮
+						document.getElementById('editor').addEventListener('tap', function(e) {
+							e.stopPropagation();
+							var btnArray = [{
+								title: "拍照"
+							}, {
+								title: "选取现有的"
+							}];
+							plus.nativeUI.actionSheet({
+								//title: "头像选取方式",  
+								cancel: "取消",
+								buttons: btnArray
+							}, function(e) {
+								var index = e.index;
+								switch (index) {
+									case 0:
+										{
+											//plus.ui.alert("你选择了取消", "警告", "OK");
+											break;
+										}
+									case 1:
+										{
+											//plus.ui.alert("你选择了拍照", "警告", "OK");							
+											var cmr = plus.camera.getCamera();
+											var res = cmr.supportedImageResolutions[0];
+											var fmt = cmr.supportedImageFormats[0];
+											cmr.captureImage(function(path) {
+													//alert(plus.io.convertLocalFileSystemURL(path));
+													plus.storage.setItem("Icon", plus.io.convertLocalFileSystemURL(path));
+													console.log(plus.storage.getItem("Icon"));
+													var wvphone = mui.openWindow({
+														url: 'editor_photo.html',
+														id: 'Icon',
+														show: {
+															aniShow: 'fade-in'
+														}
+													});
+													wvphone.addEventListener("close", function() {
+														console.log("裁剪窗口以关闭");
+														var base64 = new localStorageUtils().getItem("HeadPhotoBase64");
+														if (base64 != "") {
+															document.querySelector("#editor").setAttribute("src", base64);
+														}
+													});
+													//document.querySelector("#user_photo>img").setAttribute('src', plus.io.convertLocalFileSystemURL(path));
+												},
+												function(error) {
+													alert("Capture image failed: " + error.message);
+												}, {
+													resolution: res,
+													format: fmt
+												}
+											);
+											break;
+										}
+									case 2:
+										{
+											//plus.ui.alert("你选择了选取现有的", "警告", "OK");	
+											plus.gallery.pick(function(path) {
+												plus.storage.setItem("Icon", plus.io.convertLocalFileSystemURL(path));
+												console.log(plus.storage.getItem("Icon"));
+												var wvphone = mui.openWindow({
+													url: 'editor_photo.html',
+													id: 'Icon',
+													show: {
+														aniShow: 'fade-in'
+													}
+												});
+												wvphone.addEventListener("close", function() {
+													console.log("裁剪窗口以关闭");
+													var base64 = new localStorageUtils().getItem("HeadPhotoBase64");
+													if (base64 != "") {
+														document.querySelector("#editor").setAttribute("src", base64);
+													}
+												});
+											}, function(e) {}, {
+												filter: "image"
 											});
 											break;
-											//									default:mui.toast("fail");break;
-									}
-								}, "是否上传该录音?", ["上传", "取消", "试听"]);
-							}
-							confirm();
-						}, function(e) {
-							mui.toast("读取录音文件错误");
-						});
-					}, function(e) {
-						mui.toast("录音失败");
-					});
-					w = plus.nativeUI.showWaiting("开始录制 ", {
-						padding: '6%',
-						background: "rgba(10,92,19,0.7)",
-						back: "none"
-					});
-					t = 0;
-					iv = setInterval(function() {
-						t++;
-						if (t >= 5) {
-							//							mui.trigger(thisr,'release');
-							w.close();
-							clearInterval(iv);
-							record.stop();
-							return;
-						}
-						w.setTitle("剩余:" + (5 - t) + "秒");
-					}, 1000);
-				});
-				//车辆信息按钮
-				document.getElementById("ed_car").addEventListener('tap', function() {
-					mui.fire(ed_car, 'show', null);
-					setTimeout(function() {
-						mui.openWindow({
-							id: 'ed_car',
-							show: {
-								aniShow: 'zoom-fade-out',
-								duration: 300
-							},
-							waiting: {
-								autoShow: false
-							},
-							styles: {
-								zindex: 600
-							}
-						});
-					}, 0);
-				});
-				//视屏认证按钮
-				document.getElementById("ed_video").addEventListener('tap', function() {
-					var ps = "请控制录制时间在15s内,提高审核效率.";
-					plus.nativeUI.confirm(ps, function(e) {
-						switch (e.index) {
-							case 0:
-								var cmr = plus.camera.getCamera();
-								var res = cmr.supportedVideoResolutions[1];
-								var fmt = cmr.supportedVideoFormats[0];
-								cmr.startVideoCapture(function(path) {
-										var ww = plus.nativeUI.showWaiting("视频上传中... ", {
-											back: "none"
-										});
-										var u = new localStorageUtils().getItem("userInfo");
-										var uinfo = new JsonTools().stringToJson(u);
-										var files = [];
-										files[0] = {
-											name: "userVido",
-											path: plus.io.convertLocalFileSystemURL(path)
-										};
-										new UserDAL().uploadVideo(uinfo.user_telphone, files, ".mp4", function(_msg) {
-											console.log(_msg);
-											ww.close();
-											mui.toast("上传成功");
-										}, function(_msg) {
-											ww.close();
-											mui.toast("上传失败，请检查网络");
-										});
-									},
-									function(error) {
-										console.log("Capture video failed: " + error.message);
-									}, {
-										resolution: res,
-										format: fmt,
-										index: '2'
-									}
-								);
-								break;
-							case 1:
-							default:
-								return;
-						}
-					}, "提示", ["开始录制", "取消"]);
-				});
-				//上传新照片 按钮
-				document.getElementById("upLoadImg").addEventListener('tap', function() {
-					plus.gallery.pick(function(e) {
-						var u = new localStorageUtils().getItem("userInfo");
-						var uinfo = new JsonTools().stringToJson(u);
-						var files = [];
-						var filenames = "";
-						var w;
-						var l = e.files.length;
-						if (e.files.length > 9) {
-							l = 9; //如果选择的超过9张，就截取前9张
-						}
-						w = plus.nativeUI.showWaiting("正在上传" + l + "张图片");
-						for (var i = 0; i < l; i++) {
-							var path = plus.io.convertLocalFileSystemURL(e.files[i]);
-							var savePath = "_doc/UserAlbum/" + uinfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + "_" + i + ".png";
-							fileTool.ImgFileCompress(path, savePath, "50%", function(existPath, savePath) {
-								files.push({
-									name: savePath,
-									path: savePath
-								});
-								var fileName = savePath.substring(savePath.lastIndexOf('/') + 1);
-								filenames = filenames + fileName + "|";
-								if (files.length == l) {
-									console.log("图片全部处理完成");
-									filenames = filenames.substring(0, filenames.length - 1);
-									//个人相册上传接口
-									new UserDAL().uploadAlbum(uinfo.user_telphone, files, filenames, function(_msg, sysfilenames) {
-										if (_msg.Status != "faild") {
-											mui.toast("上传成功！");
-											//本地添加
-											AddAlbum("001",sysfilenames,"1995-10-22"); 
-										} else {
-											mui.toast("上传失败！");
 										}
-										w.close();
+								}
+							});
+						});
+						//基本信息按钮
+						document.getElementById('ed').addEventListener('tap', function() {
+							mui.fire(editor, 'show', null);
+							setTimeout(function() {
+								mui.openWindow({
+									id: 'editor',
+									show: {
+										aniShow: 'pop-in'
+									},
+									waiting: {
+										autoShow: false
+									},
+									styles: {
+										zindex: 600
+									}
+								});
+							}, 0);
+						});
+						//录制语音hold
+						document.getElementById("recording").addEventListener('tap', function() {
+							record = plus.audio.getRecorder();
+							if (record == null) {
+								alert("麦克风未就绪！");
+								return;
+							}
+							var thisr = this;
+							record.record({
+								filename: "_doc/audio/"
+							}, function(p) {
+								plus.io.resolveLocalFileSystemURL(p, function(entry) {
+									var confirm = function() {
+										// 弹出提示信息对话框	entry.name
+										plus.nativeUI.confirm(entry.name, function(e) {
+											switch (e.index) {
+												case 0:
+													var ww = plus.nativeUI.showWaiting("上传中... ", {
+														back: "none"
+													});
+													var u = new localStorageUtils().getItem("userInfo");
+													var uinfo = new JsonTools().stringToJson(u);
+													var files = [];
+													files[0] = {
+														name: "userAudo",
+														path: plus.io.convertLocalFileSystemURL(p)
+													};
+													new UserDAL().uploadUserAudio(uinfo.user_telphone, files, function(_msg) {
+														console.log(_msg);
+														ww.close();
+														mui.toast("上传成功");
+													}, function(_msg) {
+														ww.close();
+														mui.toast("上传失败，请检查网络");
+													});
+													break; //上传
+												case 1:
+													break; //取消
+												case 2:
+													var ww = plus.nativeUI.showWaiting("试听中... ", {
+														background: "rgba(56,12,92,0.8)",
+														back: "none"
+													});
+													var play = plus.audio.createPlayer(p);
+													play.play(function() {
+														confirm();
+														ww.close();
+													});
+													break;
+													//									default:mui.toast("fail");break;
+											}
+										}, "是否上传该录音?", ["上传", "取消", "试听"]);
+									}
+									confirm();
+								}, function(e) {
+									mui.toast("读取录音文件错误");
+								});
+							}, function(e) {
+								mui.toast("录音失败");
+							});
+							w = plus.nativeUI.showWaiting("开始录制 ", {
+								padding: '6%',
+								background: "rgba(10,92,19,0.7)",
+								back: "none"
+							});
+							t = 0;
+							iv = setInterval(function() {
+								t++;
+								if (t >= 5) {
+									//							mui.trigger(thisr,'release');
+									w.close();
+									clearInterval(iv);
+									record.stop();
+									return;
+								}
+								w.setTitle("剩余:" + (5 - t) + "秒");
+							}, 1000);
+						});
+						//车辆信息按钮
+						document.getElementById("ed_car").addEventListener('tap', function() {
+							mui.fire(ed_car, 'show', null);
+							setTimeout(function() {
+								mui.openWindow({
+									id: 'ed_car',
+									show: {
+										aniShow: 'zoom-fade-out',
+										duration: 300
+									},
+									waiting: {
+										autoShow: false
+									},
+									styles: {
+										zindex: 600
+									}
+								});
+							}, 0);
+						});
+						//视屏认证按钮
+						document.getElementById("ed_video").addEventListener('tap', function() {
+							var ps = "请控制录制时间在15s内,提高审核效率.";
+							plus.nativeUI.confirm(ps, function(e) {
+								switch (e.index) {
+									case 0:
+										var cmr = plus.camera.getCamera();
+										var res = cmr.supportedVideoResolutions[1];
+										var fmt = cmr.supportedVideoFormats[0];
+										cmr.startVideoCapture(function(path) {
+												var ww = plus.nativeUI.showWaiting("视频上传中... ", {
+													back: "none"
+												});
+												var u = new localStorageUtils().getItem("userInfo");
+												var uinfo = new JsonTools().stringToJson(u);
+												var files = [];
+												files[0] = {
+													name: "userVido",
+													path: plus.io.convertLocalFileSystemURL(path)
+												};
+												new UserDAL().uploadVideo(uinfo.user_telphone, files, ".mp4", function(_msg) {
+													console.log(_msg);
+													ww.close();
+													mui.toast("上传成功");
+												}, function(_msg) {
+													ww.close();
+													mui.toast("上传失败，请检查网络");
+												});
+											},
+											function(error) {
+												console.log("Capture video failed: " + error.message);
+											}, {
+												resolution: res,
+												format: fmt,
+												index: '2'
+											}
+										);
+										break;
+									case 1:
+									default:
+										return;
+								}
+							}, "提示", ["开始录制", "取消"]);
+						});
+						//上传新照片 按钮
+						document.getElementById("upLoadImg").addEventListener('tap', function() {
+							plus.gallery.pick(function(e) {
+								var u = new localStorageUtils().getItem("userInfo");
+								var uinfo = new JsonTools().stringToJson(u);
+								var files = [];
+								var filenames = "";
+								var w;
+								var l = e.files.length;
+								if (e.files.length > 9) {
+									l = 9; //如果选择的超过9张，就截取前9张
+								}
+								w = plus.nativeUI.showWaiting("正在上传" + l + "张图片");
+								for (var i = 0; i < l; i++) {
+									var path = plus.io.convertLocalFileSystemURL(e.files[i]);
+									var savePath = "_doc/UserAlbum/" + uinfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + "_" + i + ".png";
+									fileTool.ImgFileCompress(path, savePath, "50%", function(existPath, savePath) {
+										files.push({
+											name: savePath,
+											path: savePath
+										});
+										var fileName = savePath.substring(savePath.lastIndexOf('/') + 1);
+										filenames = filenames + fileName + "|";
+										if (files.length == l) {
+											console.log("图片全部处理完成");
+											filenames = filenames.substring(0, filenames.length - 1);
+											//个人相册上传接口
+											new UserDAL().uploadAlbum(uinfo.user_telphone, files, filenames, function(_msg, sysfilenames) {
+												if (_msg.Status != "faild") {
+													mui.toast("上传成功！"); 
+													var ps = plus.nativeUI.showWaiting("正在更新相册...");
+													var userDal = new UserDAL();
+													var uinfo = userDal.getUserInfo();
+													userDal.getUserAlbumInfo(uinfo.user_telphone,function(_msg){
+														new localStorageUtils().setItem("Album",new JsonTools().jsonObjToString(_msg));
+														
+														loadAlbumInfo();
+														RenderAlbumInfo();
+														
+														
+														
+														ps.close();
+														
+													},function(_msg){
+														ps.close();
+														mui.toast(_msg);
+													});
+													
+												} else {
+													mui.toast("上传失败！");
+												}
+												w.close();
+											}, function() {
+												w.close();
+												mui.toast("服务器未响应！");
+											});
+										}
 									}, function() {
-										w.close();
-										mui.toast("服务器未响应！");
+										mui.toast("第" + (i + 1) + "张图片读取出错");
+										l--;
 									});
 								}
-							}, function() {
-								mui.toast("第" + (i + 1) + "张图片读取出错");
-								l--;
+							}, function(e) {}, {
+								filter: "image",
+								multiple: true //可选择是否多张图片选择
 							});
-						}
-					}, function(e) {}, {
-						filter: "image",
-						multiple: true //可选择是否多张图片选择
-					});
-					mui.toast("您最多一次可以选择上传9张图片");
-				});
-				//职业认证
-				document.getElementById("ed_job").addEventListener('tap', function() {
-					mui.fire(ed_video, 'show', null);
-					setTimeout(function() {
-						mui.openWindow({
-							id: 'ed_job',
-							show: {
-								aniShow: 'pop-in'
-							},
-							waiting: {
-								autoShow: false
-							},
-							styles: {
-								zindex: 600
-							}
+							mui.toast("您最多一次可以选择上传9张图片");
 						});
-					}, 0);
-				});
-			};
-			 //webview的监听
-			function webListener() {
-				plus.webview.getWebviewById("editor").addEventListener("hide", function() {
-					console.log("个人资料编辑窗口以关闭");
-					LoadUserInfo();
-					renderUserInfoData();
-					//					pageOnload();
-					//					PageRender();
-				});
-				plus.webview.getWebviewById("ed_car").addEventListener("hide", function() {
-					console.log("车辆编辑窗口以关闭");
-					LoadCarInfo();
-					renderCarInfo();
-					//					pageOnload();
-					//					PageRender();
-				});
-				//window.addEventListener("CarPhoto:Change", ChangeCarPhoto);
-			};
-		</script>
+						//职业认证
+						document.getElementById("ed_job").addEventListener('tap', function() {
+							mui.fire(ed_video, 'show', null);
+							setTimeout(function() {
+								mui.openWindow({
+									id: 'ed_job',
+									show: {
+										aniShow: 'pop-in'
+									},
+									waiting: {
+										autoShow: false
+									},
+									styles: {
+										zindex: 600
+									}
+								});
+							}, 0);
+						});
+					};
+					//webview的监听
+					function webListener() {
+						plus.webview.getWebviewById("editor").addEventListener("hide", function() {
+							console.log("个人资料编辑窗口以关闭");
+							LoadUserInfo();
+							renderUserInfoData();
+							//					pageOnload();
+							//					PageRender();
+						});
+						plus.webview.getWebviewById("ed_car").addEventListener("hide", function() {
+							console.log("车辆编辑窗口以关闭");
+							LoadCarInfo();
+							renderCarInfo();
+							//					pageOnload();
+							//					PageRender();
+						});
+						//window.addEventListener("CarPhoto:Change", ChangeCarPhoto);
+					};
+		</script> 
 	</head>
 
 	<body>
@@ -1216,16 +1345,16 @@
 								</div>-->
 								<div class="photoShow">
 									<ul class="mui-table-view mui-grid-view" id="AlbumRoom">
-										<li class="mui-table-view-cell mui-media mui-col-xs-6">
+										
+									</ul>
+	<!--<li class="mui-table-view-cell mui-media mui-col-xs-6">
 											<a href="#">
 												<h5>2013-10-22</h5>
 												<img class="mui-media-object" src="../../img/travel_1.jpg">
 												<h3>9</h3>
 
 											</a>
-										</li>
-
-									</ul>
+										</li>--> 
 
 								</div>
 

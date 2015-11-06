@@ -16,23 +16,24 @@ var albumElement = function(){
 	this.initAlbumObj = function(){
 		that.album_li = document.createElement('li');
 		that.album_li.className ="mui-table-view-cell mui-media mui-col-xs-6";
-		that.album_li.id = "album_"+that.id;
+		that.album_li.id = "Album_"+that.id;
 		//var imgSrc = plus.io.convertLocalFileSystemURL("_doc/UserAlbum/"+that.imgs[that.indexImg])
 		var s='<a href="#">';
 		s+='<h5>'+that.time+'</h5>';
 		
 		for(var i= 0;i<that.imgs.length;i++){
-			var imgSrc = plus.io.convertLocalFileSystemURL("_doc/UserAlbum/"+that.imgs[i]);
+			
+			var imgSrc = ResourcesServerUrl+that.imgs[i];//plus.io.convertLocalFileSystemURL("_doc/UserAlbum/"+that.imgs[i]);
+			console.log(imgSrc);
 			if(i!=that.indexImg){
-				s+='<img class="mui-media-object" src="'+imgSrc+'" data-preview-src="" data-preview-group="'+that.id+'" style="display: none;" />';
+				s+='<img class="mui-media-object" src="../../img/wait.jpg" data-src="'+imgSrc+'" data-preview-src="" data-preview-group="'+that.id+'" style="display: none;" onload="lazyload(this)"  />';
 			}else{
-				s+='<img class="mui-media-object" src="'+imgSrc+'" data-preview-src="" data-preview-group="'+that.id+'" />';
+				s+='<img class="mui-media-object" src="../../img/wait.jpg" data-src="'+imgSrc+'" data-preview-src="" data-preview-group="'+that.id+'" onload="lazyload(this)"  />';
 			}
 		}
 		s+='<h3>'+that.getImgCount()+'</h3>';
 		s+='</a>';
 		that.album_li.innerHTML = s;
-		
 	}
 	
 	//2设置事件
@@ -42,7 +43,7 @@ var albumElement = function(){
 	
 	
 	//3获取一个相册
-	this.getAlbumObj = function(){
+	this.getAlbumLiNode = function(){
 		return that.album_li;
 	}
 	//获取图片数量
@@ -52,6 +53,10 @@ var albumElement = function(){
 	//设置封面图片
 	this.setIndexImg = function(index){
 		that.indexImg = index;
+	}
+	//移除这个相册
+	this.removeAlbum = function(){
+		that.album_li.parentNode.removeChild(that.album_li);
 	}
 	
 }
