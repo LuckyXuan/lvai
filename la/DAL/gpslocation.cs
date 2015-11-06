@@ -47,18 +47,18 @@ namespace la.DAL
 		{
 			StringBuilder strSql=new StringBuilder();
 			strSql.Append("insert into gpslocation(");
-			strSql.Append("gps_id,user_telphone,location_lat,location_lng)");
+			strSql.Append("user_telphone,location_lat,location_lng)");
 			strSql.Append(" values (");
-			strSql.Append("@gps_id,@user_telphone,@location_lat,@location_lng)");
+			strSql.Append("@user_telphone,@location_lat,@location_lng)");
 			SqlParameter[] parameters = {
-					new SqlParameter("@gps_id", SqlDbType.Int,4),
+					//new SqlParameter("@gps_id", SqlDbType.Int,4)
 					new SqlParameter("@user_telphone", SqlDbType.VarChar,20),
 					new SqlParameter("@location_lat", SqlDbType.Decimal,9),
 					new SqlParameter("@location_lng", SqlDbType.Decimal,9)};
-			parameters[0].Value = model.gps_id;
-			parameters[1].Value = model.user_telphone;
-			parameters[2].Value = model.location_lat;
-			parameters[3].Value = model.location_lng;
+			//parameters[0].Value = model.gps_id;
+			parameters[0].Value = model.user_telphone;
+			parameters[1].Value = model.location_lat;
+			parameters[2].Value = model.location_lng;
 
 			int rows=DbHelperSQL.ExecuteSql(strSql.ToString(),parameters);
 			if (rows > 0)

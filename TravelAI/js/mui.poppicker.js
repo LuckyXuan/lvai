@@ -101,6 +101,7 @@
 		//显示
 		show: function(callback,txt) {
 			var self = this;
+			//txt||txt = "";
 			var arr = txt.split('-');
 			
 			

@@ -23,3 +23,11 @@ G:\lvaiServer\la\la\Common\bin\Debug\OpenSmtp.dll
 G:\lvaiServer\la\la\Common\bin\Debug\OWC10Chart.dll
 G:\lvaiServer\la\la\Common\obj\Debug\la.Common.dll
 G:\lvaiServer\la\la\Common\obj\Debug\la.Common.pdb
+E:\Travel\lvai\la\Common\bin\Debug\la.Common.dll
+E:\Travel\lvai\la\Common\bin\Debug\la.Common.pdb
+E:\Travel\lvai\la\Common\bin\Debug\COM.Excel.dll
+E:\Travel\lvai\la\Common\bin\Debug\Excel.dll
+E:\Travel\lvai\la\Common\bin\Debug\OpenSmtp.dll
+E:\Travel\lvai\la\Common\bin\Debug\OWC10Chart.dll
+E:\Travel\lvai\la\Common\obj\Debug\la.Common.dll
+E:\Travel\lvai\la\Common\obj\Debug\la.Common.pdb

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <script src="js/mui.min.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+      	document.addEventListener("plusready", onPlusReady, false);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+				//按钮的监视
+				MenuInit();
+
+			}; 
+		function MenuInit(){
+			mui(".card").on('tap','.mui-btn',function(){
+				var btnArray = [{title:"支付宝支付"},{title:"微信支付"}];
+				plus.nativeUI.actionSheet( {
+					title:"支付方式",
+					cancel:"取消",
+					buttons:btnArray
+				}, function(e){
+					var index = e.index;
+					var text = "你刚点击了\"";
+					switch (index){ 
+						case 0:
+							text += "取消";
+							break;
+						case 1:
+							text += "支付宝支付";
+							break;
+						case 2:
+							text += "微信支付";
+							break;
+					}
+	
+				});
+			})
+			/*
+	      	document.getElementById("btnpayment").addEventListener('tap',function () {
+				var btnArray = [{title:"支付宝支付"},{title:"微信支付"}];
+				plus.nativeUI.actionSheet( {
+					title:"支付方式",
+					cancel:"取消",
+					buttons:btnArray
+				}, function(e){
+					var index = e.index;
+					var text = "你刚点击了\"";
+					switch (index){ 
+						case 0:
+							text += "取消";
+							break;
+						case 1:
+							text += "支付宝支付";
+							break;
+						case 2:
+							text += "微信支付";
+							break;
+					}
+	
+				});
+			});
+			*/
+		}		
+    </script>
+</head>
+<body>
+		<header class="mui-bar mui-bar-nav">
+			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+			<h1 class="mui-title">旅币充值</h1>
+		</header>
+		<div class="mui-content">
+			<div class="card" style="margin-top: 10px;">
+				<ul class="mui-table-view">
+					<li class="mui-table-view-cell">
+				      10000币
+					<button  class="mui-btn" type="button" style="width: 20%;">
+					  ￥1000
+					</button>
+				  </li>
+				  <li class="mui-table-view-cell">
+				      1000币
+					<button  class="mui-btn" type="button" style="width: 20%;">
+					  ￥100
+					</button>
+				  </li>
+				  <li class="mui-table-view-cell">
+				      500币
+					<button class="mui-btn" type="button" style="width: 20%;">
+					  ￥50
+					</button>
+				  </li>
+				  <li class="mui-table-view-cell">
+				      100币
+					<button class="mui-btn" type="button" style="width: 20%;">
+					  ￥10
+					</button>
+				  </li>
+				</ul>
+				<h4>旅币说明</h4>
+				<h6>1.旅币为交友的通用虚拟币，可以购买一切增值服务</h6>
+			</div>
+		</div>
+</body>
+</html>
