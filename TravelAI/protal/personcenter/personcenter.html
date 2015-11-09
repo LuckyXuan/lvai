@@ -178,9 +178,11 @@
 			.mui-android-4-1 .mui-slider .mui-slider-group .mui-slider-item img {
 				width: 100%;
 			}
+			
 			.mui-android-4-1 .mui-slider.mui-preview-image .mui-slider-group .mui-slider-item {
 				display: inline-table;
 			}
+			
 			.mui-android-4-1 .mui-slider.mui-preview-image .mui-zoom-scroller img {
 				display: table-cell;
 				vertical-align: middle;
@@ -245,6 +247,8 @@
 				max-width: 100%;
 				height: auto;
 			}
+			
+			
 		</style>
 		<script type="text/javascript" charset="utf-8">
 			var wt;
@@ -261,7 +265,8 @@
 			var headPhotoFileInfoIsLoad = false,
 				carFileInfoIsLoad = false,
 				userPhotoBg = false,
-				albumInfoIsLoad = false;
+				albumInfoIsLoad = true,
+				albumIsShow = false;
 			var userInfo = null,
 				carInfo = null,
 				albumInfo = null;
@@ -303,7 +308,7 @@
 				//LoadResource();
 				LoadUserInfo();
 				LoadCarInfo();
-				loadAlbumInfo();
+				//loadAlbumInfo();//这里注释意思为  默认不加载  当照片选项呈现再加载
 			}
 
 			function PageRender() {
@@ -311,7 +316,7 @@
 					RenderUserPhotoBg();
 					RenderHeadPhoto();
 					renderCarInfo();
-					RenderAlbumInfo();
+					//RenderAlbumInfo();//这里注释意思为  默认不加载  当照片选项呈现再加载
 					//renderCarPhoto();
 				}
 				/**
@@ -327,8 +332,8 @@
 						wt = plus.nativeUI.showWaiting("拼命加载中...");
 					}
 					fileDownLoad.DownLoadComleteHandler = function() {
-						wt.close();
 						RenderData();
+						wt.close();
 						//显示头像和车辆图片。
 					}
 					listCarWidth = plus.webview.currentWebview().listCarWidth;
@@ -343,14 +348,15 @@
 				// 系统Ui
 
 			function systemUi() {
-				//减速系数
-				mui('.mui-scroll-wrapper').scroll({
-					deceleration: 0.0005 //减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
-				});
 				//去除滚动条
 				mui('#scroll').scroll({
 					indicators: false
 				});
+				//减速系数
+				mui('.mui-scroll-wrapper').scroll({
+					deceleration: 0.0005 //减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+				});
+				
 			};
 			 //车辆图片Ui
 			function CarPhotoUi() {
@@ -374,8 +380,12 @@
 					fileTool.fileExist(url, userInfo.user_photo,
 						function(msg) {
 							headPhotoFileInfoIsLoad = true;
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
+								LoadResource();
+							}
 						},
-						function(msg, _args) {
+						function(msg, _args) { 
+				
 							var f = new HttpFile();
 							f.FileName = userInfo.user_photo.substring(userInfo.user_photo.lastIndexOf('/') + 1);
 							f.FilePath = "_doc/HeadPhoto/";
@@ -413,8 +423,8 @@
 				 * 否则加载网络资源。
 				 */
 
-			function LoadResource() {
-					fileDownLoad.DownLoad();
+			function LoadResource() {  
+					fileDownLoad.DownLoad(); 
 				}
 				//基本信息的判断及展示
 
@@ -446,9 +456,11 @@
 
 			function RenderHeadPhoto() {
 					if (userInfo.user_photo == "") return;
+					
 					var url = "_doc/HeadPhoto/" + userInfo.user_photo.substring(userInfo.user_photo.lastIndexOf('/') + 1);
 					fileTool.fileExist(url, userInfo.user_photo,
 						function(msg) {
+							
 							ShowHead(msg);
 						},
 						function(msg, _args) {}
@@ -457,6 +469,7 @@
 				//显示头像
 
 			function ShowHead(url) {
+				
 				document.querySelector("#editor").setAttribute("src", plus.io.convertLocalFileSystemURL(url));
 			};
 
@@ -519,6 +532,9 @@
 					fileTool.fileExist(url, userInfo.personcenter_bg,
 						function(msg) {
 							userPhotoBg = true;
+							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
+								LoadResource();
+							}
 						},
 						function(msg, _args) {
 							var f = new HttpFile();
@@ -619,66 +635,22 @@
 						var uinfo = userDal.getUserInfo();
 						userDal.getUserAlbumInfo(uinfo.user_telphone,function(_msg){
 							new localStorageUtils().setItem("Album",new JsonTools().jsonObjToString(_msg));
-							albumInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
-								LoadResource();
-							}
-						},function(_msg){
-							mui.toast(_msg);
-							albumInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
-								LoadResource();
-							}
-						});
-						
-//						var album;
-//						var index = 0;
-//						var fileArr = new Array();//本地路径
-//						var serverArr = new Array();//服务器路径
-//						var serverPaths,filePaths;
-//						var url = "_doc/UserAlbum/";
-//						
-//						for(var i in albumInfo){
-//							album = albumInfo[i];
-//							paths = "";
-//							filePaths = "";
-//							for(var j in album.PhotoList){
-//								paths = album.PhotoList[j].personphoto_path;
-//								filePaths = url + paths.substring(paths.lastIndexOf('/') + 1);
-//								serverArr.push(paths);
-//								fileArr.push(filePaths); 
+							console.log("获取到album数据");
+//							loadAlbumInfo();
+//							RenderAlbumInfo();
+//							albumInfoIsLoad = true;
+//							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
+//								LoadResource();
 //							}
-//						}
-//						
-//						for(var i in fileArr){
-//							fileTool.fileExist(fileArr[i],serverArr[i],function(msg){
-//								index++;
-//								if(index == fileArr.length){
-//									albumInfoIsLoad = true;
-//									if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
-//										LoadResource();
-//									}
-//								}
-//							},function(path, serverPath){
-//								var f = new HttpFile();
-//								f.FileName = serverPath.substring(serverPath.lastIndexOf('/') + 1);
-//								f.FilePath = "_doc/UserAlbum/";
-//								f.URL = ResourcesServerUrl + serverPath;
-//								
-//								fileDownLoad.AddFile(f);
-//								index++;
-//								if(index == fileArr.length){
-//									albumInfoIsLoad = true;
-//									if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
-//										LoadResource();
-//									}
-//								}
-//							});
-//							
-//						}
-//						
-//						
-//					}
+						},function(_msg){
+							//mui.toast(_msg);
+							mui.toast("获取相册数据失败");
+//							albumInfoIsLoad = true;
+//							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
+//								LoadResource();
+//							}
+						});
+
 				
 				}
 			
@@ -769,6 +741,18 @@
 					};
 					//按钮的监听事件
 					function MenuInit() {
+						//照片选项栏选中事件
+						document.querySelector('.mui-slider').addEventListener('slide', function(event) {
+						  	//var num = event.detail.slideNumber; 
+						  	if(event.detail.slideNumber==1&&!albumIsShow){
+						  		//当选到照片标签时      然后再加载相片
+						  		loadAlbumInfo();
+								RenderAlbumInfo();
+						  		albumIsShow = true;//已经加载了，不在重复加载
+						  	}
+						  	
+						});
+						
 						//背景按钮//背景按钮
 						document.getElementById("backImg").addEventListener('tap', function() {
 							var this_backImg = this;
@@ -777,8 +761,7 @@
 							}, {
 								title: "更改背景图"
 							}];
-							plus.nativeUI.actionSheet({
-								//title: "头像选取方式",  
+							plus.nativeUI.actionSheet({  
 								cancel: "取消",
 								buttons: btnArray
 							}, function(e) {
@@ -1104,7 +1087,7 @@
 													var uinfo = userDal.getUserInfo();
 													userDal.getUserAlbumInfo(uinfo.user_telphone,function(_msg){
 														new localStorageUtils().setItem("Album",new JsonTools().jsonObjToString(_msg));
-														
+														 
 														loadAlbumInfo();
 														RenderAlbumInfo();
 														
