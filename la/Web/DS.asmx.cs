@@ -478,6 +478,57 @@ namespace la.Web
             string data = new System.Web.Script.Serialization.JavaScriptSerializer().Serialize(albumLst);
             return data;
         }
+        /// <summary>
+        /// 发布旅行
+        /// </summary>
+        /// <param name="realsetravel"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public string RealseTravel(object realsetravel)
+        {
+            Dictionary<string, object> dic = realsetravel as Dictionary<string, object>;
+            string result = "{\"status\":";
+            try
+            {
+                Model.travel t = new Model.travel();
+                t.promoter_userid =Convert.ToInt32(dic["promoter_userid"].ToString());
+                t.release_time = DateTime.Now;
+                t.Destination = dic["Destination"].ToString();
+                t.startplace = dic["startplace"].ToString();
+                t.return_time =Convert.ToDateTime( dic["return_time"].ToString());
+                t.start_time =Convert.ToDateTime( dic["start_time"].ToString());
+                t.transportation = dic["transportation"].ToString();
+                t.fee = dic["fee"].ToString();
+                t.travle_theme = dic["travle_theme"].ToString();
+                t.travle_personcount =Convert.ToInt32( dic["travle_personcount"].ToString());
+                t.companion_condition = dic["companion_condition"].ToString();
+                t.travle_msg = dic["travle_msg"].ToString();
+                t.pic1 = dic["pic1"].ToString();
+                t.pic2 = dic["pic2"].ToString();
+                t.pic3 = dic["pic3"].ToString();
+                t.income_condition = dic["income_condition"].ToString();
+                t.car_condition = dic["car_condition"].ToString();
+                t.height_condition = dic["height_condition"].ToString();
+                t.credit_condition = dic["credit_condition"].ToString();
+                t.wantget_gift = dic["wantget_gift"].ToString();
+                t.wantsend_gift = dic["wantsend_gift"].ToString();
+                t.reg_fee =Convert.ToDecimal( dic["reg_fee"].ToString());
+
+                new BLL.travel().Add(t);
+            }
+            catch (Exception e)
+            {
+                result = result + "\"faild\",";
+                result = result + "\"msg\":\"" + e.Message + "\",";
+                result = result + "\"data\":{}}";
+                return result;
+            }
+
+            result = result + "\"success\",";
+            result = result + "\"msg\":\"更新成功\",";
+            result = result + "\"data\":{}}";
+            return result;
+        }
 
     }
 }
