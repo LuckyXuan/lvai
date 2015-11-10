@@ -494,7 +494,7 @@ namespace la.Web
                 Model.travel t = new Model.travel();
                 t.promoter_userid =Convert.ToInt32(dic["promoter_userid"].ToString());
                 t.release_time = DateTime.Now;
-                t.Destination = dic["Destination"].ToString();
+                t.Destination = dic["destination"].ToString();
                 t.startplace = dic["startplace"].ToString();
                 t.return_time =Convert.ToDateTime( dic["return_time"].ToString());
                 t.start_time =Convert.ToDateTime( dic["start_time"].ToString());

@@ -71,6 +71,11 @@ namespace la.Web
                         UploadAlbum(context);
                         break;
                     }
+                case "uploadTravelPhoto":
+                    {
+                        RealseTravelPhoto(context);
+                        break;
+                    }
             }
         }
 
