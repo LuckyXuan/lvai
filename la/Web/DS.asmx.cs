@@ -484,37 +484,14 @@ namespace la.Web
         /// <param name="realsetravel"></param>
         /// <returns></returns>
         [WebMethod]
-        public string RealseTravel(object realsetravel, HttpContext context)
+        public string RealseTravel(object realsetravel)
         {
             Dictionary<string, object> dic = realsetravel as Dictionary<string, object>;
             string result = "{\"status\":";
-            string filenames = context.Request.Form["filename"].ToString();
-            string[] filename = filenames.Split('|');
+            string sfile = "/UploadFile/TravelPhoto/";
             try
             {
                 Model.travel t = new Model.travel();
-                HttpFileCollection files = context.Request.Files;
-                if (files.Count > 0)
-                {
-                    for (int i = 0; i < files.Count; i++)
-                    {
-                        HttpPostedFile file = context.Request.Files[i];
-                        string fileName = filename[i];
-                        string sfile = "/UploadFile/TravelPhoto/" + fileName;
-                        if (i == 1)
-                        {
-                            t.pic1 = sfile;
-                        }
-                        if (i == 2)
-                        {
-                            t.pic2 = sfile;
-                        }
-                        if (i == 3)
-                        {
-                            t.pic3 = sfile;
-                        }
-                    }
-                }
                 t.promoter_userid =Convert.ToInt32(dic["promoter_userid"].ToString());
                 t.release_time = DateTime.Now;
                 t.Destination = dic["Destination"].ToString();
@@ -527,9 +504,9 @@ namespace la.Web
                 t.travle_personcount =Convert.ToInt32( dic["travle_personcount"].ToString());
                 t.companion_condition = dic["companion_condition"].ToString();
                 t.travle_msg = dic["travle_msg"].ToString();
-                //t.pic1 = dic["pic1"].ToString();
-                //t.pic2 = dic["pic2"].ToString();
-                //t.pic3 = dic["pic3"].ToString();
+                t.pic1 = sfile + Path.GetFileName(dic["pic1"].ToString());
+                t.pic2 = sfile + Path.GetFileName(dic["pic2"].ToString());
+                t.pic3 = sfile + Path.GetFileName(dic["pic3"].ToString());
                 t.income_condition = dic["income_condition"].ToString();
                 t.car_condition = dic["car_condition"].ToString();
                 t.height_condition = dic["height_condition"].ToString();

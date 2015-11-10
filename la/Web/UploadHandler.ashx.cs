@@ -414,7 +414,7 @@ namespace la.Web
                     for (int i = 0; i < files.Count; i++)
                     {
                         HttpPostedFile file = context.Request.Files[i];
-                        string fileName = filename[i];
+                        string fileName = Path.GetFileName( filename[i]);
                         string filePath = dirPath + fileName;//file.FileName;
                         file.SaveAs(filePath);
                         
