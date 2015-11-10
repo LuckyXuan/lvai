@@ -394,6 +394,63 @@ namespace la.Web
         }
 
         /// <summary>
+        /// 发布旅行图片。
+        /// </summary>
+        private void RealseTravelPhoto(HttpContext context)
+        {
+            string dirPath = context.Server.MapPath("~/UploadFile/TravelPhoto/");
+            string tel = context.Request.Form["tel"].ToString();
+            string filenames = context.Request.Form["filename"].ToString();
+            string []filename = filenames.Split('|');
+            if (!Directory.Exists(dirPath))
+            {
+                Directory.CreateDirectory(dirPath);
+            }
+            try
+            {
+                HttpFileCollection files = context.Request.Files;
+                if (files.Count > 0)
+                {
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        HttpPostedFile file = context.Request.Files[i];
+                        string fileName = filename[i];
+                        string filePath = dirPath + fileName;//file.FileName;
+                        file.SaveAs(filePath);
+                        
+                        BLL.travel bll = new BLL.travel();
+                        List<Model.travel> TravelList = bll.GetModelList(" promoter_userid='" + tel + "'");
+                       
+                        Model.travel info = new Model.travel();
+                        info.promoter_userid =Convert.ToInt32( tel);
+                        string sfile = "/UploadFile/TravelPhoto/" + fileName;
+                        if (i == 1)
+                        {
+                            info.pic1 = sfile;
+                        }
+                        if (i == 2)
+                        {
+                            info.pic2 = sfile;
+                        }
+                        if (i == 3)
+                        {
+                            info.pic3 = sfile;
+                        }
+                        bll.Update(info);
+
+                    }
+                }
+                string result = "{\"Status\":\"success\",\"Msg\":\"上传成功\",\"data\":{}}";
+                context.Response.Write(result);
+            }
+            catch (Exception e)
+            {
+                string result = "{\"Status\":\"faild\",\"Msg\":\"上传失败，" + e.Message + "\",\"data\":{}}";
+                context.Response.Write(result);
+            }
+        }
+
+        /// <summary>
         /// 上传用户头像。
         /// </summary>
         private void UploadHeadPhoto(HttpContext context)
