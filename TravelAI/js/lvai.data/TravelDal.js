@@ -39,7 +39,7 @@ var TravelDal = function() {
 	//旅行实体。
 	this.travel = null;
 	//相关图片集
-	this.imgFiles = null;
+	this.imgFiles = [];
 
 	/**
 	 * 上传图片集。
@@ -47,20 +47,31 @@ var TravelDal = function() {
 	 *faildHandler	失败的消息
 	 */
 	this.UploadPic = function(successHandler, faildHandler) {
-
+		var filenames = "";
+		var filePath = that.travel.promoter_userid + "_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
+		var savePath = "";
 		var imgs = [];
-		imgs.push(that.travel.pic1);
-		imgs.push(that.travel.pic2);
-		imgs.push(that.travel.pic3);
-
-		for (var i = 0; i < 3; i++) {
-			fileTool.ImgFileCompress(imgs[i], savePath, "30%", function(existPath, savePath) {
+		if(that.travel.pic1){
+			imgs.push(that.travel.pic1);	
+		}
+		if(that.travel.pic2){
+			imgs.push(that.travel.pic2);	
+		}
+		if(that.travel.pic3){
+			imgs.push(that.travel.pic3);	
+		}
+		
+		for (var i = 0; i < imgs.length; i++) {
+			savePath = "_doc/TravelPhoto/" + filePath;
+			fileTool.ImgFileCompress(imgs[i], savePath, "15%", function(existPath, savePath) {
 				that.imgFiles.push({
 					name: savePath,
 					path: savePath
 				});
-
-				if (that.imgFiles == imgs.length) {
+				var fileName = savePath.substring(savePath.lastIndexOf('/') + 1);
+				filenames = filenames + fileName + "|";
+				if (that.imgFiles.length == imgs.length) {
+					
 					var task = plus.uploader.createUpload(UploadServer, {
 							method: "POST"
 						},
@@ -73,7 +84,8 @@ var TravelDal = function() {
 						}
 					);
 					task.addData("Action", "RealseTravelPhoto");
-					task.addData("tel", that.travel.promoter_userid);
+					task.addData("filename", filenames.substring(0, filenames.length - 1));
+					
 					for (var i = 0; i < that.imgFiles.length; i++) {
 						var f = that.imgFiles[i];
 						task.addData("filename", f.name);
@@ -85,8 +97,10 @@ var TravelDal = function() {
 					
 					task.start();
 				}
+			},function(e){
+				faildHandler("not exist");	
 			});
-			faildHandler();
+			
 		}
 
 
@@ -95,15 +109,14 @@ var TravelDal = function() {
 	/***
 	 * 发布这次旅行。
 	 */
-	this.RealseTravel = function(callback,errorCallback) {
+	this.RealseTravel = function(successHandler,faildHandler) {
 		//发布。
 		var t = that.travel;
-		t = new JsonTools().jsonObjToString();
 		var ws = new WebService(mui);
 			ws.setUrl(WebServiceURL);
 			ws.setOpName("RealseTravel");
 			ws.setParas({
-				jsonTravelInfo: t
+				realsetravel: t
 			});
 
 			ws.setCallBack(callback);
@@ -117,6 +130,8 @@ var TravelDal = function() {
 					var msg = new JsonTools().stringToJson(o);
 					if (msg.status == "faild") {
 						faildHandler(msg);
+						
+						alert(JSON.stringify(msg));
 						return;
 					}
 					successHandler(msg);
@@ -125,19 +140,73 @@ var TravelDal = function() {
 
 			function errorCallback(e) {
 				console.log(JSON.stringify(e));
+				faildHandler();
 			}
 
 	}
 
 	/**
 	 * 获取所有的旅行列表。
+	 * tel:发起人  Int
+	 * 
 	 */
-	this.getTravelList = function(_callbackHandler) {
+	this.getTravelList = function(tel,succesFun,failFun) {
+		tel||(tel = that.travel.promoter_userid);
+		var ws = new WebService(mui);
+			ws.setUrl(WebServiceURL);
+			ws.setOpName("getTravelList");
+			ws.setParas({
+				tel: tel
+			});
 
+			ws.setCallBack(callback);
+			ws.setErrorCall(errorCallback);
 
+			ws.LoadData();
+			//成功的回调
+			function callback(data) {
+					var o = eval(data);
+					o = o.d;
+					var msg = new JsonTools().stringToJson(o);
+					if (msg.status == "faild") {
+						failFun(msg);
+						return;
+					}
+					succesFun(msg);
+				}
+				//失败的回调
+
+			function errorCallback(e) {
+				console.log(JSON.stringify(e));
+				failFun();
+			}
+
+		
 
 	}
-
+	
+	/**
+	 * 先文本后图片一起上传
+	 */
+	this.UpLoadStara = function(succesFun,failFun) {
+		that.RealseTravel(function(_msg){ 
+			that.UploadPic(function(responseText){ 
+				if(responseText.status=="faild"){
+					failFun("图片发布失败！"); 
+					return; 
+				}
+				succesFun(responseText);
+			},function(){ 
+				failFun("图片发布失败！");
+				console.log("图片发布失败！");
+			});//UploadPic
+		},function(){ 
+			failFun("信息发布失败！");
+			console.log("信息发布失败！");
+		});//RealseTravel
+	}
+	
+	
 	/**
 	 * json序列化。
 	 */
