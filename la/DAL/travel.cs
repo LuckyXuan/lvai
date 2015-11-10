@@ -36,7 +36,7 @@ namespace la.DAL
 
 			return DbHelperSQL.Exists(strSql.ToString(),parameters);
 		}
-
+       
 
 		/// <summary>
 		/// 增加一条数据
@@ -45,12 +45,12 @@ namespace la.DAL
 		{
 			StringBuilder strSql=new StringBuilder();
 			strSql.Append("insert into travel(");
-			strSql.Append("travle_ID,promoter_userid,release_time,Destination,startplace,return_time,start_time,transportation,fee,travle_theme,travle_personcount,companion_condition,travle_msg,pic1,pic2,pic3,income_condition,car_condition,height_condition,credit_condition,wantget_gift,wantsend_gift,reg_fee)");
+			strSql.Append("promoter_userid,release_time,Destination,startplace,return_time,start_time,transportation,fee,travle_theme,travle_personcount,companion_condition,travle_msg,pic1,pic2,pic3,income_condition,car_condition,height_condition,credit_condition,wantget_gift,wantsend_gift,reg_fee)");
 			strSql.Append(" values (");
-			strSql.Append("@travle_ID,@promoter_userid,@release_time,@Destination,@startplace,@return_time,@start_time,@transportation,@fee,@travle_theme,@travle_personcount,@companion_condition,@travle_msg,@pic1,@pic2,@pic3,@income_condition,@car_condition,@height_condition,@credit_condition,@wantget_gift,@wantsend_gift,@reg_fee)");
+			strSql.Append("@promoter_userid,@release_time,@Destination,@startplace,@return_time,@start_time,@transportation,@fee,@travle_theme,@travle_personcount,@companion_condition,@travle_msg,@pic1,@pic2,@pic3,@income_condition,@car_condition,@height_condition,@credit_condition,@wantget_gift,@wantsend_gift,@reg_fee)");
 			SqlParameter[] parameters = {
-					new SqlParameter("@travle_ID", SqlDbType.Int,4),
-					new SqlParameter("@promoter_userid", SqlDbType.Int,4),
+			//new SqlParameter("@travle_ID", SqlDbType.Int,4),
+					new SqlParameter("@promoter_userid", SqlDbType.VarChar,50),
 					new SqlParameter("@release_time", SqlDbType.DateTime),
 					new SqlParameter("@Destination", SqlDbType.VarChar,200),
 					new SqlParameter("@startplace", SqlDbType.VarChar,50),
@@ -72,29 +72,29 @@ namespace la.DAL
 					new SqlParameter("@wantget_gift", SqlDbType.VarChar,30),
 					new SqlParameter("@wantsend_gift", SqlDbType.VarChar,30),
 					new SqlParameter("@reg_fee", SqlDbType.Float,8)};
-			parameters[0].Value = model.travle_ID;
-			parameters[1].Value = model.promoter_userid;
-			parameters[2].Value = model.release_time;
-			parameters[3].Value = model.Destination;
-			parameters[4].Value = model.startplace;
-			parameters[5].Value = model.return_time;
-			parameters[6].Value = model.start_time;
-			parameters[7].Value = model.transportation;
-			parameters[8].Value = model.fee;
-			parameters[9].Value = model.travle_theme;
-			parameters[10].Value = model.travle_personcount;
-			parameters[11].Value = model.companion_condition;
-			parameters[12].Value = model.travle_msg;
-			parameters[13].Value = model.pic1;
-			parameters[14].Value = model.pic2;
-			parameters[15].Value = model.pic3;
-			parameters[16].Value = model.income_condition;
-			parameters[17].Value = model.car_condition;
-			parameters[18].Value = model.height_condition;
-			parameters[19].Value = model.credit_condition;
-			parameters[20].Value = model.wantget_gift;
-			parameters[21].Value = model.wantsend_gift;
-			parameters[22].Value = model.reg_fee;
+	//parameters[0].Value = model.travle_ID;
+			parameters[0].Value = model.promoter_userid;
+			parameters[1].Value = model.release_time;
+			parameters[2].Value = model.Destination;
+			parameters[3].Value = model.startplace;
+			parameters[4].Value = model.return_time;
+			parameters[5].Value = model.start_time;
+			parameters[6].Value = model.transportation;
+			parameters[7].Value = model.fee;
+			parameters[8].Value = model.travle_theme;
+			parameters[9].Value = model.travle_personcount;
+			parameters[10].Value = model.companion_condition;
+			parameters[11].Value = model.travle_msg;
+			parameters[12].Value = model.pic1;
+			parameters[13].Value = model.pic2;
+			parameters[14].Value = model.pic3;
+			parameters[15].Value = model.income_condition;
+			parameters[16].Value = model.car_condition;
+			parameters[17].Value = model.height_condition;
+			parameters[18].Value = model.credit_condition;
+			parameters[19].Value = model.wantget_gift;
+			parameters[20].Value = model.wantsend_gift;
+			parameters[21].Value = model.reg_fee;
 
 			int rows=DbHelperSQL.ExecuteSql(strSql.ToString(),parameters);
 			if (rows > 0)
@@ -137,7 +137,7 @@ namespace la.DAL
 			strSql.Append("reg_fee=@reg_fee");
 			strSql.Append(" where travle_ID=@travle_ID ");
 			SqlParameter[] parameters = {
-					new SqlParameter("@promoter_userid", SqlDbType.Int,4),
+					new SqlParameter("@promoter_userid", SqlDbType.VarChar,50),
 					new SqlParameter("@release_time", SqlDbType.DateTime),
 					new SqlParameter("@Destination", SqlDbType.VarChar,200),
 					new SqlParameter("@startplace", SqlDbType.VarChar,50),
@@ -278,7 +278,7 @@ namespace la.DAL
 				}
 				if(row["promoter_userid"]!=null && row["promoter_userid"].ToString()!="")
 				{
-					model.promoter_userid=int.Parse(row["promoter_userid"].ToString());
+					model.promoter_userid=row["promoter_userid"].ToString();
 				}
 				if(row["release_time"]!=null && row["release_time"].ToString()!="")
 				{

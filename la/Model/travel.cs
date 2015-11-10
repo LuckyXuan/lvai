@@ -11,7 +11,7 @@ namespace la.Model
 		{}
 		#region Model
 		private int _travle_id;
-		private int? _promoter_userid;
+		private string _promoter_userid;
 		private DateTime? _release_time;
 		private string _destination;
 		private string _startplace;
@@ -44,7 +44,7 @@ namespace la.Model
 		/// <summary>
 		/// 发起人
 		/// </summary>
-		public int? promoter_userid
+		public string promoter_userid
 		{
 			set{ _promoter_userid=value;}
 			get{return _promoter_userid;}
