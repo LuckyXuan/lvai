@@ -71,6 +71,11 @@ namespace la.Web
                         UploadAlbum(context);
                         break;
                     }
+                case "uploadTravelPhoto":
+                    {
+                        RealseTravelPhoto(context);
+                        break;
+                    }
             }
         }
 
@@ -399,7 +404,7 @@ namespace la.Web
         private void RealseTravelPhoto(HttpContext context)
         {
             string dirPath = context.Server.MapPath("~/UploadFile/TravelPhoto/");
-            string tel = context.Request.Form["tel"].ToString();
+            //string tel = context.Request.Form["tel"].ToString();
             string filenames = context.Request.Form["filename"].ToString();
             string []filename = filenames.Split('|');
             if (!Directory.Exists(dirPath))
@@ -414,29 +419,30 @@ namespace la.Web
                     for (int i = 0; i < files.Count; i++)
                     {
                         HttpPostedFile file = context.Request.Files[i];
-                        string fileName = filename[i];
+                        string fileName = Path.GetFileName( filename[i]);
                         string filePath = dirPath + fileName;//file.FileName;
                         file.SaveAs(filePath);
                         
-                        BLL.travel bll = new BLL.travel();
-                        List<Model.travel> TravelList = bll.GetModelList(" promoter_userid='" + tel + "'");
+                        //BLL.travel bll = new BLL.travel();
+                        //List<Model.travel> TravelList = bll.GetModelList(" promoter_userid='" + tel + "'");
                        
-                        Model.travel info = new Model.travel();
-                        info.promoter_userid =Convert.ToInt32( tel);
-                        string sfile = "/UploadFile/TravelPhoto/" + fileName;
-                        if (i == 1)
-                        {
-                            info.pic1 = sfile;
-                        }
-                        if (i == 2)
-                        {
-                            info.pic2 = sfile;
-                        }
-                        if (i == 3)
-                        {
-                            info.pic3 = sfile;
-                        }
-                        bll.Update(info);
+                        //Model.travel info = new Model.travel();
+                        //info.promoter_userid =Convert.ToInt32( tel);
+                        //string sfile = "/UploadFile/TravelPhoto/" + fileName;
+                        //if (i == 1)
+                        //{
+                        //    info.pic1 = sfile;
+                        //}
+                        //if (i == 2)
+                        //{
+                        //    info.pic2 = sfile;
+                        //}
+                        //if (i == 3)
+                        //{
+                        //    info.pic3 = sfile;
+                        //}
+
+                        //bll.Update(info);
 
                     }
                 }

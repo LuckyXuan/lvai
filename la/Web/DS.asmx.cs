@@ -488,12 +488,13 @@ namespace la.Web
         {
             Dictionary<string, object> dic = realsetravel as Dictionary<string, object>;
             string result = "{\"status\":";
+            string sfile = "/UploadFile/TravelPhoto/";
             try
             {
                 Model.travel t = new Model.travel();
                 t.promoter_userid =Convert.ToInt32(dic["promoter_userid"].ToString());
                 t.release_time = DateTime.Now;
-                t.Destination = dic["Destination"].ToString();
+                t.Destination = dic["destination"].ToString();
                 t.startplace = dic["startplace"].ToString();
                 t.return_time =Convert.ToDateTime( dic["return_time"].ToString());
                 t.start_time =Convert.ToDateTime( dic["start_time"].ToString());
@@ -503,9 +504,9 @@ namespace la.Web
                 t.travle_personcount =Convert.ToInt32( dic["travle_personcount"].ToString());
                 t.companion_condition = dic["companion_condition"].ToString();
                 t.travle_msg = dic["travle_msg"].ToString();
-                t.pic1 = dic["pic1"].ToString();
-                t.pic2 = dic["pic2"].ToString();
-                t.pic3 = dic["pic3"].ToString();
+                t.pic1 = sfile + Path.GetFileName(dic["pic1"].ToString());
+                t.pic2 = sfile + Path.GetFileName(dic["pic2"].ToString());
+                t.pic3 = sfile + Path.GetFileName(dic["pic3"].ToString());
                 t.income_condition = dic["income_condition"].ToString();
                 t.car_condition = dic["car_condition"].ToString();
                 t.height_condition = dic["height_condition"].ToString();
