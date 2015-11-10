@@ -6,7 +6,11 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<title></title>
 		<script src="../../js/mui.min.js"></script>
-		<script type="text/javascript" src="../../js/lvai.data/TravelDal.js" ></script>
+		<script type="text/javascript" src="../../js/extends/extends.js"></script>
+		<script type="text/javascript" src="../../js/lvai.op/FileTool.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/config.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/WebService2.js"></script>
+		<script type="text/javascript" src="../../js/lvai.data/TravelDal.js"></script>
 		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js"></script>
 		<script type="text/javascript" src="../../js/lvai.data/UserDAL.js"></script>
 		<!--描述：地域选择 js 以及 css -->
@@ -14,32 +18,38 @@
 		<script src="../../js/mui.poppicker.js"></script>
 		<script src="../../js/city.data.js" type="text/javascript" charset="utf-8"></script>
 		<script src="../../js/city.data-3.js" type="text/javascript" charset="utf-8"></script>
-	
+
 		<link href="../../css/mui.listpicker.css" rel="stylesheet" />
 		<link href="../../css/mui.poppicker.css" rel="stylesheet" />
 		<!---->
-		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js" ></script>
+		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js"></script>
 		<style type="text/css">
 			.costSelect {
 				border-color: darkorange;
 			}
-			.placeholder{
-			 text-align: right;
+			.placeholder {
+				text-align: right;
 			}
-			::-webkit-input-placeholder { color:; }
-			.mui-grid-view li{
+			::-webkit-input-placeholder {
+				color: ;
+			}
+			.mui-grid-view li {
 				width: 33% !important;
 				padding: 0px;
 			}
-			.mui-grid-view img{
+			.mui-grid-view img {
 				width: 100% !important;
 				margin: 0px;
-				height: 13% !important; 
+				height: 13% !important;
 			}
-			.mui-right{text-align:right;}
-			.mui-float{float: left;}
-			.mui-frame{
-				width:20%; 
+			.mui-right {
+				text-align: right;
+			}
+			.mui-float {
+				float: left;
+			}
+			.mui-frame {
+				width: 20%;
 				margin: 2px;
 				margin-top: 8px;
 				text-align: center;
@@ -47,41 +57,42 @@
 				border-radius: 5px;
 				font-size: 12px;
 			}
-			.mui-frame-d1{
+			.mui-frame-d1 {
 				float: left;
-				display: inline; 
+				display: inline;
 				margin: 2px;
 				margin-top: 8px;
 				text-align: center;
 				border: 1px solid #ddd;
-				border-radius: 5px;	 			
+				border-radius: 5px;
 			}
-			.mui-frame-d2{
+			.mui-frame-d2 {
 				float: left;
-				display: inline; 
+				display: inline;
 				margin: 2px;
 				margin-top: 8px;
 				text-align: center;
 				background-color: #8F8F94;
 				border: 1px solid #ddd;
-				border-radius: 5px;	 
-						
+				border-radius: 5px;
 			}
-			.mui-frame-btn{
+			.mui-frame-btn {
 				float: right;
 				border-radius: 5px;
 				margin: 4px;
-				background-color:hotpink;
+				background-color: hotpink;
 			}
+			
+			
 		</style>
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<script type="text/javascript" charset="utf-8">
-			var travel=new travelModel();
-			var fee="免费";
+			var travel = null;
+			var fee = "免费";
 			var travle_theme;
-			var Traffic; 
+			var Traffic;
 			var PartnerNumber;
-			var Destination; 
+			var Destination;
 			var Origin;
 			var Credit;
 			var Income;
@@ -227,52 +238,52 @@
 				Origin.setData(cityData);
 			});
 			mui.init({
-				swipeBack:true //启用右滑关闭功能
+				swipeBack: true //启用右滑关闭功能
 			});
 			 // 扩展API加载完毕后调用onPlusReady回调函数 
 			document.addEventListener("plusready", onPlusReady, false);
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
-				//初始化时间选择器
-				menu();
-				costTap();
-				Theme();
-				Requirements() ;
+					//初始化时间选择器
+					menu();
+					costTap();
+					Theme();
+					Requirements();
+				}
+				//费用
 
-			}
-			//费用
 			function costTap() {
-				mui("#fee").on('tap', 'div', function() {
-					document.getElementById("fee1").style.borderColor = "#ddd";
-					document.getElementById("fee2").style.borderColor = "#ddd";
-					document.getElementById("fee3").style.borderColor = "#ddd";
-					this.style.border = "1px solid darkorange";
-					fee=this.innerHTML;
-				});
-			}
-			//主题
+					mui("#fee").on('tap', 'div', function() {
+						document.getElementById("fee1").style.borderColor = "#ddd";
+						document.getElementById("fee2").style.borderColor = "#ddd";
+						document.getElementById("fee3").style.borderColor = "#ddd";
+						this.style.border = "1px solid darkorange";
+						fee = this.innerHTML;
+					});
+				}
+				//主题
+
 			function Theme() {
-				//添加主题
-				mui("#theme").on('tap', 'div', function() {
-					var newNode = document.createElement("div");
-					newNode.innerHTML = this.innerHTML;
-					newNode.className = "mui-frame-d2";
-					document.getElementById("Selectedtheme").appendChild(newNode);
-				});
-				document.getElementById("addBtn").addEventListener('tap', function() {
-					var newNode = document.createElement("div");
-					
-					newNode.innerHTML = document.getElementById("Addtheme").value;
-					newNode.className = "mui-frame-d2";
-					document.getElementById("Selectedtheme").appendChild(newNode);
-				});
-				//删除主题
-				mui("#Selectedtheme").on('tap', 'div', function() {
-					this.parentElement.removeChild(this);
-				});
-			}
-			
-			//对旅伴要求
+					//添加主题
+					mui("#theme").on('tap', 'div', function() {
+						var newNode = document.createElement("div");
+						newNode.innerHTML = this.innerHTML;
+						newNode.className = "mui-frame-d2";
+						document.getElementById("Selectedtheme").appendChild(newNode);
+					});
+					document.getElementById("addBtn").addEventListener('tap', function() {
+						var newNode = document.createElement("div");
+						newNode.innerHTML = document.getElementById("Addtheme").value;
+						newNode.className = "mui-frame-d2";
+						document.getElementById("Selectedtheme").appendChild(newNode);
+					});
+					//删除主题
+					mui("#Selectedtheme").on('tap', 'div', function() {
+						this.parentElement.removeChild(this);
+					});
+				}
+				//对旅伴要求
+
 			function Requirements() {
 				//添加要求
 				mui("#requirements").on('tap', 'div', function() {
@@ -283,7 +294,6 @@
 				});
 				document.getElementById("addBtn1").addEventListener('tap', function() {
 					var newNode = document.createElement("div");
-					
 					newNode.innerHTML = document.getElementById("Addrequirements").value;
 					newNode.className = "mui-frame-d2";
 					document.getElementById("selectedrequirements").appendChild(newNode);
@@ -295,88 +305,126 @@
 			}
 
 			function menu() {
-				//交通方式
-				document.getElementById("transportation").addEventListener('tap', function() {
-					Traffic.show(function(items) {
-						document.querySelector("#transportation").value = items[0].text;
-						//返回 false 可以阻止选择框的关闭
-						//return false;
-					},'');
+			//添加图片
+			document.getElementById("addImg").addEventListener('tap', function() {
+				plus.gallery.pick(function(e) {
+					var imgs = mui("#imgRoom>img");
+					var files = e.files;
+					var l = files.length;
+					l=l>3?3:l;//如果选择的超过9张，就截取前3张
+					for(var i=0;i<l;i++){
+						var path = plus.io.convertLocalFileSystemURL(files[i]);
+						console.log(imgs[i]);
+						
+						imgs[i].src = path;
+					}
+					
+				}, function(e) {
+					mui.toast("相册处理错误");
+				}, {
+					filter: "image",
+					multiple: true //可选择是否多张图片选择
 				});
-				//年收入
-				document.getElementById("income_condition").addEventListener('tap', function() {
-					Income.show(function(items) {
-						document.querySelector("#income_condition").value = items[0].text;
-						//返回 false 可以阻止选择框的关闭
-						//return false;
-					},'');
+				mui.toast("您最多一次可以选择上传3张图片");
+			
+			});
+			
+			//单张更改
+			
+			mui("#imgRoom").on('tap','img',function(){
+				var that = this;
+				plus.gallery.pick(function(path) {
+					that.src = path;
+					
+				}, function(e) {
+					mui.toast("相册处理错误");
+				}, {
+					filter: "image",
 				});
-				//座驾
-				document.getElementById("car_condition").addEventListener('tap', function() {
-					Car.show(function(items) {
-						document.querySelector("#car_condition").value = items[0].text;
-						//返回 false 可以阻止选择框的关闭
-						//return false;
-					},'');
-				});
-				//身高
-				document.getElementById("height_condition").addEventListener('tap', function() {
-					Height.show(function(items) {
-						document.querySelector("#height_condition").value = items[0].text;
-						//返回 false 可以阻止选择框的关闭
-						//return false;
-					},'');
-				});
-				//信用等级
-				document.getElementById("credit_condition").addEventListener('tap', function() {
-					Credit.show(function(items) {
-						document.querySelector("#credit_condition").value = items[0].text;
-						//返回 false 可以阻止选择框的关闭
-						//return false;
-					},'');
-				});
-				//得到的礼物
-				document.getElementById("wantget_gift").addEventListener('tap', function() {
-					Wantget_gift.show(function(items) {
-						document.querySelector("#wantget_gift").value = items[0].text;
-						//返回 false 可以阻止选择框的关闭
-						//return false;
-					},'');
-				});
-				//送出的礼物
-				document.getElementById("wantsend_gift").addEventListener('tap', function() {
-					Wantsend_gift.show(function(items) {
-						document.querySelector("#wantsend_gift").value = items[0].text;
-						//返回 false 可以阻止选择框的关闭
-						//return false;
-					},'');
-				});
-				//旅伴数量
-				document.getElementById("partnerNumber").addEventListener('tap', function() {
-					PartnerNumber.show(function(items) {
-						document.querySelector("#partnerNumber").value = items[0].text;
-						//返回 false 可以阻止选择框的关闭
-						//return false;
-					},'');
-				});
-				//目的地
-				document.getElementById("destinationbtn").addEventListener('tap', function() {
-					Destination.show(function(items) {
-						document.querySelector("#destination").value = items[0].text + " " + items[1].text;
-						//返回 false 可以阻止选择框的关闭
-						//return false;
-					},'');
-				});
-				//出发地
-				document.getElementById("startplacebtn").addEventListener('tap', function() {
-					Origin.show(function(items) {
-						document.querySelector("#startplace").value = items[0].text + " " + items[1].text;
-						//返回 false 可以阻止选择框的关闭
-						//return false;
-					},'');
-				});
-				//出发日期
-				document.getElementById("start_time").addEventListener('tap', function() {
+			});
+			
+			 //交通方式
+			document.getElementById("transportation").addEventListener('tap', function() {
+				Traffic.show(function(items) {
+					document.querySelector("#transportation").value = items[0].text;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				}, '');
+			});
+			 //年收入
+			document.getElementById("income_condition").addEventListener('tap', function() {
+				Income.show(function(items) {
+					document.querySelector("#income_condition").value = items[0].text;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				}, '');
+			});
+			 //座驾
+			document.getElementById("car_condition").addEventListener('tap', function() {
+				Car.show(function(items) {
+					document.querySelector("#car_condition").value = items[0].text;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				}, '');
+			});
+			 //身高
+			document.getElementById("height_condition").addEventListener('tap', function() {
+				Height.show(function(items) {
+					document.querySelector("#height_condition").value = items[0].text;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				}, '');
+			});
+			 //信用等级
+			document.getElementById("credit_condition").addEventListener('tap', function() {
+				Credit.show(function(items) {
+					document.querySelector("#credit_condition").value = items[0].text;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				}, '');
+			});
+			 //得到的礼物
+			document.getElementById("wantget_gift").addEventListener('tap', function() {
+				Wantget_gift.show(function(items) {
+					document.querySelector("#wantget_gift").value = items[0].text;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				}, '');
+			});
+			 //送出的礼物
+			document.getElementById("wantsend_gift").addEventListener('tap', function() {
+				Wantsend_gift.show(function(items) {
+					document.querySelector("#wantsend_gift").value = items[0].text;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				}, '');
+			});
+			 //旅伴数量
+			document.getElementById("partnerNumber").addEventListener('tap', function() {
+				PartnerNumber.show(function(items) {
+					document.querySelector("#partnerNumber").value = items[0].text;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				}, '');
+			});
+			 //目的地
+			document.getElementById("destinationbtn").addEventListener('tap', function() {
+				Destination.show(function(items) {
+					document.querySelector("#destination").value = items[0].text + " " + items[1].text;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				}, '');
+			});
+			 //出发地
+			document.getElementById("startplacebtn").addEventListener('tap', function() {
+				Origin.show(function(items) {
+					document.querySelector("#startplace").value = items[0].text + " " + items[1].text;
+					//返回 false 可以阻止选择框的关闭
+					//return false;
+				}, '');
+			});
+			 //出发日期
+			document.getElementById("start_time").addEventListener('tap', function() {
 					var dDate = new Date();
 					dDate.setFullYear(2015, 7, 16);
 					var minDate = new Date();
@@ -384,81 +432,96 @@
 					var maxDate = new Date();
 					maxDate.setFullYear(9999, 11, 31);
 					plus.nativeUI.pickDate(function(e) {
+						var bir = document.getElementById("start_time");
 						var d = e.date;
-						document.getElementById("start_time").value = d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日";
+						var y = d.getFullYear();
+						var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
+						var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
+						bir.value = y + "-" + m + "-" + day;
 					}, function(e) {
 						this.value = "您没有选择日期";
 					}, {
 						title: "请选择日期",
-						date: dDate,
-						minDate: minDate,
-						maxDate: maxDate
+						date: dDate
 					});
 				})
 				//返回日期
-				document.getElementById("return_time").addEventListener('tap', function() {
-					var dDate = new Date();
-					dDate.setFullYear(2015, 7, 16);
-					var minDate = new Date();
-					minDate.setFullYear(0000, 0, 1);
-					var maxDate = new Date();
-					maxDate.setFullYear(9999, 11, 31);
-					plus.nativeUI.pickDate(function(e) {
-						var d = e.date;
-						document.getElementById("return_time").value = d.getFullYear() + "年" + (d.getMonth() + 1) + "月" + d.getDate() + "日";
-					}, function(e) {
-						this.value = "您没有选择日期";
-					}, {
-						title: "请选择日期",
-						date: dDate,
-						minDate: minDate,
-						maxDate: maxDate
-					});
-				})
+			 document.getElementById("return_time").addEventListener('tap', function() {
+				var dDate = new Date();
+				dDate.setFullYear(2015, 7, 16);
+				var minDate = new Date();
+				minDate.setFullYear(0000, 0, 1);
+				var maxDate = new Date();
+				maxDate.setFullYear(9999, 11, 31);
+				plus.nativeUI.pickDate(function(e) {
+					var bir = document.getElementById("return_time");
+					var d = e.date;
+					var y = d.getFullYear();
+					var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
+					var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
+					bir.value = y + "-" + m + "-" + day;
+				}, function(e) {
+					this.value = "您没有选择日期";
+				}, {
+					title: "请选择日期",
+					date: dDate,
+					minDate: minDate,
+					maxDate: maxDate
+				});
+			})
 			}
-			
 			/**
 			 * 发布旅行。
 			 */
-			function btnReleaseClick()
-			{
-				
-				travel.promoter_userid=new UserDAL().getUserInfo().user_telphone;				
-				travel.destination=document.querySelector("#destination").value;
-				travel.startplace=document.querySelector("#startplace").value;
-				travel.start_time=document.querySelector("#start_time").value;
-				travel.return_time=document.querySelector("#return_time").value;
-				travel.transportation=document.querySelector("#transportation").value;
-				travel.fee=fee;
-				alert(travel.fee);
+			function btnReleaseClick() {
+				travel = new travelModel();
+				travel.promoter_userid = new UserDAL().getUserInfo().user_telphone;
+				travel.destination = document.querySelector("#destination").value;
+				travel.startplace = document.querySelector("#startplace").value;
+				travel.start_time = document.querySelector("#start_time").value;
+				travel.return_time = document.querySelector("#return_time").value;
+				travel.transportation = document.querySelector("#transportation").value;
+				travel.fee = fee;
+				//alert(travel.fee);
 				//travle_theme
-				var  themes = document.querySelectorAll("#Selectedtheme>div");
-				for(var i=0;i<themes.length;i++){
+				var themes = document.querySelectorAll("#Selectedtheme>div");
+				for (var i = 0; i < themes.length; i++) {
 					//alert(themes[i].innerHTML);
-					travel.travle_theme+=themes[i].innerHTML+"|";
+					travel.travle_theme += themes[i].innerHTML + "|";
 				}
-				alert(travel.travle_theme); 
-				travel.travle_personcount=document.querySelector("#partnerNumber").value;
+				//alert(travel.travle_theme); 
+				travel.travle_personcount = document.querySelector("#partnerNumber").value;
 				//companion_condition
-				var requirements=document.querySelectorAll("#selectedrequirements>div");
-				for(var i=0;i<requirements.length;i++){
+				var requirements = document.querySelectorAll("#selectedrequirements>div");
+				for (var i = 0; i < requirements.length; i++) {
 					//alert(themes[i].innerHTML);
-					travel.companion_condition+=requirements[i].innerHTML+"|";
+					travel.companion_condition += requirements[i].innerHTML + "|";
 				}
-				alert(travel.companion_condition);
-				travel.income_condition=document.querySelector("#income_condition").value;
-				travel.car_condition=document.querySelector("#car_condition").value;
-				travel.height_condition=document.querySelector("#height_condition").value;
-				travel.credit_condition=document.querySelector("#credit_condition").value;
-				travel.wantget_gift=document.querySelector("#wantget_gift").value;
-				travel.wantsend_gift=document.querySelector("#wantsend_gift").value;
-				travel.travle_msg=document.querySelector("#travle_msg").value;
+				//alert(travel.companion_condition);
+				travel.income_condition = document.querySelector("#income_condition").value;
+				travel.car_condition = document.querySelector("#car_condition").value;
+				travel.height_condition = document.querySelector("#height_condition").value;
+				travel.credit_condition = document.querySelector("#credit_condition").value;
+				travel.wantget_gift = document.querySelector("#wantget_gift").value;
+				travel.wantsend_gift = document.querySelector("#wantsend_gift").value;
+				travel.travle_msg = document.querySelector("#travle_msg").value;
+				//travel.pic1 = travel.pic2 = travel.pic3 = plus.io.convertLocalFileSystemURL("_www/img/travel_4.jpg");
+				var Images = mui("#imgRoom>img"); 
+				console.log(travel.pic1 = Images[0].getAttribute("src")?Images[0].getAttribute("src"):"");
+				console.log(travel.pic2 = Images[1].getAttribute("src")?Images[1].getAttribute("src"):"");
+				console.log(travel.pic3 = Images[2].getAttribute("src")?Images[2].getAttribute("src"):"");
 				
-				var travelDAL=new TravelDal();
-				travelDAL.travel=travel;
-				
-				travelDAL.RealseTravel();
-				
+				travel.reg_fee = 10.0;
+				var travelDAL = new TravelDal();
+				travelDAL.travel = travel;
+				var traveW = plus.nativeUI.showWaiting("信息发布中...");
+				travelDAL.UpLoadStara(function(_msg) {
+					mui.toast("发布成功！");
+					traveW.close();
+				}, function(e) {
+					mui.toast(e);
+					traveW.close();
+				});
 			}
 		</script>
 	</head>
@@ -480,25 +543,27 @@
 					<!--旅途-->
 					<label class="mui-btn mui-btn-block mui-btn-outlined" style="border:0px;">
 						<h4>——旅行——</h4></label>
+
 					<div class="mui-card">
+
 						<form class="mui-input-group">
 							<div class="mui-input-row">
 								<label>目的地</label>
-								<input id="destination" type="text" class="mui-right" style="display: block; width: 45%;float:left;" placeholder="巴厘岛" >
-									<button id="destinationbtn" type="button" class="mui-right" style="border-radius: 5px;margin: 3px;">国内</button>
+								<input id="destination" type="text" class="mui-right" style="display: block; width: 45%;float:left;" placeholder="巴厘岛">
+								<button id="destinationbtn" type="button" class="mui-right" style="border-radius: 5px;margin: 3px;">国内</button>
 							</div>
 							<div class="mui-input-row">
 								<label>出发地</label>
 								<input id="startplace" type="text" class="mui-right" style="display: block; width: 45%;float:left;" placeholder="上海">
-									<button id="startplacebtn" type="button" class="mui-right" style="border-radius: 5px;margin: 3px;">国内</button>
+								<button id="startplacebtn" type="button" class="mui-right" style="border-radius: 5px;margin: 3px;">国内</button>
 							</div>
 							<div class="mui-input-row">
 								<label>出发时间</label>
-								<input type="text" id='start_time' class="mui-right " placeholder="2015年9月20日">
+								<input type="text" id='start_time' class="mui-right " placeholder="2015-9-20">
 							</div>
 							<div class="mui-input-row">
 								<label>返回时间</label>
-								<input type="text" id='return_time' class="mui-right" placeholder="2015年9月20日">
+								<input type="text" id='return_time' class="mui-right" placeholder="2015-9-20">
 							</div>
 							<div class="mui-input-row">
 								<label>交通方式</label>
@@ -525,112 +590,110 @@
 							<div id="theme" style="float: left; width: 100%; margin: 15px;">
 								<div id="theme1" class="mui-frame-d1">好摄之徒</div>
 								<div id="theme2" class="mui-frame-d1">穷游</div>
-							<div id="theme3" class="mui-frame-d1" >豪华之旅</div>
-							<div id="theme4" class="mui-frame-d1" >闲装情侣</div>
-						</div>
-						<div id="Selectedtheme" style="float: left; width: 100%; margin: 15px; ">
-							<div id="Selectedtheme1" class="mui-frame-d2" >豪华之旅</div>
-							<div id="Selectedtheme2" class="mui-frame-d2" >闲装情侣</div> 
-						</div>
-					</div>					
-				</div>
-				
-				<!--旅伴-->
-				<label class="mui-btn mui-btn-block mui-btn-outlined" style="border:0px; ">
-					<h4>——旅伴——</h4></label>
-				<div class="mui-card ">					
-					<div class="mui-input-row " >
-						<label>旅伴数量</label>
-						<input id="partnerNumber" type="text" class="mui-right " placeholder="1 ">
-					</div>
-					<div class="mui-input-row">
-						<label style="width: 100%; "> 对旅伴的要求?</label>
-						<div style="margin-left: 15px; ">
-							<input id="Addrequirements" type="text" style="display: block;float:left;width: 75%;background-color:#DDDDDD;border-radius: 5px; " placeholder=" ">
-							<button id="addBtn1" class="mui-frame-btn" type="button">添加</button>
-						</div>
-						<div id="requirements" style="float: left; width: 100%; margin-left: 15px;margin-right: 15px; ">
-							<div id=" " class="mui-frame-d1 " >妹纸</div>
-							<div id=" " class="mui-frame-d1 " >汉子</div>
-							<div id=" " class="mui-frame-d1 " >男女均可</div>
-							<div id=" " class="mui-frame-d1 " >颜值报表</div>
-							<div id=" " class="mui-frame-d1 " >挥金如土</div>
-							<div id=" " class="mui-frame-d1 " >八块腹肌</div>
-							<div id=" " class="mui-frame-d1 " >大长腿</div>
-							<div id=" " class="mui-frame-d1 " >小蛮腰</div>
-
-						</div>
-						<div id="selectedrequirements" style="float: left; margin-left: 15px;margin-right: 15px; ">
-							<div id=" " class="mui-frame-d2 " >汉子</div>
-							<div id=" " class="mui-frame-d2 " >八块腹肌</div>
-
+								<div id="theme3" class="mui-frame-d1">豪华之旅</div>
+								<div id="theme4" class="mui-frame-d1">闲装情侣</div>
+							</div>
+							<div id="Selectedtheme" style="float: left; width: 100%; margin: 15px; ">
+								<div id="Selectedtheme1" class="mui-frame-d2">豪华之旅</div>
+								<div id="Selectedtheme2" class="mui-frame-d2">闲装情侣</div>
+							</div>
 						</div>
 					</div>
-					<form class="mui-input-group ">
-					<div class="mui-input-row ">
-						<label>年收入</label>
-						<input id="income_condition" type="text" class="mui-right " placeholder="30万 ">
-					</div>
-					<div class="mui-input-row ">
-						<label>座驾</label>
-						<input id="car_condition" type="text" class="mui-right " placeholder="30万以上 ">
-					</div>
-					<div class="mui-input-row ">
-						<label>身高</label>
-						<input id="height_condition" type="text" class="mui-right " placeholder="175cm">
-					</div>
-					<div class="mui-input-row ">
-						<label>信用等级</label>
-						<input id="credit_condition" type="text" class="mui-right " placeholder="5 ">
-					</div>
-					</form>
-				</div>
 
-				<!--礼物-->
-				<label class="mui-btn mui-btn-block mui-btn-outlined " style="border:0px; ">
-					<h4>——礼物——</h4></label>
-				<div class="mui-card ">
-					<h6 class="mui-text-center ">您可以选择本次旅行想得到或者送出什么礼物</h6>
-					<div class="mui-input-row ">
-						<label>我想得到</label>
-						<input id="wantget_gift" type="text" class="mui-right " placeholder="可填可不填">
-					</div>
-					<div class="mui-input-row ">
-						<label>我想送出</label>
-						<input id="wantsend_gift" type="text" class="mui-right " placeholder="可填可不填 ">
-					</div>
-				</div>
+					<!--旅伴-->
+					<label class="mui-btn mui-btn-block mui-btn-outlined" style="border:0px; ">
+						<h4>——旅伴——</h4></label>
+					<div class="mui-card ">
+						<div class="mui-input-row ">
+							<label>旅伴数量</label>
+							<input id="partnerNumber" type="text" class="mui-right " placeholder="1 ">
+						</div>
+						<div class="mui-input-row">
+							<label style="width: 100%; "> 对旅伴的要求?</label>
+							<div style="margin-left: 15px; ">
+								<input id="Addrequirements" type="text" style="display: block;float:left;width: 75%;background-color:#DDDDDD;border-radius: 5px; " placeholder=" ">
+								<button id="addBtn1" class="mui-frame-btn" type="button">添加</button>
+							</div>
+							<div id="requirements" style="float: left; width: 100%; margin-left: 15px;margin-right: 15px; ">
+								<div id=" " class="mui-frame-d1 ">妹纸</div>
+								<div id=" " class="mui-frame-d1 ">汉子</div>
+								<div id=" " class="mui-frame-d1 ">男女均可</div>
+								<div id=" " class="mui-frame-d1 ">颜值报表</div>
+								<div id=" " class="mui-frame-d1 ">挥金如土</div>
+								<div id=" " class="mui-frame-d1 ">八块腹肌</div>
+								<div id=" " class="mui-frame-d1 ">大长腿</div>
+								<div id=" " class="mui-frame-d1 ">小蛮腰</div>
 
-				<!--图片-->
-				<label class="mui-btn mui-btn-block mui-btn-outlined " style="border:0px; ">
-					<h4>——图片——</h4></label>
-				<div class="mui-card">
-					<h6 class="mui-text-center">您还可以为本次旅行配上几张图片</h6>
-					<ul class="mui-table-view mui-grid-view">
-						<li class="mui-table-view-cell mui-media mui-col-xs-4 ">
-							<img id="photo1" src="../../img/guide_3.jpg" />
-						</li>
-						<li class="mui-table-view-cell mui-media mui-col-xs-4 ">
-							<img id="photo2" src="../../img/guide_3.jpg" />
-						</li>
-						<li class="mui-table-view-cell mui-media mui-col-xs-4 ">
-							<img id="photo3" src="../../img/guide_3.jpg" />
-						</li>
-					</ul>
-				</div>
+							</div>
+							<div id="selectedrequirements" style="float: left; margin-left: 15px;margin-right: 15px; ">
+								<div id=" " class="mui-frame-d2 ">汉子</div>
+								<div id=" " class="mui-frame-d2 ">八块腹肌</div>
 
-				<!--最后一句话-->
-				<label class="mui-btn mui-btn-block mui-btn-outlined " style="border:0px; ">
-					<h4>——最后一句——</h4></label>
-				<div class="mui-card">
-					<h6 class="mui-text-center ">最后说句话吧，让更多人关注你</h6>
-					<div class="mui-input-row " style="margin: 10px 5px; ">
-						<textarea id="travle_msg" rows="5" placeholder=" "></textarea>
+							</div>
+						</div>
+						<form class="mui-input-group ">
+							<div class="mui-input-row ">
+								<label>年收入</label>
+								<input id="income_condition" type="text" class="mui-right " placeholder="30万 ">
+							</div>
+							<div class="mui-input-row ">
+								<label>座驾</label>
+								<input id="car_condition" type="text" class="mui-right " placeholder="30万以上 ">
+							</div>
+							<div class="mui-input-row ">
+								<label>身高</label>
+								<input id="height_condition" type="text" class="mui-right " placeholder="175cm">
+							</div>
+							<div class="mui-input-row ">
+								<label>信用等级</label>
+								<input id="credit_condition" type="text" class="mui-right " placeholder="5 ">
+							</div>
+						</form>
+					</div>
+
+					<!--礼物-->
+					<label class="mui-btn mui-btn-block mui-btn-outlined " style="border:0px; ">
+						<h4>——礼物——</h4></label>
+					<div class="mui-card ">
+						<h6 class="mui-text-center ">您可以选择本次旅行想得到或者送出什么礼物</h6>
+						<div class="mui-input-row ">
+							<label>我想得到</label>
+							<input id="wantget_gift" type="text" class="mui-right " placeholder="可填可不填">
+						</div>
+						<div class="mui-input-row ">
+							<label>我想送出</label>
+							<input id="wantsend_gift" type="text" class="mui-right " placeholder="可填可不填 ">
+						</div>
+					</div>
+
+					<!--图片-->
+					<label class="mui-btn mui-btn-block mui-btn-outlined " style="border:0px; ">
+						<h4>——图片——</h4></label>
+					<div class="mui-card" style="text-align: center;">
+						<h6 class="mui-text-center">您还可以为本次旅行配上3张图片</h6>
+						<div id="imgRoom">
+							<img src="" width="100px" height="100px" style="background-image: url(../../img/head.png); background-size: 100% 100%;" />
+							<img src="" width="100px" height="100px" style="background-image: url(../../img/head.png); background-size: 100% 100%;" />
+							<img src="" width="100px" height="100px" style="background-image: url(../../img/head.png); background-size: 100% 100%;" />
+						</div>
+
+						<div hidden="hidden">
+							<button id="addImg" type="button" class="mui-btn mui-btn-blue mui-btn-outlined" style="margin: 2px;">添加图片</button>
+						</div>
+					</div>
+
+					<!--最后一句话-->
+					<label class="mui-btn mui-btn-block mui-btn-outlined " style="border:0px; ">
+						<h4>——最后一句——</h4></label>
+					<div class="mui-card">
+						<h6 class="mui-text-center ">最后说句话吧，让更多人关注你</h6>
+						<div class="mui-input-row " style="margin: 10px 5px; ">
+							<textarea id="travle_msg" rows="5" placeholder=" "></textarea>
+						</div>
 					</div>
 				</div>
-			</div>
 			</form>
 		</div>
 	</body>
-	
+
 </html>

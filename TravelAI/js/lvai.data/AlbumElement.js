@@ -24,7 +24,6 @@ var albumElement = function(){
 		for(var i= 0;i<that.imgs.length;i++){
 			
 			var imgSrc = ResourcesServerUrl+that.imgs[i];//plus.io.convertLocalFileSystemURL("_doc/UserAlbum/"+that.imgs[i]);
-			console.log(imgSrc);
 			if(i!=that.indexImg){
 				s+='<img class="mui-media-object" src="../../img/wait.jpg" data-src="'+imgSrc+'" data-preview-src="" data-preview-group="'+that.id+'" style="display: none;" onload="lazyload(this)"  />';
 			}else{
