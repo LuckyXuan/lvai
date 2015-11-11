@@ -90,7 +90,6 @@
 			var fee="免费";
 			var travle_theme;
 			var Traffic;
-			var PartnerNumber;
 			var Destination;
 			var Origin;
 			var Credit;
@@ -112,24 +111,7 @@
 					value: '3',
 					text: '游轮'
 				}]);
-				//旅伴数选择
-				PartnerNumber = new mui.PopPicker();
-				PartnerNumber.setData([{
-					value: '1',
-					text: '1'
-				}, {
-					value: '2',
-					text: '2'
-				}, {
-					value: '3',
-					text: '3'
-				}, {
-					value: '4',
-					text: '4'
-				}, {
-					value: '5',
-					text: '5'
-				}]);
+				
 				//信用等级
 				Credit = new mui.PopPicker();
 				Credit.setData([{
@@ -243,14 +225,29 @@
 			document.addEventListener("plusready", onPlusReady, false);
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
+				    //页面一些初始化
+				    pageInit();
 					//初始化时间选择器
 					menu();
 					costTap();
 					Theme();
 					Requirements();
+					
 				}
 				//费用
-
+			
+			function pageInit(){
+				//选择时间   的初始化     出发时间只能提示今天
+				var d = new Date();
+				var y = d.getFullYear();
+				var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
+				var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
+				document.getElementById("start_time").placeholder = y+'-'+m+'-'+day;
+				
+				
+			}
+			
+			
 			function costTap() {
 					mui("#fee").on('tap', 'div', function() {
 						document.getElementById("fee1").style.borderColor = "#ddd";
@@ -314,7 +311,7 @@
 				});
 			}
 
-			function menu() {
+		function menu() {
 			//添加图片
 			document.getElementById("addImg").addEventListener('tap', function() {
 				plus.gallery.pick(function(e) {
@@ -411,11 +408,29 @@
 			});
 			 //旅伴数量
 			document.getElementById("partnerNumber").addEventListener('tap', function() {
-				PartnerNumber.show(function(items) {
-					document.querySelector("#partnerNumber").value = items[0].text;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				}, '');
+				var that = this;
+				var btnArray = [{
+						title: "1人",
+						value : 1
+					}, {
+						title: "1~5人",
+						value : 5
+					},{
+						title: "5~10人",
+						value : 10
+					},{
+						title: "不限人数",
+						value : 99
+					}];
+					plus.nativeUI.actionSheet({
+						title: "旅伴数量按选取的最大值计算。",  
+						cancel: "取消",
+						buttons: btnArray
+					}, function(e) {
+						//取消  e.index 就是 0 ，所以 不做赋值
+						!e.index||(that.value = btnArray[e.index-1].value);
+					});
+
 			});
 			 //目的地
 			document.getElementById("destinationbtn").addEventListener('tap', function() {
@@ -424,7 +439,7 @@
 					//返回 false 可以阻止选择框的关闭
 					//return false;
 				}, '');
-			});
+			}); 
 			 //出发地
 			document.getElementById("startplacebtn").addEventListener('tap', function() {
 				Origin.show(function(items) {
@@ -435,15 +450,61 @@
 			});
 			 //出发日期
 			document.getElementById("start_time").addEventListener('tap', function() {
-					var dDate = new Date();
-					dDate.setFullYear(2015, 7, 16);
-					var minDate = new Date();
-					minDate.setFullYear(0000, 0, 1);
-					var maxDate = new Date();
-					maxDate.setFullYear(9999, 11, 31);
+					var bir = document.getElementById("start_time");
+					var endBir = document.getElementById("return_time");
+					var arr = bir.value.split('-');
+					
+					var date = new Date();
+					date.setFullYear(arr[0], parseInt(arr[1]) - 1, arr[2]);
+					
 					plus.nativeUI.pickDate(function(e) {
 						var bir = document.getElementById("start_time");
 						var d = e.date;
+						var zuo = new Date();
+						zuo.setDate(zuo.getDate()-1);
+						if(Date.parse(d)<Date.parse(zuo)){
+							mui.alert("出发时间只能选择今天以后,请重新选择！","错误");
+							return;
+						}
+//						
+						var y = d.getFullYear();
+						var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
+						var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
+						bir.value = y + "-" + m + "-" + day;
+						endBir.value = "";
+					}, function(e) {
+						this.value = "您没有选择日期";
+					}, {
+						title: "请选择出发日期",
+						date: date
+					});
+				});
+				//返回日期
+			 document.getElementById("return_time").addEventListener('tap', function() {
+					
+					var startBir = document.getElementById("start_time");
+					if(!startBir.value){
+						mui.alert("请先选择【出发时间】!","警告");
+						return;
+					}
+					var bir = document.getElementById("return_time");
+					var arr = bir.value.split('-');
+					var startArr = startBir.value.split('-');
+					var date = new Date();
+					date.setFullYear(arr[0], parseInt(arr[1]) - 1, arr[2]);
+					var startDate = new Date();
+					startDate.setFullYear(startArr[0], parseInt(startArr[1]) - 1, parseInt(startArr[2])-1);
+					 
+					plus.nativeUI.pickDate(function(e) {
+						var bir = document.getElementById("return_time");
+						var d = e.date;
+						
+						if(Date.parse(d)<Date.parse(startDate)){ 
+							
+							mui.alert("返回时间必须在出发时间当天以及以后,请重新选择！","错误");
+							return;
+						}
+						
 						var y = d.getFullYear();
 						var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
 						var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
@@ -451,34 +512,10 @@
 					}, function(e) {
 						this.value = "您没有选择日期";
 					}, {
-						title: "请选择日期",
-						date: dDate
+						title: "请选择返回日期",
+						date: date,
 					});
-				})
-				//返回日期
-			 document.getElementById("return_time").addEventListener('tap', function() {
-				var dDate = new Date();
-				dDate.setFullYear(2015, 7, 16);
-				var minDate = new Date();
-				minDate.setFullYear(0000, 0, 1);
-				var maxDate = new Date();
-				maxDate.setFullYear(9999, 11, 31);
-				plus.nativeUI.pickDate(function(e) {
-					var bir = document.getElementById("return_time");
-					var d = e.date;
-					var y = d.getFullYear();
-					var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
-					var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
-					bir.value = y + "-" + m + "-" + day;
-				}, function(e) {
-					this.value = "您没有选择日期";
-				}, {
-					title: "请选择日期",
-					date: dDate,
-					minDate: minDate,
-					maxDate: maxDate
 				});
-			})
 			}
 			/**
 			 * 发布旅行。
@@ -523,17 +560,20 @@
 				console.log(travel.pic3 = Images[2].getAttribute("src")?Images[2].getAttribute("src"):"");
 				
 				travel.reg_fee = 10.0;
+				
 				var travelDAL = new TravelDal();
 				travelDAL.travel = travel;
 				var traveW = plus.nativeUI.showWaiting("信息发布中...");
 				travelDAL.UpLoadStara(function(_msg) {
 					mui.toast("发布成功！");
 					traveW.close();
+					plus.webview.currentWebview().close();
 				}, function(e) {
 					mui.toast(e);
 					traveW.close();
 				});
 			}
+			
 		</script>
 	</head>
 
@@ -570,11 +610,11 @@
 							</div>
 							<div class="mui-input-row">
 								<label>出发时间</label>
-								<input type="text" id='start_time' class="mui-right " placeholder="2015-9-20">
+								<input type="text" id='start_time' class="mui-right" readOnly="true"  placeholder="请选择">
 							</div>
 							<div class="mui-input-row">
 								<label>返回时间</label>
-								<input type="text" id='return_time' class="mui-right" placeholder="2015-9-20">
+								<input type="text" id='return_time' class="mui-right" readOnly="true" placeholder="请选择">
 							</div>
 							<div class="mui-input-row">
 								<label>交通方式</label>
@@ -616,7 +656,7 @@
 					<div class="mui-card ">
 						<div class="mui-input-row ">
 							<label>旅伴数量</label>
-							<input id="partnerNumber" type="text" class="mui-right " placeholder="1 ">
+							<input id="partnerNumber" type="text" class="mui-right " readonly="true" placeholder="1 " value="1">
 						</div>
 						<div class="mui-input-row">
 						<label style="width: 100%; "> 对旅伴的要求?</label>

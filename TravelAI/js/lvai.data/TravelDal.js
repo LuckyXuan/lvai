@@ -60,7 +60,10 @@ var TravelDal = function() {
 		if(that.travel.pic3){
 			imgs.push(that.travel.pic3);	
 		}
-		
+		if(!imgs.length){
+			successHandler();
+			return;
+		}
 		for (var i = 0; i < imgs.length; i++) {
 			savePath = "_doc/TravelPhoto/" + filePath;
 			fileTool.ImgFileCompress(imgs[i], savePath, "15%", function(existPath, savePath) {
