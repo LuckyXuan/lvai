@@ -354,15 +354,16 @@ var UserDAL = function() {
 			for (var i = 0; i < filess.length; i++) {
 				var f = filess[i];
 				task.addFile(f.path, {
-					key: f.name
+					key: f.path
 				});
+				task.addData("filename",f.name);
 			}
 			console.log("开始上传");
 			task.start();
 		}
-		//个人音频上传
+		//个人视频上传
 		//phone:手机号
-		//files:音频文件
+		//files:视频文件
 	this.uploadVideo = function(phone, files, type, successHandler, faildHandler) {
 			var filess = files;
 			var task = plus.uploader.createUpload(UploadServer, {

@@ -61,7 +61,7 @@ var TravelDal = function() {
 			imgs.push(that.travel.pic3);	
 		}
 		if(!imgs.length){
-			successHandler();
+			faildHandler();
 			return;
 		}
 		for (var i = 0; i < imgs.length; i++) {
