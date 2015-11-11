@@ -62,8 +62,6 @@
 				pageInit();
 				pageOnload();
 				PageRender();
-				//fromInit();
-				//MenuInit();
 			};
 			/**
 			 * 页面初始化函数，加载HTML，但是不加载数据。
@@ -74,8 +72,8 @@
 				plus.webview.currentWebview().setStyle({
 					scrollIndicator: 'none'
 				});
-				//AddCarPhotoUi();
 				MenuInit();
+				webListener();
 			};
 			/**
 			 *页面加载完成发生。
@@ -117,7 +115,6 @@
 			}
 
 			function renderCarInfo() {
-				
 				if (carInfo.car_brand) {
 					document.querySelector("#car_brand").value = carInfo.car_brand;
 				}
@@ -131,7 +128,7 @@
 				carPhoto[1] = carInfo.car_photo2;
 				carPhoto[2] = carInfo.car_photo3;
 			};
-			 //下载车辆图片并显示车辆图片
+			 //显示车辆图片
 			function PageShowPhoto() {
 				for (var index = 0; index < carPhoto.length; index++) {
 					if (!carPhoto[index]) {
@@ -166,7 +163,6 @@
 				//点击已有图片更改图片的事件
 				mui('#loveCarPhoto').on('tap', 'img', function(e) {
 					var loveIndex = Number(this.getAttribute("LoveIndex"));
-					console.log(loveIndex);
 					var that = this;
 					plus.gallery.pick(function(path) {
 						var savePath = "_doc/CarPhoto/thumbCarPhoto/" + userInfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
@@ -213,7 +209,7 @@
 					
 					
 				}, false);
-				
+
 				//添加爱车靓照按钮
 				document.querySelector("#loveCarPhoto div").addEventListener('tap', function() {
 					plus.gallery.pick(function(path) {
@@ -322,6 +318,17 @@
 					});
 				});
 			};
+			 //webview的监听
+			function webListener() {
+				window.addEventListener("page:change", webViewChange);
+			};
+			function webViewChange()
+			{
+				photoindex = 0;
+				$('#loveCarPhoto img').remove(); 
+				pageOnload();
+				PageRender();
+			}
 		</script>
 	</head>
 

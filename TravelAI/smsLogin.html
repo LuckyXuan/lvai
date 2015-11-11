@@ -6,9 +6,100 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<title></title>
 		<script src="js/mui.min.js"></script>
+		<script type="text/javascript" src="js/lvai.data/config.js"></script>
+		<script type="text/javascript" src="js/lvai.base/JsonTools.js"></script>
+		<script type="text/javascript" src="js/lvai.data/WebService2.js"></script>
+		<script type="text/javascript" src="js/lvai.data/UserDAL.js"></script>
+		<script type="text/javascript" src="js/lvai.base/Utility.js"></script>
+		<script type="text/javascript" src="js/lvai.base/localStorageUtils.js"></script>
 		<link href="css/mui.min.css" rel="stylesheet" />
 		<script type="text/javascript" charset="utf-8">
 			mui.init();
+			 // 扩展API加载完毕后调用onPlusReady回调函数 
+			document.addEventListener("plusready", onPlusReady, false);
+			 // 扩展API加载完毕，现在可以正常调用扩展API 
+			function onPlusReady() {
+				/*页面初始化，加载页面元素*/
+				pageInit();
+				pageOnload();
+				PageRender();
+			};
+			 //初始化
+			function pageInit() {
+				//仅支持竖屏显示
+				plus.screen.lockOrientation("portrait-primary");
+				MenuInit();
+			};
+			 //加载本地
+			function pageOnload() {};
+			 //显示页面
+			function PageRender() {};
+			 //按钮监听事件
+			function MenuInit() {
+					//打开主界面
+					document.getElementById('btnReg').addEventListener('tap', function() {
+						var tel = document.getElementById("txtTel").value;
+						var code = document.getElementById("txtCode").value;
+						if (tel == "" || code == "") {
+							mui.toast("手机号和验证码不能为空");
+							return;
+						}
+						if (!Utility.checkPhone(tel)) {
+							mui.toast("手机号输入错误");
+							return;
+						}
+						new UserDAL().validSMSCode(tel, code,
+							function(_args) {
+								//new localStorageUtils().setItem("userCar", "");
+								mui.toast("欢迎回来");
+								mui.openWindow({
+									url: 'protal/main.html',
+									id: 'main',
+									show: {
+										aniShow: 'pop-in'
+									}
+								});
+							},
+							function(_args) {
+								mui.toast(_args.msg)
+							}
+						);
+					});
+					//获取验证码部分
+					document.getElementById('btnGetVailCode').addEventListener('tap', function() {
+						var tel = document.getElementById("txtTel").value;
+						if (Utility.checkPhone(tel)) {
+							new UserDAL().getLoginCode(tel,
+								function(_args) {
+									ShowDownTime();
+								}, //成功的函数
+								function(_args) {
+									mui.toast(_args);
+								} //失败的函数
+							);
+						} else {
+							mui.toast("号码不正确");
+						}
+					});
+				}
+				/**
+				 * 显示倒计时
+				 */
+
+			function ShowDownTime() {
+				var s = 60;
+				var btn = document.getElementById("btnGetVailCode");
+				btn.disabled = true;
+				var time = setInterval(function() {
+					s--;
+					btn.innerHTML = s + "秒后获取";
+					if (s < 0) {
+						btn.disabled = false;
+						btn.innerHTML = "获取验证码";
+						clearInterval(time);
+					}
+				}, 1000);
+			};
 		</script>
 	</head>
 

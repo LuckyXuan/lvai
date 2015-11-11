@@ -14,10 +14,12 @@
 		<script type="text/javascript" src="js/lvai.data/WebService2.js"></script>
 		<script type="text/javascript" src="js/lvai.base/localStorageUtils.js"></script>
 		<script type="text/javascript" src="js/extends/extends.js"></script>
-		<script type="text/javascript" src="js/lvai.base/JsonTools.js" ></script>
+		<script type="text/javascript" src="js/lvai.base/JsonTools.js"></script>
 		<link href="css/mui.min.css" rel="stylesheet" />
 		<style>
-			a{text-decoration: none;}
+			a {
+				text-decoration: none;
+			}
 		</style>
 		<script type="text/javascript" charset="utf-8">
 			var wt = null;
@@ -35,15 +37,32 @@
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
 				SetBackEvent();
+				DataInit();
 				OnPreload();
 				MenuInit();
-				DataInit();
+			};
+
+			function DataInit() {
+				var u = new UserDAL().getUserInfo();
+				if (u) {
+					document.getElementById("txtTel").value = u.user_telphone;
+				}
+			};
+			 //预加载
+			function OnPreload() {
+				reg = mui.preload({
+					"id": 'reg',
+					"url": 'reg.html'
+				});
+				smsLogin = mui.preload({
+					"id": 'smsLogin',
+					"url": 'smsLogin.html'
+				});
 			};
 
 			function MenuInit() {
 				//打开主界面
 				document.getElementById('btnLogin').addEventListener('tap', function() {
-					
 					var tel = document.getElementById("txtTel").value;
 					var pwd = document.getElementById("txtPwd").value;
 					if (tel == "" || pwd == "") {
@@ -61,8 +80,18 @@
 						wt.close();
 					}
 					dal.successLoginHandler = function(_args) {
-						//mui.toast(_args.toString())
-						GetCarData(_args);
+						mui.toast("欢迎回来： " + _args.user_nikeName);
+						mui.openWindow({
+							url: 'protal/main.html',
+							id: 'main',
+							show: {
+								aniShow: 'pop-in'
+							},
+							waiting: {
+								autoShow: false
+							}
+						});
+						wt.close();
 					}
 					dal.login(tel, pwd);
 				});
@@ -82,7 +111,7 @@
 					}, 0);
 				});
 				//忘记密码时按钮监听
-				document.getElementById("smsLogin").addEventListener('tap',function(){
+				document.getElementById("smsLogin").addEventListener('tap', function() {
 					mui.fire(smsLogin, 'show', null);
 					setTimeout(function() {
 						mui.openWindow({
@@ -97,51 +126,6 @@
 					}, 0);
 				});
 			};
-			 //预加载
-			function OnPreload() {
-				reg = mui.preload({
-					"id": 'reg',
-					"url": 'reg.html'
-				});
-				smsLogin = mui.preload({
-					"id": 'smsLogin',
-					"url": 'smsLogin.html'
-				});
-			};
-			 //获取车辆信息
-			function GetCarData(_args) {
-				console.log(_args.user_telphone)
-				new UserDAL().getCarInfo(_args.user_telphone, function() {
-					//获取车辆成功，显示车辆信息
-					mui.toast("欢迎回来： " + _args.user_nikeName);
-					mui.openWindow({
-						url: 'protal/main.html',
-						id: 'main',
-						show: {
-							aniShow: 'pop-in'
-						},
-						waiting:{
-							autoShow:false
-						}
-					});
-					wt.close();
-				}, function() {
-					//获取车辆失败
-					mui.toast("未能登录，请检查网络");
-					wt.close();
-				});
-			};
-			
-			function DataInit() {
-				var u = new localStorageUtils().getItem("userInfo");
-				if(u)
-				{
-					var uinfo = new JsonTools().stringToJson(u);
-					document.getElementById("txtTel").value = uinfo.user_telphone;
-				}
-			}
-
-
 		</script>
 	</head>
 

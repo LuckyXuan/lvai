@@ -20,57 +20,79 @@
 			var ws = null,
 				menu = null,
 				page = new Array();
+			var userInfo = null;
 			 //mui初始化
 			mui.init();
 			 // 扩展API加载完毕后调用onPlusReady回调函数 
 			document.addEventListener("plusready", onPlusReady, false);
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
-					//1页面初始化
-					pageInit();
-					//2页面数据载入
-					pageLoad();
-					//3页面数据展示
-					pageRender();
-					//4加载网络数据
-					loadData();
-					//5显示网络数据
-					renderData();
-				}
-				//1页面初始化
-
+				//页面初始化
+				pageInit();
+				//页面数据载入
+				pageLoad();
+				//页面数据展示
+				pageRender();
+				//发送请求
+				SendNetData();
+				//加载网络数据
+				loadData();
+				//显示网络数据
+				renderData();
+			};
+			 //页面初始化
 			function pageInit() {
-					//仅支持竖屏显示
-					plus.screen.lockOrientation("portrait-primary");
-					//退出设置
-					SetBackEvent();
-					//菜单的事件
-					MenuInit();
-					//预加载
-					//OnPreload();
-				}
-				//2页面数据载入
-
+				//仅支持竖屏显示
+				plus.screen.lockOrientation("portrait-primary");
+				//退出设置
+				SetBackEvent();
+				//菜单的事件
+				MenuInit();
+				//预加载
+				//OnPreload();
+			};
+			 //页面数据载入
 			function pageLoad() {
-					ws = plus.webview.currentWebview();
-				}
-				//3页面数据展示
-
+				ws = plus.webview.currentWebview();
+				userInfo = new UserDAL().getUserInfo();
+			};
+			 //页面数据展示
 			function pageRender() {
-					//默认加载第一页  
-					document.querySelector("header").style.visibility = "visible";
-					preateHide(ws, {
-						id: "travel/travel.html"
-					}, "45px", "51px", document.body.clientWidth);
-				}
-				//4加载网络数据
-
-			function loadData() {}
-				//5显示网络数据
-
-			function renderData() {}
-				//子页面切换
-
+				//默认加载第一页  
+				document.querySelector("header").style.visibility = "visible";
+				preateHide(ws, {
+					id: "travel/travel.html"
+				}, "45px", "51px", document.body.clientWidth);
+			};
+			 //发送请求例如GPS
+			function SendNetData() {
+				//gps获取发送
+				var userDal = new UserDAL();
+				var userinfo = userDal.getUserInfo();
+				plus.geolocation.getCurrentPosition(function(p) {
+					var gps = new JsonTools().jsonObjToString(p);
+					if (!p.addresses) {
+						alert("获取位置失败，请检查是否允许程序获取位置信息");
+					} else {
+						var lat = p.coords.latitude;
+						var lng = p.coords.longitude;
+						new UserDAL().GPSLocation(userinfo.user_telphone, lat, lng, function(_msg) {
+							mui.toast('位置更新成功');
+						}, function(_msg) {
+							mui.toast(_msg);
+						});
+					}
+				}, function(e) {
+					alert("获取百度定位位置信息失败：" + e.message);
+				}, {
+					provider: 'baidu'
+				});
+			};
+			 //加载网络数据
+			function loadData() {};
+			 //显示网络数据
+			function renderData() {};
+			 //按钮的监听
 			function MenuInit() {
 				mui('.mui-bar.mui-bar-tab').on('tap', 'a', function(e) {
 					var top = '0px',
@@ -82,29 +104,10 @@
 					}
 					preateHide(ws, this, top, bom, document.body.clientWidth);
 				}, false);
-				document.querySelector(".mui-btn").addEventListener('tap', function() {
-					//获取gps定位
-				});
 				//用户签到
 				document.querySelector("header>button").addEventListener('tap', function() {
-					console.log("ss");
-					var userDal = new UserDAL();
-					//获取 用户对象
-					var userinfo = userDal.getUserInfo();
-					plus.geolocation.getCurrentPosition(function(p) {
-						var gps = new JsonTools().jsonObjToString(p);
-						console.log(gps);
-						alert("地址" + p.addresses);
-					}, function(e) {
-						alert("获取百度定位位置信息失败：" + e.message);
-					}, {
-						
-						provider: 'baidu'
-					});
+					
 				});
-			
-		
-			
 			};
 			 //			function OnPreload() {
 			 //				ws.append(CreatePage("msg/msgList.html", "msg", "0px", "51px",document.body.clientWidth, false));
