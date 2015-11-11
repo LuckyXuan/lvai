@@ -668,6 +668,7 @@
 				ab.initAlbumObj();
 				ab.setFun('tap', function() {
 					//alert(this.id); 
+					// 封面tap事件
 				});
 				ab.setFun('longtap', function() {
 					var that = this;
@@ -676,7 +677,20 @@
 							case 0: //确认
 								//1，向服务器发起  删除相册请求      Album.id为标识符
 								//2成功回调 就删除本地
-								abRoom.removeChild(that);
+								
+								var album_id = that.id.substring(that.id.lastIndexOf('_')+1);
+								var deleteW = plus.nativeUI.showWaiting("正在删除中...");
+								new UserDAL().deleteAlbumModel(userInfo.user_telphone,album_id,function(_msg){
+									abRoom.removeChild(that);
+									deleteW.close();
+									mui.toast("删除相册文件夹成功！");
+								},function(e){
+									mui.toast("删除失败！");
+									deleteW.close();
+									console.log(e.msg);
+								});
+								
+								
 								break;
 							case 1: //取消
 								break;

@@ -569,5 +569,41 @@ var UserDAL = function() {
 			mui.toast("相册服务器连接失败");
 		}
 	}
+	
+	/**
+	 * 删除一个相册
+	 * tel :手机号
+	 * album_id : 相册id
+	 */
+	this.deleteAlbumModel = function(tel,album_id,callbackHandler,faildHandler){
+		var ws = new WebService(mui);
+		ws.setUrl(WebServiceURL);
+		ws.setOpName("deleteAlbumModel");
+		ws.setParas({
+			tel: tel,
+			album_id:album_id
+		});
+		ws.setCallBack(callback);
+		ws.setErrorCall(errorCallback);
+		ws.LoadData();
 
+		//成功的回调
+		function callback(data) {
+			var msg = eval(data);
+			msg = msg.d;
+
+			msg = new JsonTools().stringToJson(msg);
+			if (msg.status == "faild") {
+				faildHandler(msg.msg);
+				return;
+			}
+			callbackHandler(msg);
+		}
+
+		//失败的提示
+		function errorCallback(e) {
+			//mui.toast(JSON.stringify(e));
+			mui.toast("相册服务器连接失败");
+		}
+	}
 }
