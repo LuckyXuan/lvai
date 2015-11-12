@@ -51,8 +51,10 @@ var TravelDal = function() {
 		var filePath = that.travel.promoter_userid + "_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
 		var savePath = "";
 		var imgs = [];
+		
 		if(that.travel.pic1){
 			imgs.push(that.travel.pic1);	
+			console.log(that.travel.pic1);
 		}
 		if(that.travel.pic2){
 			imgs.push(that.travel.pic2);	
@@ -195,16 +197,16 @@ var TravelDal = function() {
 		that.RealseTravel(function(_msg){ 
 			that.UploadPic(function(responseText){ 
 				if(responseText.status=="faild"){
-					failFun("图片发布失败！"); 
+					succesFun({text:true,img:false});
 					return; 
 				}
-				succesFun(responseText);
-			},function(){ 
-				failFun("图片发布失败！");
-				console.log("图片发布失败！");
+				succesFun({text:true,img:true});
+			},function(e){ 
+				succesFun({text:true,img:false});
+				console.log("文字发布成功，图片发布失败！");
 			});//UploadPic
 		},function(){ 
-			failFun("信息发布失败！");
+			failFun({text:false,img:false});
 			console.log("信息发布失败！");
 		});//RealseTravel
 	}

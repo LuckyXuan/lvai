@@ -680,7 +680,7 @@
 								
 								var album_id = that.id.substring(that.id.lastIndexOf('_')+1);
 								var deleteW = plus.nativeUI.showWaiting("正在删除中...");
-								new UserDAL().deleteAlbumModel(userInfo.user_telphone,album_id,function(_msg){
+								new UserDAL().deleteAlbum(userInfo.user_telphone,album_id,function(_msg){
 									abRoom.removeChild(that);
 									deleteW.close();
 									mui.toast("删除相册文件夹成功！");

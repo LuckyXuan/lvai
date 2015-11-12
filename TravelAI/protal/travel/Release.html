@@ -522,6 +522,11 @@
 			 */
 			function btnReleaseClick()
 			{
+				if(!(document.querySelector("#start_time").value&&document.querySelector("#return_time").value)){
+					mui.alert("【出发时间】【返回时间】为空！","警告");
+					return;
+				}
+				
 				var travel=new travelModel();
 				travel.promoter_userid=new UserDAL().getUserInfo().user_telphone;				
 				travel.destination=document.querySelector("#destination").value;
@@ -565,11 +570,14 @@
 				travelDAL.travel = travel;
 				var traveW = plus.nativeUI.showWaiting("信息发布中...");
 				travelDAL.UpLoadStara(function(_msg) {
-					mui.toast("发布成功！");
+					var text = _msg.text?"成功":"失败";
+					var img = _msg.img?"成功":"失败";
+					mui.toast("信息发布"+text+"!"+"图片发布"+img+"!");
 					traveW.close();
 					plus.webview.currentWebview().close();
 				}, function(e) {
-					mui.toast(e);
+					mui.toast("发布失败！");
+					//mui.toast(e);
 					traveW.close();
 				});
 			}

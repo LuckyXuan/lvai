@@ -575,10 +575,10 @@ var UserDAL = function() {
 	 * tel :手机号
 	 * album_id : 相册id
 	 */
-	this.deleteAlbumModel = function(tel,album_id,callbackHandler,faildHandler){
+	this.deleteAlbum = function(tel,album_id,callbackHandler,faildHandler){
 		var ws = new WebService(mui);
 		ws.setUrl(WebServiceURL);
-		ws.setOpName("deleteAlbumModel");
+		ws.setOpName("deleteAlbum");
 		ws.setParas({
 			tel: tel,
 			album_id:album_id
