@@ -249,7 +249,6 @@
 		<script type="text/javascript" charset="utf-8">
 			var wt; //等待对象
 			 //页面对象
-			var recordShow_button = null;
 			var listCar;
 			var listCarWidth;
 			 //车辆对象
@@ -278,9 +277,7 @@
 				iv = null,
 				w = null;
 			 //页面对象
-			var item1 = null,
-				item2 = null,
-				item3 = null;
+			var playAudio = null;
 			/*MUI页面初始化*/
 			mui.init({
 				gestureConfig: {
@@ -321,11 +318,7 @@
 					RenderData();
 				}
 				listCarWidth = plus.webview.currentWebview().listCarWidth;
-				 
 				new localStorageUtils().setItem("HeadPhotoBase64", "");
-				item1 = document.getElementById("item1mobile");
-				item2 = document.getElementById("item2mobile");
-				item3 = document.getElementById("item3mobile");
 				systemUi();
 				CarPhotoUi();
 				OnPreload();
@@ -509,14 +502,11 @@
 				}
 				//修改审核状态
 				document.querySelector("#recordShow > span").innerHTML = userAudio.audio_state;
-				//移除所有时间绑定
-				if (recordShow_button) {
-					recordShow_button.removeEventListener('tap');
-				}
-				//修改播放的时间--改变播放的地址
-				recordShow_button = document.querySelector("#recordShow button").addEventListener('tap', function() {
-					alert(2222);
-				});
+				//修改播放的事件--改变播放的地址
+				playAudio = null;
+				var url = ResourcesServerUrl + userAudio.audio_url;
+				console.log(url);
+				playAudio = plus.audio.createPlayer(url);
 				//当有音频则可看
 				document.querySelector("#recordShow").style.visibility = "visible";
 			};
@@ -677,20 +667,17 @@
 							case 0: //确认
 								//1，向服务器发起  删除相册请求      Album.id为标识符
 								//2成功回调 就删除本地
-								
-								var album_id = that.id.substring(that.id.lastIndexOf('_')+1);
+								var album_id = that.id.substring(that.id.lastIndexOf('_') + 1);
 								var deleteW = plus.nativeUI.showWaiting("正在删除中...");
-								new UserDAL().deleteAlbum(userInfo.user_telphone,album_id,function(_msg){
+								new UserDAL().deleteAlbum(userInfo.user_telphone, album_id, function(_msg) {
 									abRoom.removeChild(that);
 									deleteW.close();
 									mui.toast("删除相册文件夹成功！");
-								},function(e){
+								}, function(e) {
 									mui.toast("删除失败！");
 									deleteW.close();
 									console.log(e.msg);
 								});
-								
-								
 								break;
 							case 1: //取消
 								break;
@@ -747,7 +734,7 @@
 			function MenuInit() {
 				//照片选项栏选中事件
 				document.querySelector('.mui-slider').addEventListener('slide', function(event) {
-					mui('.mui-scroll-wrapper').scroll().scrollTo(0,0,100);
+					mui('.mui-scroll-wrapper').scroll().scrollTo(0, 0, 100);
 					switch (event.detail.slideNumber) {
 						case 0:
 							break;
@@ -1145,6 +1132,15 @@
 						multiple: true //可选择是否多张图片选择
 					});
 					mui.toast("您最多一次可以选择上传9张图片");
+				});
+				//播放音频
+				document.querySelector("#recordShow button").addEventListener('tap', function() {
+					alert("ss");
+					playAudio.play(function() {
+						alert("Audio play success!");
+					}, function(e) {
+						alert("Audio play error: " + e.message);
+					});
 				});
 			};
 			 //webview的监听
