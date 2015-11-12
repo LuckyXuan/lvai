@@ -1102,7 +1102,7 @@
 						for (var i = 0; i < l; i++) {
 							var path = plus.io.convertLocalFileSystemURL(e.files[i]);
 							var savePath = "_doc/UserAlbum/" + userInfo.user_telphone + "_" + new Date().toFormatString("yyyyMMddhhmmss") + "_" + i + ".png";
-							fileTool.ImgFileCompress(path, savePath, "50%", function(existPath, savePath) {
+							fileTool.ImgFileCompress(path, savePath, "30%", function(existPath, savePath) {
 								files.push({
 									name: savePath,
 									path: savePath

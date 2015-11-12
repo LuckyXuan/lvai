@@ -237,12 +237,16 @@
 				//费用
 			
 			function pageInit(){
-				//选择时间   的初始化     出发时间只能提示今天
+				//选择时间   的初始化     出发返回时间默认今天
 				var d = new Date();
 				var y = d.getFullYear();
 				var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
 				var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
-				document.getElementById("start_time").placeholder = y+'-'+m+'-'+day;
+				
+//				document.getElementById("start_time").placeholder = y+'-'+m+'-'+day;
+//				document.getElementById("return_time").placeholder = y+'-'+m+'-'+day;
+				document.getElementById("start_time").value = y+'-'+m+'-'+day;
+				document.getElementById("return_time").value = y+'-'+m+'-'+day;
 				
 				
 			}
@@ -535,7 +539,7 @@
 				travel.return_time=document.querySelector("#return_time").value;
 				travel.transportation=document.querySelector("#transportation").value;
 				travel.fee=fee;
-				alert(travel.fee);
+				//alert(travel.fee);
 				//travle_theme
 				var themes = document.querySelectorAll("#Selectedtheme>div");
 				for (var i = 0; i < themes.length; i++) {
