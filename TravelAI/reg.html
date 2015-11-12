@@ -81,35 +81,40 @@
 				}, 1000);
 			};
 		</script>
+		<style>
+			.bg{ background: transparent;}
+		    	::-webkit-input-placeholder { color:#ececec; }
+		</style>
 	</head>
 
-	<body>
-		<header class="mui-bar mui-bar-nav">
+	<body style="background-color: #ff669c;">
+		<header class="mui-bar mui-bar-nav" style="background-color: #ff669c; ">
 			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 			<h1 class="mui-title">手机号注册</h1>
 		</header>
-		<div class="mui-content">
+		<div class="mui-content bg">
 			<div class="mui-slider-group">
-				<div class="mui-slider-item mui-slider-item-duplicate">
-					<img id="tupian" width="100%" src="img/reg_Log.jpg">
+				<div class="mui-slider-item mui-slider-item-duplicate" style="text-align: center;">
+					<img id="tupian" style="width: 40%;margin-top: 10%;" src="img/mark.png">
+					<img id="tupian" style="width: 80%;margin-top: 1%;" src="img/33.png">
 				</div>
 			</div>
-			<div class="mui-card" style="margin-top: 5%; ">
-				<form class="mui-input-group">
+			<div class="mui-card bg" style="margin-top: 5%; ">
+				<form class="mui-input-group bg">
 					<div class="mui-input-row">
-						<label style="font-size: 14px; width: 25%; color: #666;">手机号</label>
-						<input id="txtTel" type="tel" style="font-size: 14px; width: 45%; float: left; " placeholder="请输入手机号">
-						<button id="btnGetVailCode" type="button" class="mui-btn mui-pull-left" style=" padding: 5px; height: 85%; width: 30%; margin-top: 3px; font-size: 11px; color: #666; float: left;  ">
+						<label style="font-size: 14px; width: 25%; color: #ececec;">手机号</label>
+						<input id="txtTel" type="text" style="font-size: 14px; width: 45%; float: left; " placeholder="请输入手机号">
+					</div>
+					<div class="mui-input-row">
+						<label style="font-size: 14px; width: 25%; color: #ececec;">验证码</label>
+						<input id="txtCode" type="text" style="font-size: 14px; width: 45%; float: left; " placeholder="请输入验证码">
+						<button id="btnGetVailCode" type="button" class="mui-btn mui-pull-left bg" style=" padding: 5px; height: 85%; width: 30%; margin-top: 3px; font-size: 11px; color: #ececec; float: left;  ">
 							获取验证码
 						</button>
 					</div>
-					<div class="mui-input-row">
-						<label style="font-size: 14px; width: 25%; color: #666;">验证码</label>
-						<input id="txtCode" type="text" style="font-size: 14px; width: 45%; float: left; " placeholder="请输入验证码">
-					</div>
 				</form>
 			</div>
-			<button id="btnReg" class="mui-btn mui-btn-primary mui-btn-block" style="margin: auto; width: 50%; margin-top: 5%; ">进入旅爱</button>
+			<button id="btnLogin" class="mui-btn  bg" style=" display: block; border: 0px solid red; margin: auto; width: 50%; height: 40%; margin-top: 20%;margin-left: 27%; border-radius: 10px; background-image: url(img/btn.PNG); background-size: 100% 100%; ">　</button>
 		</div>
 	</body>
 

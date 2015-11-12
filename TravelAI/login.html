@@ -20,6 +20,8 @@
 			a {
 				text-decoration: none;
 			}
+			.bg{ background: transparent;}
+		    	::-webkit-input-placeholder { color:#ececec; }
 		</style>
 		<script type="text/javascript" charset="utf-8">
 			var wt = null;
@@ -111,6 +113,7 @@
 					}, 0);
 				});
 				//忘记密码时按钮监听
+				/*
 				document.getElementById("smsLogin").addEventListener('tap', function() {
 					mui.fire(smsLogin, 'show', null);
 					setTimeout(function() {
@@ -125,40 +128,45 @@
 						});
 					}, 0);
 				});
+				*/
 			};
 		</script>
 	</head>
 
-	<body>
-		<header class="mui-bar mui-bar-nav">
+	<body style="background-color: #ff669c;">
+		<header class="mui-bar mui-bar-nav bg" style="background-color: #ff669c;">
 			<button id="btnReg" class="mui-btn mui-btn-link mui-btn-nav mui-pull-right">
 				注册
 				<span class="mui-icon mui-icon-right-nav"></span>
 			</button>
-			<h1 class="mui-title">登录</h1>
+			<h1 class="mui-title" style="color: #ececec;">登录</h1>
 		</header>
-		<div class="mui-content">
+		<div class="mui-content bg">
 			<div class="mui-slider-group">
-				<div class="mui-slider-item mui-slider-item-duplicate">
-					<img id="tupian" width="100%" src="img/login_Log.jpg">
+				<div class="mui-slider-item mui-slider-item-duplicate" style="text-align: center;">
+					<img id="tupian" style="width: 40%;margin-top: 10%;" src="img/mark.png">
+					<img id="tupian" style="width: 80%;margin-top: 1%;" src="img/33.png">
 				</div>
 			</div>
-			<div class="mui-card" style="margin-top: 5%; ">
-				<form class="mui-input-group">
+			<div class="mui-card bg" style="margin-top: 5%; ">
+				<form class="mui-input-group bg">
 					<div class="mui-input-row">
-						<label style="font-size: 14px; width: 25%; color: #666;">手机号</label>
+						<label style="font-size: 14px; width: 25%; color: #ececec;">手机号</label>
 						<input id="txtTel" type="tel" style="font-size: 14px; width: 70%; " placeholder="请输入您的手机号">
 					</div>
 					<div class="mui-input-row">
-						<label style="font-size: 14px; width: 25%; color: #666;">密　码</label>
+						<label style="font-size: 14px; width: 25%; color: #ececec;">密　码</label>
 						<input id="txtPwd" type="password" style="font-size: 14px; width: 70%; " placeholder="请输入您的密码">
 					</div>
 				</form>
 			</div>
-			<button id="btnLogin" class="mui-btn mui-btn-primary mui-btn-block" style="margin: auto; width: 50%; margin-top: 5%; ">进入旅爱</button>
-			<div style="text-align: center; margin-top: 10%;">
-				<a id="smsLogin"><span>忘记密码？有账号无密码？</span></a>
+			<div style="text-align: center;">
+				<img id="button_bg" src="img/22.png" width="60%" style="margin: auto; left: 20%; position: fixed; bottom: 0; " />			
+				<button id="btnLogin" class="mui-btn  bg" style=" display: block; border: 0px solid red; margin: auto; width: 50%; height: 40%; margin-top: 45%;margin-left: 27%; border-radius: 10px; background-image: url(img/btn.PNG); background-size: 100% 100%; ">　</button>
 			</div>
+			<!--<div style="text-align: center; margin-top: 10%;">
+				<a id="smsLogin"><span>忘记密码？有账号无密码？</span></a>
+			</div>-->
 		</div>
 	</body>
 
