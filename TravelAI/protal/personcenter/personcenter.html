@@ -263,7 +263,8 @@
 			var fileDownLoad;
 			var headPhotoFileInfoIsLoad = false,
 				carFileInfoIsLoad = false,
-				userPhotoBg = false,
+				userPhotoBgFileInfoIsLoad = false,
+				userAudioFileInfoIsLoad = false,
 				albumInfoIsLoad = true,
 				albumIsShow = false;
 			 //个人中心各个对象
@@ -272,12 +273,12 @@
 				userAudio = null,
 				albumInfo = null;
 			 //音频设备对象
-			var record = null,
+			var record = null, //录音对象
 				t = null,
 				iv = null,
-				w = null;
-			 //页面对象
-			var playAudio = null;
+				w = null,
+				playAudio = null, //播放对象
+				playAudioUrl = null;
 			/*MUI页面初始化*/
 			mui.init({
 				gestureConfig: {
@@ -345,8 +346,8 @@
 			};
 			 //获取网络数据（只包括资料页面）
 			function getNetData() {
-				//网络数据是否加载完毕的标识（只要有图片的请求）
-				var IsGetNetDataOver = 1;
+				//网络数据是否加载完毕的标识（图片,视频，音频的请求）
+				var IsGetNetDataOver = 2;
 				//获取车辆信息本地化。。并渲染初步数据
 				new UserDAL().getCarInfo(userInfo.user_telphone, function() {
 					LoadCarInfo();
@@ -365,9 +366,19 @@
 				//获取音频信息
 				new UserDAL().getUserAudio(userInfo.user_telphone, function() {
 					LoadUserAudio();
-					renderUserAudio();
+					//修改审核状态
+					document.querySelector("#recordShow > span").innerHTML = userAudio.audio_state;
+					//renderUserAudio();
+					IsGetNetDataOver--;
+					if (IsGetNetDataOver == 0) {
+						LoadData();
+					}
 				}, function() {
 					mui.toast("音频信息获取失败！");
+					IsGetNetDataOver--;
+					if (IsGetNetDataOver == 0) {
+						LoadData();
+					}
 				});
 				//获取视频信息
 				//获取礼物
@@ -378,6 +389,7 @@
 				loadUserHeadPhoto();
 				loadUserPhotoBgNetData();
 				loadCarPhotoNetData();
+				loadUserAudioNetData();
 				//loadAlbumData();
 			};
 			/**
@@ -387,6 +399,7 @@
 				renderHeadPhoto();
 				renderUserPhotoBg();
 				renderCarPhoto();
+				renderUserAudio();
 				//renderAlbumInfo();
 			};
 			/***
@@ -476,15 +489,15 @@
 				if (carInfo.car_type) {
 					document.querySelector("#car_type").innerHTML = carInfo.car_type;
 				}
+				carPhoto[0] = carInfo.car_photo1;
+				carPhoto[1] = carInfo.car_photo2;
+				carPhoto[2] = carInfo.car_photo3;
 			};
 			 //呈现车辆靓照
 			function renderCarPhoto() {
 				if (!carInfo) {
 					return;
 				}
-				carPhoto[0] = carInfo.car_photo1;
-				carPhoto[1] = carInfo.car_photo2;
-				carPhoto[2] = carInfo.car_photo3;
 				for (var index = 0; index < carPhoto.length; index++) {
 					if (carPhoto[index]) {
 						listCar.style.height = listCarWidth * 0.3 + 6 + "px";
@@ -500,13 +513,8 @@
 				if (!userAudio || userAudio.audio_url == "") {
 					return;
 				}
-				//修改审核状态
-				document.querySelector("#recordShow > span").innerHTML = userAudio.audio_state;
 				//修改播放的事件--改变播放的地址
-				playAudio = null;
-				var url = ResourcesServerUrl + userAudio.audio_url;
-				console.log(url);
-				playAudio = plus.audio.createPlayer(url);
+				playAudioUrl = "_doc/audio/" + userAudio.audio_url.substring(userAudio.audio_url.lastIndexOf('/') + 1);
 				//当有音频则可看
 				document.querySelector("#recordShow").style.visibility = "visible";
 			};
@@ -515,11 +523,13 @@
 			function loadUserHeadPhoto() {
 				if (userInfo.user_photo == "") {
 					headPhotoFileInfoIsLoad = true;
+					FileIsOk();
 				} else {
 					var url = "_doc/HeadPhoto/" + userInfo.user_photo.substring(userInfo.user_photo.lastIndexOf('/') + 1);
 					fileTool.fileExist(url, userInfo.user_photo,
 						function(msg) {
 							headPhotoFileInfoIsLoad = true;
+							FileIsOk();
 						},
 						function(msg, _args) {
 							var f = new HttpFile();
@@ -528,9 +538,7 @@
 							f.URL = ResourcesServerUrl + userInfo.user_photo;
 							fileDownLoad.AddFile(f);
 							headPhotoFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
-								LoadResource();
-							}
+							FileIsOk();
 						}
 					);
 				}
@@ -538,15 +546,14 @@
 			 //从网络载入头像区域的背景图片
 			function loadUserPhotoBgNetData() {
 				if (userInfo.personcenter_bg == "") {
-					userPhotoBg = true;
+					userPhotoBgFileInfoIsLoad = true;
+					FileIsOk();
 				} else {
 					var url = "_doc/BGPhoto/" + userInfo.personcenter_bg.substring(userInfo.personcenter_bg.lastIndexOf('/') + 1);
 					fileTool.fileExist(url, userInfo.personcenter_bg,
 						function(msg) {
-							userPhotoBg = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
-								LoadResource();
-							}
+							userPhotoBgFileInfoIsLoad = true;
+							FileIsOk();
 						},
 						function(msg, _args) {
 							var f = new HttpFile();
@@ -554,10 +561,8 @@
 							f.FilePath = "_doc/BGPhoto/";
 							f.URL = ResourcesServerUrl + userInfo.personcenter_bg;
 							fileDownLoad.AddFile(f);
-							userPhotoBg = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
-								LoadResource();
-							}
+							userPhotoBgFileInfoIsLoad = true;
+							FileIsOk();
 						}
 					);
 				}
@@ -566,47 +571,65 @@
 			function loadCarPhotoNetData() {
 				if (!carInfo) {
 					carFileInfoIsLoad = true;
-					if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg) {
-						LoadResource();
+					FileIsOk();
+				} else {
+					photoindex = 0;
+					for (var index = 0; index < carPhoto.length; index++) {
+						if (!carPhoto[index]) {
+							photoindex++;
+							if (photoindex == 3) {
+								carFileInfoIsLoad = true;
+								FileIsOk();
+							}
+							continue;
+						}
+						var url = "_doc/CarPhoto/thumbCarPhoto/" + carPhoto[index].substring(carPhoto[index].lastIndexOf('/') + 1);
+						fileTool.fileExist(url, carPhoto[index], function(msg) {
+							photoindex++;
+							if (photoindex == carPhoto.length) {
+								carFileInfoIsLoad = true;
+								FileIsOk();
+							}
+						}, function(path, serverPath) {
+							var f = new HttpFile();
+							f.FileName = serverPath.substring(serverPath.lastIndexOf('/') + 1);
+							f.FilePath = "_doc/CarPhoto/thumbCarPhoto/";
+							f.URL = ResourcesServerUrl + serverPath;
+							fileDownLoad.AddFile(f);
+							photoindex++;
+							if (photoindex == carPhoto.length) {
+								carFileInfoIsLoad = true;
+								FileIsOk();
+							}
+						});
 					}
+				}
+			};
+
+			function loadUserAudioNetData() {
+				if (!userAudio || !userAudio.audio_url) {
+					userAudioFileInfoIsLoad = true;
+					FileIsOk();
 					return;
 				}
-				photoindex = 0;
-				for (var index = 0; index < carPhoto.length; index++) {
-					if (!carPhoto[index]) {
-						photoindex++;
-						if (photoindex == 3) {
-							carFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
-								LoadResource();
-							}
-						}
-						continue;
-					}
-					var url = "_doc/CarPhoto/thumbCarPhoto/" + carPhoto[index].substring(carPhoto[index].lastIndexOf('/') + 1);
-					fileTool.fileExist(url, carPhoto[index], function(msg) {
-						console.log()
-						photoindex++;
-						if (photoindex == carPhoto.length) {
-							carFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
-								LoadResource();
-							}
-						}
-					}, function(path, serverPath) {
-						var f = new HttpFile();
-						f.FileName = serverPath.substring(serverPath.lastIndexOf('/') + 1);
-						f.FilePath = "_doc/CarPhoto/thumbCarPhoto/";
-						f.URL = ResourcesServerUrl + serverPath;
-						fileDownLoad.AddFile(f);
-						photoindex++;
-						if (photoindex == carPhoto.length) {
-							carFileInfoIsLoad = true;
-							if (carFileInfoIsLoad && headPhotoFileInfoIsLoad && userPhotoBg && albumInfoIsLoad) {
-								LoadResource();
-							}
-						}
-					});
+				var url = "_doc/audio/" + userAudio.audio_url.substring(userAudio.audio_url.lastIndexOf('/') + 1);
+				fileTool.fileExist(url, userAudio.audio_url, function(msg) {
+					userAudioFileInfoIsLoad = true;
+					FileIsOk();
+				}, function(path, serverPath) {
+					var f = new HttpFile();
+					f.FileName = serverPath.substring(serverPath.lastIndexOf('/') + 1);
+					f.FilePath = "_doc/audio/";
+					f.URL = ResourcesServerUrl + serverPath;
+					fileDownLoad.AddFile(f);
+					userAudioFileInfoIsLoad = true;
+					FileIsOk();
+				});
+			};
+			 //下载列表是否全部加载
+			function FileIsOk() {
+				if (headPhotoFileInfoIsLoad && carFileInfoIsLoad && userPhotoBgFileInfoIsLoad && userAudioFileInfoIsLoad) {
+					LoadResource();
 				}
 			};
 			/*************************相册****************************/
@@ -1136,10 +1159,9 @@
 				//播放音频
 				document.querySelector("#recordShow button").addEventListener('tap', function() {
 					alert("ss");
-					playAudio.play(function() {
-						alert("Audio play success!");
-					}, function(e) {
-						alert("Audio play error: " + e.message);
+					playAudio = plus.audio.createPlayer(playAudioUrl);
+					playAudio.play(function() {}, function(e) {
+						alert("音频错误: " + e.message);
 					});
 				});
 			};
