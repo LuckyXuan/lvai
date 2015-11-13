@@ -13,6 +13,7 @@
 		<script type="text/javascript" src="js/lvai.base/Utility.js"></script>
 		<script type="text/javascript" src="js/lvai.base/localStorageUtils.js"></script>
 		<link href="css/mui.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="css/PageOutside.css" />
 		<script type="text/javascript" charset="utf-8">
 			mui.init();
 			 // 扩展API加载完毕后调用onPlusReady回调函数 
@@ -62,6 +63,16 @@
 						mui.toast("号码不正确");
 					}
 				});
+				document.getElementById("btnVideo").addEventListener('tap', function() {
+					alert(111);
+					var Intent = plus.android.importClass("android.content.Intent");
+					var Uri = plus.android.importClass("android.net.Uri");
+					var main = plus.android.runtimeMainActivity();
+					var intent = new Intent(Intent.ACTION_VIEW);
+					var uri = Uri.parse("http://192.168.1.188:13333/UploadFile/UserVideo/201511111703038805.mp4");
+					intent.setDataAndType(uri, "video/*");
+					main.startActivity(intent);
+				});
 			};
 			/**
 			 * 显示倒计时
@@ -82,13 +93,17 @@
 			};
 		</script>
 		<style>
-			.bg{ background: transparent;}
-		    	::-webkit-input-placeholder { color:#ececec; }
+			.bg {
+				background: transparent;
+			}
+			::-webkit-input-placeholder {
+				color: #ececec;
+			}
 		</style>
 	</head>
 
 	<body style="background-color: #ff669c;">
-		<header class="mui-bar mui-bar-nav" style="background-color: #ff669c; ">
+		<header class="mui-bar mui-bar-nav" style="box-shadow: 0 1px 6px transparent !important;">
 			<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
 			<h1 class="mui-title">手机号注册</h1>
 		</header>
@@ -115,6 +130,7 @@
 				</form>
 			</div>
 			<button id="btnReg" class="mui-btn  bg" style=" display: block; border: 0px solid red; margin: auto; width: 50%; height: 40%; margin-top: 20%;margin-left: 27%; border-radius: 10px; background-image: url(img/btn.PNG); background-size: 100% 100%; ">　</button>
+			<button id="btnVideo" class="mui-btn  bg" style=" display: block; border: 0px solid red; margin: auto; width: 50%; height: 40%; margin-top: 20%;margin-left: 27%; border-radius: 10px; background-image: url(img/btn.PNG); background-size: 100% 100%; ">　</button>
 		</div>
 	</body>
 
