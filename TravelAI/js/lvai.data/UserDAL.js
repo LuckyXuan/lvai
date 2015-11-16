@@ -219,7 +219,6 @@ var UserDAL = function() {
 			//失败的回调
 
 		function errorCallback(e) {
-			console.log(11);
 			alert(JSON.stringify(e));
 		}
 	}

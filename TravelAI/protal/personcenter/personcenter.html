@@ -769,7 +769,7 @@
 			function OnPreload() {
 				editor = mui.preload({
 					"id": 'editor',
-					"url": 'editor_card1.html'
+					"url": 'editor_card.html'
 				});
 				ed_car = mui.preload({
 					"id": 'ed_car',
@@ -1194,13 +1194,6 @@
 					});
 					mui.toast("您最多一次可以选择上传9张图片");
 				});
-				//播放音频
-				document.querySelector("#recordShow button").addEventListener('tap', function() {
-					playAudio = plus.audio.createPlayer(playAudioUrl);
-					playAudio.play(function() {}, function(e) {
-						alert("音频错误: " + e.message);
-					});
-				});
 				//播放视频
 				document.querySelector("#VideoShow button").addEventListener('tap', function() {
 					var urls = ResourcesServerUrl + userVideo.video_url;
@@ -1212,6 +1205,11 @@
 					var uri = Uri.parse(urls);
 					intent.setDataAndType(uri, "video/*");
 					main.startActivity(intent);
+				});
+				/*---------------------2015-11-16 新增 */
+				mui("#travel_menu").on('tap','li',function(e){
+					var url = "personTravel/"+this.id+".html";
+					mui.openWindow(url,this.id); 
 				});
 			};
 			 //webview的监听
@@ -1384,14 +1382,14 @@
 							<div id="item3mobile" class="mui-slider-item mui-control-content">
 								<div class="card" style="margin-top: 10px;">
 
-									<ul class="mui-table-view">
-										<li class="mui-table-view-cell">
+									<ul class="mui-table-view" id = "travel_menu">
+										<li class="mui-table-view-cell" id="travel_release">
 											<span class="mui-icon mui-icon-flag"></span> 我发起的旅行
 										</li>
-										<li class="mui-table-view-cell">
+										<li class="mui-table-view-cell" id="travel_join">
 											<span class="mui-icon mui-icon-compose"></span> 我报名的旅行
 										</li>
-										<li class="mui-table-view-cell">
+										<li class="mui-table-view-cell" id="travel_collection">
 											<span class="mui-icon mui-icon-star"></span> 我收藏的旅行
 										</li>
 									</ul>
