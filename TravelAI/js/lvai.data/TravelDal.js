@@ -68,7 +68,7 @@ var TravelDal = function() {
 		for (var i = 0; i < imgs.length; i++) {
 			var filePath = that.travel.promoter_userid + "_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
 			savePath = "_doc/TravelPhoto/" + filePath;
-			fileTool.ImgFileCompress(imgs[i], savePath, "15%", function(existPath, savePath) {
+			fileTool.ImgFileCompress(imgs[i], savePath, "30%", function(existPath, savePath) {
 				that.imgFiles.push({
 					name: savePath,
 					path: savePath
@@ -189,6 +189,36 @@ var TravelDal = function() {
 		
 
 	}
+	
+	//添加旅行
+	this.addLoadTravel = function(files,succesFun,failFun) {
+		console.log(files.length);
+		var t = that.travel;	
+		var task = plus.uploader.createUpload(UploadServer, {
+				method: "POST"
+			},
+			function(t, status) { //上传完成
+				if (status == 200) {
+					succesFun(t.responseText);
+				} else {
+					failFun(status);
+				}
+			}
+		);
+		task.addData("Action", "addLoadTravel");
+		task.addData("travel", new JsonTools().jsonObjToString(t));
+		for (var i = 0; i < files.length; i++) {
+			var f = files[i];
+			task.addData("filename", f.name);
+			task.addFile(f.path, {
+				key: f.name
+			});
+		};
+		console.log("开始上传");
+		task.start();
+	}
+	
+	
 	
 	/**
 	 * 先文本后图片一起上传

@@ -82,12 +82,10 @@
 				margin: 4px;
 				background-color: hotpink;
 			}
-			
-			
 		</style>
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		<script type="text/javascript" charset="utf-8">
-			var fee="免费";
+			var fee = "免费";
 			var travle_theme;
 			var Traffic;
 			var Destination;
@@ -98,6 +96,8 @@
 			var Car;
 			var Wantsend_gift;
 			var Wantget_gift;
+			 //用户对象
+			var userInfo = null;
 			mui.ready(function() {
 				//交通选择
 				Traffic = new mui.PopPicker();
@@ -111,7 +111,6 @@
 					value: '3',
 					text: '游轮'
 				}]);
-				
 				//信用等级
 				Credit = new mui.PopPicker();
 				Credit.setData([{
@@ -225,33 +224,30 @@
 			document.addEventListener("plusready", onPlusReady, false);
 			 // 扩展API加载完毕，现在可以正常调用扩展API 
 			function onPlusReady() {
-				    //页面一些初始化
-				    pageInit();
+					//页面一些初始化
+					pageInit();
 					//初始化时间选择器
 					menu();
 					costTap();
 					Theme();
 					Requirements();
-					
 				}
 				//费用
-			
-			function pageInit(){
+
+			function pageInit() {
+				//获取用户对象
+				userInfo = new UserDAL().getUserInfo();
 				//选择时间   的初始化     出发返回时间默认今天
 				var d = new Date();
 				var y = d.getFullYear();
 				var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
 				var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
-				
-//				document.getElementById("start_time").placeholder = y+'-'+m+'-'+day;
-//				document.getElementById("return_time").placeholder = y+'-'+m+'-'+day;
-				document.getElementById("start_time").value = y+'-'+m+'-'+day;
-				document.getElementById("return_time").value = y+'-'+m+'-'+day;
-				
-				
+				//				document.getElementById("start_time").placeholder = y+'-'+m+'-'+day;
+				//				document.getElementById("return_time").placeholder = y+'-'+m+'-'+day;
+				document.getElementById("start_time").value = y + '-' + m + '-' + day;
+				document.getElementById("return_time").value = y + '-' + m + '-' + day;
 			}
-			
-			
+
 			function costTap() {
 					mui("#fee").on('tap', 'div', function() {
 						document.getElementById("fee1").style.borderColor = "#ddd";
@@ -264,32 +260,31 @@
 				//主题
 
 			function Theme() {
-				//添加主题
-				mui("#theme").on('tap', 'div', function() {
-					var newNode = document.createElement("div");
-					newNode.innerHTML = this.innerHTML;
-					newNode.className = "mui-frame-d2";
-					document.getElementById("Selectedtheme").appendChild(newNode);
-					this.parentElement.removeChild(this);
-				});
-				document.getElementById("addBtn").addEventListener('tap', function() {
-					var newNode = document.createElement("div");
-					
-					newNode.innerHTML = document.getElementById("Addtheme").value;
-					newNode.className = "mui-frame-d2";
-					document.getElementById("Selectedtheme").appendChild(newNode);
-				});
-				//删除主题
-				mui("#Selectedtheme").on('tap', 'div', function() {
-					var newNode = document.createElement("div");
-					newNode.innerHTML = this.innerHTML;
-					newNode.className = "mui-frame-d1";
-					document.getElementById("theme").appendChild(newNode);
-					this.parentElement.removeChild(this);
-				});
-			}
-			
-			//对旅伴要求
+					//添加主题
+					mui("#theme").on('tap', 'div', function() {
+						var newNode = document.createElement("div");
+						newNode.innerHTML = this.innerHTML;
+						newNode.className = "mui-frame-d2";
+						document.getElementById("Selectedtheme").appendChild(newNode);
+						this.parentElement.removeChild(this);
+					});
+					document.getElementById("addBtn").addEventListener('tap', function() {
+						var newNode = document.createElement("div");
+						newNode.innerHTML = document.getElementById("Addtheme").value;
+						newNode.className = "mui-frame-d2";
+						document.getElementById("Selectedtheme").appendChild(newNode);
+					});
+					//删除主题
+					mui("#Selectedtheme").on('tap', 'div', function() {
+						var newNode = document.createElement("div");
+						newNode.innerHTML = this.innerHTML;
+						newNode.className = "mui-frame-d1";
+						document.getElementById("theme").appendChild(newNode);
+						this.parentElement.removeChild(this);
+					});
+				}
+				//对旅伴要求
+
 			function Requirements() {
 				//添加要求
 				mui("#requirements").on('tap', 'div', function() {
@@ -315,235 +310,224 @@
 				});
 			}
 
-		function menu() {
-			//添加图片
-			document.getElementById("addImg").addEventListener('tap', function() {
-				plus.gallery.pick(function(e) {
-					var imgs = mui("#imgRoom>img");
-					var files = e.files;
-					var l = files.length;
-					l=l>3?3:l;//如果选择的超过9张，就截取前3张
-					for(var i=0;i<l;i++){
-						var path = plus.io.convertLocalFileSystemURL(files[i]);
-						console.log(imgs[i]);
-						
-						imgs[i].src = path;
-					}
-					
-				}, function(e) {
-					mui.toast("相册处理错误");
-				}, {
-					filter: "image",
-					multiple: true //可选择是否多张图片选择
-				});
-				mui.toast("您最多一次可以选择上传3张图片");
-			
-			});
-			
-			//单张更改
-			
-			mui("#imgRoom").on('tap','img',function(){
-				var that = this;
-				plus.gallery.pick(function(path) {
-					that.src = path;
-					
-				}, function(e) {
-					mui.toast("相册处理错误");
-				}, {
-					filter: "image",
-				});
-			});
-			
-			 //交通方式
-			document.getElementById("transportation").addEventListener('tap', function() {
-				Traffic.show(function(items) {
-					document.querySelector("#transportation").value = items[0].text;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				}, '');
-			});
-			 //年收入
-			document.getElementById("income_condition").addEventListener('tap', function() {
-				Income.show(function(items) {
-					document.querySelector("#income_condition").value = items[0].text;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				}, '');
-			});
-			 //座驾
-			document.getElementById("car_condition").addEventListener('tap', function() {
-				Car.show(function(items) {
-					document.querySelector("#car_condition").value = items[0].text;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				}, '');
-			});
-			 //身高
-			document.getElementById("height_condition").addEventListener('tap', function() {
-				Height.show(function(items) {
-					document.querySelector("#height_condition").value = items[0].text;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				}, '');
-			});
-			 //信用等级
-			document.getElementById("credit_condition").addEventListener('tap', function() {
-				Credit.show(function(items) {
-					document.querySelector("#credit_condition").value = items[0].text;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				}, '');
-			});
-			 //得到的礼物
-			document.getElementById("wantget_gift").addEventListener('tap', function() {
-				Wantget_gift.show(function(items) {
-					document.querySelector("#wantget_gift").value = items[0].text;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				}, '');
-			});
-			 //送出的礼物
-			document.getElementById("wantsend_gift").addEventListener('tap', function() {
-				Wantsend_gift.show(function(items) {
-					document.querySelector("#wantsend_gift").value = items[0].text;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				}, '');
-			});
-			 //旅伴数量
-			document.getElementById("partnerNumber").addEventListener('tap', function() {
-				var that = this;
-				var btnArray = [{
-						title: "1人",
-						value : 1
-					}, {
-						title: "1~5人",
-						value : 5
-					},{
-						title: "5~10人",
-						value : 10
-					},{
-						title: "不限人数",
-						value : 99
-					}];
-					plus.nativeUI.actionSheet({
-						title: "旅伴数量按选取的最大值计算。",  
-						cancel: "取消",
-						buttons: btnArray
-					}, function(e) {
-						//取消  e.index 就是 0 ，所以 不做赋值
-						!e.index||(that.value = btnArray[e.index-1].value);
+			function menu() {
+					//添加图片
+					document.getElementById("addImg").addEventListener('tap', function() {
+						plus.gallery.pick(function(e) {
+							var imgs = mui("#imgRoom>img");
+							var files = e.files;
+							var l = files.length;
+							l = l > 3 ? 3 : l; //如果选择的超过9张，就截取前3张
+							for (var i = 0; i < l; i++) {
+								var path = plus.io.convertLocalFileSystemURL(files[i]);
+								console.log(imgs[i]);
+								imgs[i].src = path;
+							}
+						}, function(e) {
+							mui.toast("相册处理错误");
+						}, {
+							filter: "image",
+							multiple: true //可选择是否多张图片选择
+						});
+						mui.toast("您最多一次可以选择上传3张图片");
 					});
-
-			});
-			 //目的地
-			document.getElementById("destinationbtn").addEventListener('tap', function() {
-				Destination.show(function(items) {
-					document.querySelector("#destination").value = items[0].text + " " + items[1].text;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				}, '');
-			}); 
-			 //出发地
-			document.getElementById("startplacebtn").addEventListener('tap', function() {
-				Origin.show(function(items) {
-					document.querySelector("#startplace").value = items[0].text + " " + items[1].text;
-					//返回 false 可以阻止选择框的关闭
-					//return false;
-				}, '');
-			});
-			 //出发日期
-			document.getElementById("start_time").addEventListener('tap', function() {
-					var bir = document.getElementById("start_time");
-					var endBir = document.getElementById("return_time");
-					var arr = bir.value.split('-');
-					
-					var date = new Date();
-					date.setFullYear(arr[0], parseInt(arr[1]) - 1, arr[2]);
-					
-					plus.nativeUI.pickDate(function(e) {
+					//单张更改
+					mui("#imgRoom").on('tap', 'img', function() {
+						var that = this;
+						plus.gallery.pick(function(path) {
+							var filePath = userInfo.user_telphone + "_travel_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
+							savePath = "_doc/TravelPhoto/" + filePath;
+							fileTool.ImgFileCompress(path, savePath, "30%", function(existPath, savePath) {
+								that.src = plus.io.convertLocalFileSystemURL(savePath);
+							}, function() {
+								mui.toast("相册处理错误");
+							});
+						}, function(e) {
+							mui.toast("相册处理错误");
+						}, {
+							filter: "image",
+						});
+					});
+					//交通方式
+					document.getElementById("transportation").addEventListener('tap', function() {
+						Traffic.show(function(items) {
+							document.querySelector("#transportation").value = items[0].text;
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+						}, '');
+					});
+					//年收入
+					document.getElementById("income_condition").addEventListener('tap', function() {
+						Income.show(function(items) {
+							document.querySelector("#income_condition").value = items[0].text;
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+						}, '');
+					});
+					//座驾
+					document.getElementById("car_condition").addEventListener('tap', function() {
+						Car.show(function(items) {
+							document.querySelector("#car_condition").value = items[0].text;
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+						}, '');
+					});
+					//身高
+					document.getElementById("height_condition").addEventListener('tap', function() {
+						Height.show(function(items) {
+							document.querySelector("#height_condition").value = items[0].text;
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+						}, '');
+					});
+					//信用等级
+					document.getElementById("credit_condition").addEventListener('tap', function() {
+						Credit.show(function(items) {
+							document.querySelector("#credit_condition").value = items[0].text;
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+						}, '');
+					});
+					//得到的礼物
+					document.getElementById("wantget_gift").addEventListener('tap', function() {
+						Wantget_gift.show(function(items) {
+							document.querySelector("#wantget_gift").value = items[0].text;
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+						}, '');
+					});
+					//送出的礼物
+					document.getElementById("wantsend_gift").addEventListener('tap', function() {
+						Wantsend_gift.show(function(items) {
+							document.querySelector("#wantsend_gift").value = items[0].text;
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+						}, '');
+					});
+					//旅伴数量
+					document.getElementById("partnerNumber").addEventListener('tap', function() {
+						var that = this;
+						var btnArray = [{
+							title: "1人",
+							value: 1
+						}, {
+							title: "1~5人",
+							value: 5
+						}, {
+							title: "5~10人",
+							value: 10
+						}, {
+							title: "不限人数",
+							value: 99
+						}];
+						plus.nativeUI.actionSheet({
+							title: "旅伴数量按选取的最大值计算。",
+							cancel: "取消",
+							buttons: btnArray
+						}, function(e) {
+							//取消  e.index 就是 0 ，所以 不做赋值
+							!e.index || (that.value = btnArray[e.index - 1].value);
+						});
+					});
+					//目的地
+					document.getElementById("destinationbtn").addEventListener('tap', function() {
+						Destination.show(function(items) {
+							document.querySelector("#destination").value = items[0].text + " " + items[1].text;
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+						}, '');
+					});
+					//出发地
+					document.getElementById("startplacebtn").addEventListener('tap', function() {
+						Origin.show(function(items) {
+							document.querySelector("#startplace").value = items[0].text + " " + items[1].text;
+							//返回 false 可以阻止选择框的关闭
+							//return false;
+						}, '');
+					});
+					//出发日期
+					document.getElementById("start_time").addEventListener('tap', function() {
 						var bir = document.getElementById("start_time");
-						var d = e.date;
-						var zuo = new Date();
-						zuo.setDate(zuo.getDate()-1);
-						if(Date.parse(d)<Date.parse(zuo)){
-							mui.alert("出发时间只能选择今天以后,请重新选择！","错误");
+						var endBir = document.getElementById("return_time");
+						var arr = bir.value.split('-');
+						var date = new Date();
+						date.setFullYear(arr[0], parseInt(arr[1]) - 1, arr[2]);
+						plus.nativeUI.pickDate(function(e) {
+							var bir = document.getElementById("start_time");
+							var d = e.date;
+							var zuo = new Date();
+							zuo.setDate(zuo.getDate() - 1);
+							if (Date.parse(d) < Date.parse(zuo)) {
+								mui.alert("出发时间只能选择今天以后,请重新选择！", "错误");
+								return;
+							}
+							//						
+							var y = d.getFullYear();
+							var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
+							var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
+							bir.value = y + "-" + m + "-" + day;
+							endBir.value = "";
+						}, function(e) {
+							this.value = "您没有选择日期";
+						}, {
+							title: "请选择出发日期",
+							date: date
+						});
+					});
+					//返回日期
+					document.getElementById("return_time").addEventListener('tap', function() {
+						var startBir = document.getElementById("start_time");
+						if (!startBir.value) {
+							mui.alert("请先选择【出发时间】!", "警告");
 							return;
 						}
-//						
-						var y = d.getFullYear();
-						var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
-						var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
-						bir.value = y + "-" + m + "-" + day;
-						endBir.value = "";
-					}, function(e) {
-						this.value = "您没有选择日期";
-					}, {
-						title: "请选择出发日期",
-						date: date
-					});
-				});
-				//返回日期
-			 document.getElementById("return_time").addEventListener('tap', function() {
-					
-					var startBir = document.getElementById("start_time");
-					if(!startBir.value){
-						mui.alert("请先选择【出发时间】!","警告");
-						return;
-					}
-					var bir = document.getElementById("return_time");
-					var arr = bir.value.split('-');
-					var startArr = startBir.value.split('-');
-					var date = new Date();
-					date.setFullYear(arr[0], parseInt(arr[1]) - 1, arr[2]);
-					var startDate = new Date();
-					startDate.setFullYear(startArr[0], parseInt(startArr[1]) - 1, parseInt(startArr[2])-1);
-					 
-					plus.nativeUI.pickDate(function(e) {
 						var bir = document.getElementById("return_time");
-						var d = e.date;
-						
-						if(Date.parse(d)<Date.parse(startDate)){ 
-							
-							mui.alert("返回时间必须在出发时间当天以及以后,请重新选择！","错误");
-							return;
-						}
-						
-						var y = d.getFullYear();
-						var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
-						var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
-						bir.value = y + "-" + m + "-" + day;
-					}, function(e) {
-						this.value = "您没有选择日期";
-					}, {
-						title: "请选择返回日期",
-						date: date,
+						var arr = bir.value.split('-');
+						var startArr = startBir.value.split('-');
+						var date = new Date();
+						date.setFullYear(arr[0], parseInt(arr[1]) - 1, arr[2]);
+						var startDate = new Date();
+						startDate.setFullYear(startArr[0], parseInt(startArr[1]) - 1, parseInt(startArr[2]) - 1);
+						plus.nativeUI.pickDate(function(e) {
+							var bir = document.getElementById("return_time");
+							var d = e.date;
+							if (Date.parse(d) < Date.parse(startDate)) {
+								mui.alert("返回时间必须在出发时间当天以及以后,请重新选择！", "错误");
+								return;
+							}
+							var y = d.getFullYear();
+							var m = d.getMonth() < 9 ? ('0' + (d.getMonth() + 1)) : d.getMonth() + 1;
+							var day = d.getDate() < 10 ? ('0' + d.getDate()) : d.getDate();
+							bir.value = y + "-" + m + "-" + day;
+						}, function(e) {
+							this.value = "您没有选择日期";
+						}, {
+							title: "请选择返回日期",
+							date: date,
+						});
 					});
-				});
-			}
-			/**
-			 * 发布旅行。
-			 */
-			function btnReleaseClick()
-			{
-				if(!(document.querySelector("#start_time").value&&document.querySelector("#return_time").value)){
-					mui.alert("【出发时间】【返回时间】为空！","警告");
+				}
+				/**
+				 * 发布旅行。
+				 */
+
+			function btnReleaseClick() {
+				if (!(document.querySelector("#start_time").value && document.querySelector("#return_time").value)) {
+					mui.alert("【出发时间】【返回时间】为空！", "警告");
 					return;
 				}
-				
-				var travel=new travelModel();
-				travel.promoter_userid=new UserDAL().getUserInfo().user_telphone;				
-				travel.destination=document.querySelector("#destination").value;
-				travel.startplace=document.querySelector("#startplace").value;
-				travel.start_time=document.querySelector("#start_time").value;
-				travel.return_time=document.querySelector("#return_time").value;
-				travel.transportation=document.querySelector("#transportation").value;
-				travel.fee=fee;
+				var travel = new travelModel();
+				travel.promoter_userid = userInfo.user_telphone;
+				travel.destination = document.querySelector("#destination").value;
+				travel.startplace = document.querySelector("#startplace").value;
+				travel.start_time = document.querySelector("#start_time").value;
+				travel.return_time = document.querySelector("#return_time").value;
+				travel.transportation = document.querySelector("#transportation").value;
+				travel.fee = fee;
 				//alert(travel.fee);
 				//travle_theme
 				var themes = document.querySelectorAll("#Selectedtheme>div");
 				for (var i = 0; i < themes.length; i++) {
-
 					travel.travle_theme += themes[i].innerHTML + "|";
 				}
 				//alert(travel.travle_theme); 
@@ -563,29 +547,42 @@
 				travel.wantsend_gift = document.querySelector("#wantsend_gift").value;
 				travel.travle_msg = document.querySelector("#travle_msg").value;
 				//travel.pic1 = travel.pic2 = travel.pic3 = plus.io.convertLocalFileSystemURL("_www/img/travel_4.jpg");
-				var Images = mui("#imgRoom>img"); 
-				console.log(travel.pic1 = Images[0].getAttribute("src")?Images[0].getAttribute("src"):"");
-				console.log(travel.pic2 = Images[1].getAttribute("src")?Images[1].getAttribute("src"):"");
-				console.log(travel.pic3 = Images[2].getAttribute("src")?Images[2].getAttribute("src"):"");
-				
+				var Images = mui("#imgRoom>img");
+				console.log(travel.pic1 = Images[0].getAttribute("src") ? Images[0].getAttribute("src") : "");
+				console.log(travel.pic2 = Images[1].getAttribute("src") ? Images[1].getAttribute("src") : "");
+				console.log(travel.pic3 = Images[2].getAttribute("src") ? Images[2].getAttribute("src") : "");
 				travel.reg_fee = 10.0;
-				
 				var travelDAL = new TravelDal();
 				travelDAL.travel = travel;
 				var traveW = plus.nativeUI.showWaiting("信息发布中...");
-				travelDAL.UpLoadStara(function(_msg) {
-					var text = _msg.text?"成功":"失败";
-					var img = _msg.img?"成功":"失败";
-					mui.toast("信息发布"+text+"!"+"图片发布"+img+"!");
+				var files = [];
+				if (travel.pic1) {
+					files.push({
+						name: travel.pic1,
+						path: travel.pic1
+					});
+				}
+				if (travel.pic2) {
+					files.push({
+						name: travel.pic2,
+						path: travel.pic2
+					});
+				}
+				if (travel.pic3) {
+					files.push({
+						name: travel.pic3,
+						path: travel.pic3
+					});
+				}
+				travelDAL.addLoadTravel(files,function(_msg){
+					mui.toast("信息发布成功!");
 					traveW.close();
 					plus.webview.currentWebview().close();
-				}, function(e) {
-					mui.toast("发布失败！");
-					//mui.toast(e);
+				},function(e){
+					mui.toast("信息发布失败!");
 					traveW.close();
 				});
 			}
-			
 		</script>
 	</head>
 
@@ -622,7 +619,7 @@
 							</div>
 							<div class="mui-input-row">
 								<label>出发时间</label>
-								<input type="text" id='start_time' class="mui-right" readOnly="true"  placeholder="请选择">
+								<input type="text" id='start_time' class="mui-right" readOnly="true" placeholder="请选择">
 							</div>
 							<div class="mui-input-row">
 								<label>返回时间</label>
@@ -653,12 +650,12 @@
 							<div id="theme" style="float: left; width: 100%; margin: 15px;">
 								<div id="theme1" class="mui-frame-d1">好摄之徒</div>
 								<div id="theme2" class="mui-frame-d1">穷游</div>
-								<div id="theme3" class="mui-frame-d1" >海天盛宴</div>
-								<div id="theme4" class="mui-frame-d1" >奇石妙旅</div>
+								<div id="theme3" class="mui-frame-d1">海天盛宴</div>
+								<div id="theme4" class="mui-frame-d1">奇石妙旅</div>
 							</div>
 							<div id="Selectedtheme" style="float: left; width: 100%; margin: 15px; ">
-								<div id="Selectedtheme1" class="mui-frame-d2" >豪华之旅</div>
-								<div id="Selectedtheme2" class="mui-frame-d2" >闲装情侣</div>
+								<div id="Selectedtheme1" class="mui-frame-d2">豪华之旅</div>
+								<div id="Selectedtheme2" class="mui-frame-d2">闲装情侣</div>
 							</div>
 						</div>
 					</div>
@@ -671,28 +668,28 @@
 							<input id="partnerNumber" type="text" class="mui-right " readonly="true" placeholder="1 " value="1">
 						</div>
 						<div class="mui-input-row">
-						<label style="width: 100%; "> 对旅伴的要求?</label>
-						<div style="margin-left: 15px; ">
-							<input id="Addrequirements" type="text" style="display: block;float:left;width: 75%;background-color:#DDDDDD;border-radius: 5px; " placeholder=" ">
-							<button id="addBtn1" class="mui-frame-btn" type="button">添加</button>
-						</div>
-						<div id="requirements" style="float: left; width: 100%; margin-left: 15px;margin-right: 15px; ">
-							<div id=" " class="mui-frame-d1" >妹纸</div>
-							<div id=" " class="mui-frame-d1" >汉子</div>
-							<div id=" " class="mui-frame-d1" >男女均可</div>
-							<div id=" " class="mui-frame-d1" >颜值报表</div>
-							<div id=" " class="mui-frame-d1" >挥金如土</div>
-							<div id=" " class="mui-frame-d1" >八块腹肌</div>
-							<div id=" " class="mui-frame-d1" >大长腿</div>
-							<div id=" " class="mui-frame-d1 " >小蛮腰</div>
+							<label style="width: 100%; "> 对旅伴的要求?</label>
+							<div style="margin-left: 15px; ">
+								<input id="Addrequirements" type="text" style="display: block;float:left;width: 75%;background-color:#DDDDDD;border-radius: 5px; " placeholder=" ">
+								<button id="addBtn1" class="mui-frame-btn" type="button">添加</button>
+							</div>
+							<div id="requirements" style="float: left; width: 100%; margin-left: 15px;margin-right: 15px; ">
+								<div id=" " class="mui-frame-d1">妹纸</div>
+								<div id=" " class="mui-frame-d1">汉子</div>
+								<div id=" " class="mui-frame-d1">男女均可</div>
+								<div id=" " class="mui-frame-d1">颜值报表</div>
+								<div id=" " class="mui-frame-d1">挥金如土</div>
+								<div id=" " class="mui-frame-d1">八块腹肌</div>
+								<div id=" " class="mui-frame-d1">大长腿</div>
+								<div id=" " class="mui-frame-d1 ">小蛮腰</div>
 
-						</div>
-						<div id="selectedrequirements" style="float: left; margin-left: 15px;margin-right: 15px; ">
-							<div id=" " class="mui-frame-d2 " >美女</div>
-							<div id=" " class="mui-frame-d2 " >可爱</div>
+							</div>
+							<div id="selectedrequirements" style="float: left; margin-left: 15px;margin-right: 15px; ">
+								<div id=" " class="mui-frame-d2 ">美女</div>
+								<div id=" " class="mui-frame-d2 ">可爱</div>
 
+							</div>
 						</div>
-						</div> 
 						<form class="mui-input-group ">
 							<div class="mui-input-row ">
 								<label>年收入</label>
