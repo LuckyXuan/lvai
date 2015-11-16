@@ -271,6 +271,7 @@
 			var userInfo = null,
 				carInfo = null,
 				userAudio = null,
+				userVideo = null,
 				albumInfo = null;
 			 //音频设备对象
 			var record = null, //录音对象
@@ -332,6 +333,7 @@
 				LoadUserInfo();
 				LoadCarInfo();
 				LoadUserAudio();
+				LoadUserVideo();
 				LoadAlbumInfo();
 			};
 			 //页面渲染
@@ -342,6 +344,7 @@
 				renderCarInfo();
 				renderCarPhoto();
 				renderUserAudio();
+				renderUserVideo();
 				//renderAlbumInfo();
 			};
 			 //获取网络数据（只包括资料页面）
@@ -381,6 +384,14 @@
 					}
 				});
 				//获取视频信息
+				new UserDAL().getUserVideo(userInfo.user_telphone, function() {
+					LoadUserVideo();
+					//修改审核状态
+					document.querySelector("#VideoShow > span").innerHTML = userVideo.video_state;
+					renderUserVideo();
+				}, function() {
+					mui.toast("视频信息获取失败！");
+				});
 				//获取礼物
 				//获取其他
 			};
@@ -428,7 +439,18 @@
 					userAudio = null;
 				}
 			};
-			 //加载本地化的用户相册对象
+
+			function LoadUserVideo() {
+					var user_Video = new localStorageUtils().getItem("userVideo");
+					if (user_Video) {
+						userVideo = new JsonTools().stringToJson(user_Video);
+						console.log(user_Video);
+					} else {
+						userVideo = null;
+					}
+				}
+				//加载本地化的用户相册对象
+
 			function LoadAlbumInfo() {
 				var ab = new localStorageUtils().getItem("Album");
 				if (ab) {
@@ -518,8 +540,17 @@
 				//当有音频则可看
 				document.querySelector("#recordShow").style.visibility = "visible";
 			};
-			/*************************加载各个部位的网络资源列表****************************/
-			 //从网络载入头像图片
+
+			function renderUserVideo() {
+					if (!userVideo || userVideo.video_url == "") {
+						return;
+					}
+					//当有视频则可看
+					document.querySelector("#VideoShow").style.visibility = "visible";
+				}
+				/*************************加载各个部位的网络资源列表****************************/
+				//从网络载入头像图片
+
 			function loadUserHeadPhoto() {
 				if (userInfo.user_photo == "") {
 					headPhotoFileInfoIsLoad = true;
@@ -1043,24 +1074,30 @@
 						switch (e.index) {
 							case 0:
 								var cmr = plus.camera.getCamera();
-								var res = cmr.supportedVideoResolutions[1];
+								var res = cmr.supportedVideoResolutions[3];
 								var fmt = cmr.supportedVideoFormats[0];
+								var fn = "_doc/Video/" + userInfo.user_telphone + "_video_" + new Date().toFormatString("yyyyMMddhhmmss") + ".mp4";
 								cmr.startVideoCapture(function(path) {
-										var ww = plus.nativeUI.showWaiting("视频上传中... ", {
+										console.log(path);
+										var ww = plus.nativeUI.showWaiting("视频上传中...", {
 											back: "none"
 										});
-										var u = new localStorageUtils().getItem("userInfo");
-										var uinfo = new JsonTools().stringToJson(u);
 										var files = [];
 										files[0] = {
-											name: "userVido",
+											name: plus.io.convertLocalFileSystemURL(path),
 											path: plus.io.convertLocalFileSystemURL(path)
 										};
-										new UserDAL().uploadVideo(uinfo.user_telphone, files, ".mp4", function(_msg) {
-											console.log(_msg);
-											ww.close();
+										new UserDAL().uploadVideo(ww, userInfo.user_telphone, files, function() {
+											var VideoTemp = {
+												video_url: "/UploadFile/UserVideo/" + files[0].name.substring(files[0].name.lastIndexOf('/') + 1),
+												video_state: "未审核"
+											};
+											new localStorageUtils().setItem("userVideo", new JsonTools().jsonObjToString(VideoTemp));
 											mui.toast("上传成功");
-										}, function(_msg) {
+											LoadUserVideo();
+											renderUserVideo();
+											ww.close();
+										}, function() {
 											ww.close();
 											mui.toast("上传失败，请检查网络");
 										});
@@ -1068,6 +1105,7 @@
 									function(error) {
 										console.log("Capture video failed: " + error.message);
 									}, {
+										filename: fn,
 										resolution: res,
 										format: fmt,
 										index: '2'
@@ -1158,11 +1196,22 @@
 				});
 				//播放音频
 				document.querySelector("#recordShow button").addEventListener('tap', function() {
-					alert("ss");
 					playAudio = plus.audio.createPlayer(playAudioUrl);
 					playAudio.play(function() {}, function(e) {
 						alert("音频错误: " + e.message);
 					});
+				});
+				//播放视频
+				document.querySelector("#VideoShow button").addEventListener('tap', function() {
+					var urls = ResourcesServerUrl + userVideo.video_url;
+					console.log(urls);
+					var Intent = plus.android.importClass("android.content.Intent");
+					var Uri = plus.android.importClass("android.net.Uri");
+					var main = plus.android.runtimeMainActivity();
+					var intent = new Intent(Intent.ACTION_VIEW);
+					var uri = Uri.parse(urls);
+					intent.setDataAndType(uri, "video/*");
+					main.startActivity(intent);
 				});
 			};
 			 //webview的监听
@@ -1279,7 +1328,7 @@
 									<div class="card" style=" height: 66px; text-align: center;">
 										<button type="button" id="ed_video" class="mui-icon mui-icon-videocam" style=" float: left; margin: 10px 10%;  border: 1px solid gray; border-radius: 90px; padding: 10px;"></button>
 										<span style="line-height: 66px;  float: left;">点击左侧进行视频认证</span>
-										<div style=" visibility: hidden; float: right; text-align: center; height: 66px; width: 25%; ">
+										<div id="VideoShow" style=" visibility: hidden; float: right; text-align: center; height: 66px; width: 25%; ">
 											<div>
 												<button type="button" id="vidoPlay" class="mui-icon mui-icon-mic" style="  border: 1px solid gray; margin-top: 5px; border-radius: 90px; padding: 5px;"></button>
 											</div>

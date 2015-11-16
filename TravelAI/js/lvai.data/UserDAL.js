@@ -223,50 +223,87 @@ var UserDAL = function() {
 			alert(JSON.stringify(e));
 		}
 	}
-	
-	
+
+
 	//获取个人音频信息
 	//tel   ：  手机号码
 	this.getUserAudio = function(tel, successHandler, faildHandler) {
-		var ws = new WebService(mui);
-		ws.setUrl(WebServiceURL);
-		ws.setOpName("getAudio");
-		ws.setParas({
-			tel: tel
-		});
+			var ws = new WebService(mui);
+			ws.setUrl(WebServiceURL);
+			ws.setOpName("getAudio");
+			ws.setParas({
+				tel: tel
+			});
 
-		ws.setCallBack(callback);
-		ws.setErrorCall(errorCallback);
+			ws.setCallBack(callback);
+			ws.setErrorCall(errorCallback);
 
-		ws.LoadData();
-		//成功的回调
-		function callback(data) {
-				//alert(JSON.stringify(data));
-				var o = eval(data);
-				o = o.d;
-				var msg = new JsonTools().stringToJson(o);
-				if (msg.status == "faild") {
-					faildHandler();
-					return;
+			ws.LoadData();
+			//成功的回调
+			function callback(data) {
+					//alert(JSON.stringify(data));
+					var o = eval(data);
+					o = o.d;
+					var msg = new JsonTools().stringToJson(o);
+					if (msg.status == "faild") {
+						faildHandler();
+						return;
+					}
+					if (msg.data.audio_url) {
+						new localStorageUtils().setItem("userAudio", new JsonTools().jsonObjToString(msg.data));
+					} else {
+						new localStorageUtils().setItem("userAudio", "");
+					}
+
+					successHandler();
+
 				}
-				if (msg.data.audio_url) {
-					new localStorageUtils().setItem("userAudio", new JsonTools().jsonObjToString(msg.data));
-				} else {
-					new localStorageUtils().setItem("userAudio", "");
-				}
-				
-				successHandler();
+				//失败的回调
 
+			function errorCallback(e) {
+				alert(JSON.stringify(e));
 			}
-			//失败的回调
-
-		function errorCallback(e) {
-			alert(JSON.stringify(e));
 		}
-	}
+		//获取个人视频信息
+		//tel   ：  手机号码
+	this.getUserVideo = function(tel, successHandler, faildHandler) {
+			var ws = new WebService(mui);
+			ws.setUrl(WebServiceURL);
+			ws.setOpName("getVideo");
+			ws.setParas({
+				tel: tel
+			});
 
-	//车辆信息更新
-	//carJsonstring : 车辆信息的json数据
+			ws.setCallBack(callback);
+			ws.setErrorCall(errorCallback);
+
+			ws.LoadData();
+			//成功的回调
+			function callback(data) {
+					//alert(JSON.stringify(data));
+					var o = eval(data);
+					o = o.d;
+					var msg = new JsonTools().stringToJson(o);
+					if (msg.status == "faild") {
+						faildHandler();
+						return;
+					}
+					if (msg.data.video_url) {
+						new localStorageUtils().setItem("userVideo", new JsonTools().jsonObjToString(msg.data));
+					} else {
+						new localStorageUtils().setItem("userVideo", "");
+					}
+
+					successHandler();
+				}
+				//失败的回调
+
+			function errorCallback(e) {
+				alert(JSON.stringify(e));
+			}
+		}
+		//车辆信息更新
+		//carJsonstring : 车辆信息的json数据
 	this.UpdateCarInfo = function(carJsonstring, successHandler, faildHandler) {
 			var ws = new WebService(mui);
 			ws.setUrl(WebServiceURL);
@@ -356,7 +393,7 @@ var UserDAL = function() {
 				task.addFile(f.path, {
 					key: f.path
 				});
-				task.addData("filename",f.name);
+				task.addData("filename", f.name);
 			}
 			console.log("开始上传");
 			task.start();
@@ -364,11 +401,12 @@ var UserDAL = function() {
 		//个人视频上传
 		//phone:手机号
 		//files:视频文件
-	this.uploadVideo = function(phone, files, type, successHandler, faildHandler) {
+	this.uploadVideo = function(ww, phone, files, successHandler, faildHandler) {
+			var options = {
+				method: "POST"
+			};
 			var filess = files;
-			var task = plus.uploader.createUpload(UploadServer, {
-					method: "POST"
-				},
+			var task = plus.uploader.createUpload(UploadServer, options,
 				function(t, status) { //上传完成
 					console.log(status);
 					if (status == 200) {
@@ -376,18 +414,30 @@ var UserDAL = function() {
 					} else {
 						faildHandler(status);
 					}
-				}
-			);
+				});
+
 			task.addData("Action", "uploadVideo");
 			task.addData("tel", phone);
-			task.addData("type", type);
 			for (var i = 0; i < filess.length; i++) {
 				var f = filess[i];
 				task.addFile(f.path, {
-					key: f.name
+					key: f.path
 				});
+				task.addData("filename", f.name);
 			}
-			console.log("开始上传");
+
+			// 监听上传任务状态
+			var i = 0,
+				progress = 0;
+
+			function onStateChanged(upload, status) {
+				progress = Math.round(upload.uploadedSize / upload.totalSize * 100);
+				if (progress == i) {
+					i += 5;
+					ww.setTitle("上传中..." + progress + "%");
+				}
+			};
+			task.addEventListener("statechanged", onStateChanged, false);
 			task.start();
 		}
 		//个人背景图片上传
@@ -569,19 +619,19 @@ var UserDAL = function() {
 			mui.toast("相册服务器连接失败");
 		}
 	}
-	
+
 	/**
 	 * 删除一个相册
 	 * tel :手机号
 	 * album_id : 相册id
 	 */
-	this.deleteAlbum = function(tel,album_id,callbackHandler,faildHandler){
+	this.deleteAlbum = function(tel, album_id, callbackHandler, faildHandler) {
 		var ws = new WebService(mui);
 		ws.setUrl(WebServiceURL);
 		ws.setOpName("deleteAlbum");
 		ws.setParas({
 			tel: tel,
-			album_id:album_id
+			album_id: album_id
 		});
 		ws.setCallBack(callback);
 		ws.setErrorCall(errorCallback);
