@@ -48,13 +48,12 @@ var TravelDal = function() {
 	 */
 	this.UploadPic = function(successHandler, faildHandler) {
 		var filenames = "";
-		var filePath = that.travel.promoter_userid + "_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
+		
 		var savePath = "";
 		var imgs = [];
 		
 		if(that.travel.pic1){
 			imgs.push(that.travel.pic1);	
-			console.log(that.travel.pic1);
 		}
 		if(that.travel.pic2){
 			imgs.push(that.travel.pic2);	
@@ -67,6 +66,7 @@ var TravelDal = function() {
 			return;
 		}
 		for (var i = 0; i < imgs.length; i++) {
+			var filePath = that.travel.promoter_userid + "_" + new Date().toFormatString("yyyyMMddhhmmss") + ".png";
 			savePath = "_doc/TravelPhoto/" + filePath;
 			fileTool.ImgFileCompress(imgs[i], savePath, "15%", function(existPath, savePath) {
 				that.imgFiles.push({
@@ -88,12 +88,12 @@ var TravelDal = function() {
 							}
 						}
 					);
-					task.addData("Action", "RealseTravelPhoto");
+					task.addData("Action", "uploadTravelPhoto");
 					task.addData("filename", filenames.substring(0, filenames.length - 1));
 					
 					for (var i = 0; i < that.imgFiles.length; i++) {
 						var f = that.imgFiles[i];
-						task.addData("filename", f.name);
+						// task.addData("filename", f.name);
 						task.addFile(f.path, {
 							key: f.name
 						});
