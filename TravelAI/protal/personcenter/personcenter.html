@@ -678,7 +678,7 @@
 			 //显示本地相册数据
 			function renderAlbumInfo() {
 				console.log("展示本地相册");
-				console.log(albumInfo);
+				console.log(JSON.stringify(albumInfo));
 				var d = new Date();
 				var album, imgs, time, paths;
 				for (var i in albumInfo) {
@@ -699,7 +699,7 @@
 			};
 			 //本地页面添加相册
 			function AddAlbum(_id, _imgs, _time) {
-				if (document.getElementById("Album_" + _id)) {
+				if (document.getElementById("Album_" + _id)||!_imgs) {
 					//如果有就不创建
 					return;
 				}
@@ -710,10 +710,6 @@
 				ab.imgs = _imgs.split('|');
 				ab.time = _time;
 				ab.initAlbumObj();
-				ab.setFun('tap', function() {
-					//alert(this.id); 
-					// 封面tap事件
-				});
 				ab.setFun('longtap', function() {
 					var that = this;
 					plus.nativeUI.confirm('是否删除相册？', function(e) {
@@ -725,6 +721,13 @@
 								var deleteW = plus.nativeUI.showWaiting("正在删除中...");
 								new UserDAL().deleteAlbum(userInfo.user_telphone, album_id, function(_msg) {
 									abRoom.removeChild(that);
+									for(var i in albumInfo){
+										if(album_id == albumInfo[i].album_id){
+											albumInfo.splice(albumInfo[i],1);
+											new localStorageUtils().setItem("Album", new JsonTools().jsonObjToString(albumInfo));
+											break;
+										}
+									}
 									deleteW.close();
 									mui.toast("删除相册文件夹成功！");
 								}, function(e) {
