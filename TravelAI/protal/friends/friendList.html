@@ -12,7 +12,8 @@
 		<script type="text/javascript" src="../../js/lvai.base/ImgTool.js" ></script>
 		<!--缓存图片end-->
 		
-		
+		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js" ></script>
+		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js" ></script>
 		<link href="../../css/mui.min.css" rel="stylesheet" />
 		
 		<style type="text/css">
@@ -34,6 +35,8 @@
 			.info {}
 		</style>
 		<script type="text/javascript" charset="utf-8">
+			var friendList = "";//本地好友列表
+			var cardWebView = null;//个人料页面
 			mui.init();
 			mui.plusReady(function() {
 				//页面初始化
@@ -51,38 +54,43 @@
 				//去除滚动挑么？
 				//搜索初始化
 				SearchFirendInit();
+				//预加载一个 资料页面
+				webViewPreload();
 			}
 			/*页面加载完成发生*/
 			function pageOnload(){
+				//清除页面
+				friendListPageOnload();
 				//获取本地 好友列表
-				
+				friendListOnload();
 			}
 			/*页面渲染*/
 			function PageRender(){
-				var info = {
-					phone:1,
-					nickName : "李白",
-					headerImgSrc : "http://img4.imgtn.bdimg.com/it/u=1024821189,4177030163&fm=21&gp=0.jpg",
-					qianMing : "举头思明月,低头思故乡"
-				}
-				for(var i=0;i<10;i++){
-					info.phone+=22;
-					info.nickName += (info.phone+6);
-					friendListAdd(info);
-				}
+				
+				//添加本地全部好友
+				friendListAdd();
+				//添加好友列表 事件
 				friendListHandle();
-				
-				
 			}
 			//请求网络数据以便判断一致性并渲染文字资料
-			function getNetData(){}
+			function getNetData(){
+				//获取网络上的好友列表
+				friendListNetData();
+			}
 			
+			//添加本地全部好友
+			function friendListAdd(){
+				for(var i in friendList){
+					friendAdd(friendList[i]);
+				}
+			}
 			
-			//动态添加   好友
-			function friendListAdd(info){
+			//添加单个   好友
+			function friendAdd(info){
+				//if(document.getElementById(info.phone)){return;}//已经显示的不再添加
 				var content  = document.getElementById("tpl").content;
 				var li = content.querySelector('li');
-				li.id = info.phone;
+				li.id = info.phone; 
 				var headImg = content.querySelector(".info>img");
 				headImg.setAttribute('data-src',info.headerImgSrc);//头像
 				var body = content.querySelector(".mui-media-body");
@@ -92,6 +100,7 @@
 				qianM.innerHTML  = info.qianMing;//签名
 				var room = document.getElementById("friendRoom");
 				room.appendChild(content.cloneNode(true));
+				
 			}
 			
 			//渲染之后给每个好友设置 事件
@@ -106,36 +115,47 @@
 					};
 					//添加点击事件
 					this.addEventListener('tap',function(){
-						var btnArray = [{
-							title: "发送消息"
-						}, {
-							title: "查看资料"
-						}];
-						plus.nativeUI.actionSheet({
-							cancel: "取消",
-							buttons: btnArray
-						}, function(e) {
-							switch (e.index) {
-								case 0:break;//取消
-								case 1:alert(li.obj.id);break;//根据id聊天
-								case 2:alert(li.obj.querySelector("img").src );break;//同上
-								default:break;
-							}
-						});
+						if(!cardWebView){
+						    cardWebView = plus.webview.getWebviewById('friendCard');
+						}
+						
+					    cardWebView.show('pop-in',200,function(){
+					    	mui.fire(cardWebView, 'info', {
+					    		obj:{
+					    			id:li.obj.id,//id:手机号
+					    			nickName:li.obj.querySelector("span").innerHTML,//昵称
+					    			headImg:li.obj.querySelector("img").src//头像
+					    		}
+					    	});
+					    });
+					    
 					});
-					//添加 点击左滑 菜单事件
-					//<a class="mui-btn mui-btn-warning">资料</a>
-					//<a class="mui-btn mui-btn-red">聊天</a>
-//					this.querySelector('.mui-btn-warning').addEventListener('tap',function(e){
-//						e.stopPropagation();//阻塞  父窗体响应tap事件
-//						alert(li.obj.id+":"+this.innerHTML);
-//					});
-//					this.querySelector('.mui-btn-red').addEventListener('tap',function(e){
-//						e.stopPropagation();//阻塞  父窗体响应tap事件
-//						alert(li.obj.id+":"+this.innerHTML);
-//					});
-					
 				});
+			}
+			
+			//获取本地好友列表
+			function friendListOnload(){
+				friendList = new localStorageUtils().getItem("friendList");
+				if(friendList){
+					friendList = new JsonTools().stringToJson(friendList);
+				}
+			}
+			//获取网络上的好友列表
+			function friendListNetData(){  
+				var info = [{
+					phone:1,
+					nickName : "李白",
+					headerImgSrc : "http://img4.imgtn.bdimg.com/it/u=1024821189,4177030163&fm=21&gp=0.jpg",
+					qianMing : "举头思明月,低头思故乡"
+				},{
+					phone:233,
+					nickName : "凯圩",
+					headerImgSrc : "https://avatars2.githubusercontent.com/u/14814560?v=3&u=a57f0a6f8d649cb02fa4a56a05ad674151a02681&s=140",
+					qianMing : "什么时候你来玩"
+				}];
+				new localStorageUtils().setItem("friendList",new JsonTools().jsonObjToString(info)); 
+				pageOnload();
+				PageRender();
 			}
 			
 			//搜索框 的 初始化
@@ -155,7 +175,22 @@
 					
 				}
 			}
+			//清除页面
+			function friendListPageOnload(){
+				document.getElementById("friendRoom").innerHTML = "";
+			}
 			
+			//预加载一个 资料页面
+			function webViewPreload(){
+				var cardW = plus.nativeUI.showWaiting("正在加载中...");
+				cardWebView = mui.preload({
+					url:"friendCard.html",
+					id:"friendCard"
+				});
+				cardWebView.addEventListener('loaded',function () {
+				 	cardW.close();
+				});
+			}
 		</script>
 	</head>
 
@@ -177,6 +212,10 @@
 					 <!--class="mui-scroll">-->
 					<ul class="mui-table-view" id = "friendRoom">
 
+						
+					
+					</ul>
+
 						<template id="tpl">
 							<li class="mui-table-view-cell">
 								<div class="info ">
@@ -193,17 +232,10 @@
 							</li>
 						</template>
 
-					</ul>
-
-					
-
 				</div>
 			</div>
 			
 		</div>
 		
 	</body>
-	<script>
-		
-	</script>
 </html>

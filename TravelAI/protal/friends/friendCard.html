@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title></title>
+		<script src="../../js/mui.min.js"></script>
+		
+		<script type="text/javascript" src="../../js/lvai.data/config.js" ></script>
+		<script type="text/javascript" src="../../js/lvai.data/WebService2.js" ></script>
+		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js" ></script>
+		<script type="text/javascript" src="../../js/lvai.data/UserDAL.js" ></script>
+		
+		<link href="../../css/mui.min.css" rel="stylesheet" />
+		<style type="text/css">
+			#scroll{
+				padding-bottom: 45px;
+			}
+		</style>
+		<script type="text/javascript" charset="utf-8">
+		    var userInfo = {}; //用户信息
+			/*MUI页面初始化*/
+			mui.init({
+				gestureConfig: {
+					hold: true, //默认为false，不监听
+					longtap: true, //默认为false
+					release: true //默认为false，不监听
+				}
+			});
+			//页面监听
+			function pageEventListenter(){
+				//获得手机号
+				window.addEventListener('info',function(event){
+				    //通过event.detail可获得传递过来的参数内容
+				    userInfo.user_telphone = event.detail.obj.id;//手机号
+				    userInfo.user_nikeName = event.detail.obj.nickName//昵称
+				    userInfo.user_photo = event.detail.obj.headImg//头像
+					/*页面渲染  */
+				    PageRender();
+				});
+			}
+			mui.plusReady(function() {
+				/*页面初始化，加载页面元素*/
+				pageInit();
+				/*页面加载完成发生*/
+				pageOnload();
+				/*页面渲染*/
+				//PageRender();
+				//请求网络数据以便判断一致性并渲染文字资料
+				getNetData();
+			});
+			
+			/*页面初始化，加载页面元素*/
+			function pageInit(){
+				//ui初始化
+				uiInit();
+				//页面监听   拿到 上个界面传来的手机号
+				pageEventListenter();
+			}
+			/*页面加载完成发生*/
+			function pageOnload(){
+				//初始化控件事件
+				menuInit();
+			}
+			/*页面渲染*/
+		    function PageRender(){
+		    	document.getElementById("txtName").innerHTML = userInfo.user_nikeName;
+		    	document.getElementById("headImg").src = userInfo.user_photo;
+		    }
+			//请求网络数据以便判断一致性并渲染文字资料
+			function getNetData(){
+				
+			}
+			//ui初始化
+			function uiInit(){
+				//减速系数
+				mui('.mui-scroll-wrapper').scroll({
+					//deceleration: 0.0001, //减速系数，系数越大，滚动速度越慢，滚动距离越小，默认值0.0006
+					deceleration: 0.002,
+					indicators: false  //去除滚动条
+				});
+			}
+			//获取用户信息
+			function getUserInfo(){
+				//new UserDAL().getUserInfo();//////////
+			}
+			//初始化控件事件
+			function menuInit(){
+				//发送消息按钮
+				document.getElementById("sendBtn").addEventListener('tap',function(){
+					var phone = userInfo.user_telphone;//传递过来的手机号
+					//通过手机号 再传递给 聊天界面
+					//打开聊天界面
+					mui.toast("正在整合中。。。");
+				});
+				//更多 按钮
+				document.getElementById("more").addEventListener('tap',function(){
+					mui.toast("正在开发中。。。");
+				});
+			}
+		</script>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="display: none;">
+			<h1 class="mui-title">xxx</h1>
+		</header>
+		<div class="mui-content">
+			<div id="scroll" class="mui-scroll-wrapper">
+				<div class="mui-scroll">
+					<div id="backImg" style="  text-align: center;  padding-bottom: 30px; background: url(../../img/reg_Log.jpg) no-repeat center center;">
+						<div style="height: 44px; ">
+							<span style="text-align: center;line-height: 44px;">
+								<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" style="line-height: 44px;font-size: 1em !important;color: white;">返回</a>
+								<a id = "more" class="mui-icon mui-icon-right-nav mui-pull-right" style="line-height: 44px;font-size: 1em !important;color: white; margin-right: 2%;">更多</a>
+							</span>
+						</div>
+						<img id="headImg" class="lazy" style=" line-height: 50px; background-color: transparent; border: 1px solid #ddd;
+  border-radius: 50px;" src="../../img/head.png" width="70px" height="70px" />
+						<div>
+							<span id="txtName">昵称</span>
+							<div style="margin-top: 10px;">
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+								<img src="../../img/guide_1.jpg" width="15px" height="15px" />
+							</div>
+						</div>
+					</div>
+					<div id="slider" class="mui-slider">
+						<!--<div class="mui-slider-group">
+							<div id="item1mobile" style="background-color:gainsboro" class="mui-slider-item mui-control-content mui-active">-->
+								<div class=""><div><div>
+									<h5 class="mui-content-padded">基本信息</h5>
+									<div class="card">
+										<div id="userInfoDiv" style="background: white; text-align: center; visibility:visible ; ">
+											<span id="user_age">年龄：未填</span>|
+											<span id="user_height">身高：未填</span>|
+											<span id="user_weight">体重：未填</span>|
+											<span id="user_income">收入：未填</span>|
+											<br />
+											<span id="user_address">地址：未填</span>|
+											<span>单身</span>|
+											<span id="user_job">工作：未填</span>
+										</div>
+									</div>
+								</div>
+								<div>
+									<h5 class="mui-content-padded">车辆信息</h5>
+									<div class="card">
+										<div style="background: white; text-align: center;">
+											<span id="car_brand">车辆：未填</span>|
+											<span id="car_type">级别：未填</span>|
+											<span id="car_level">价值：未填</span>
+											<span style="border: 1px solid black; border-radius: 20px; background: gainsboro;">
+												已认证
+											</span>
+											<div id="loveCarPhoto">
+												<img src="" data-preview-src="" data-preview-group="2" />
+												<img src="" data-preview-src="" data-preview-group="2" />
+												<img src="" data-preview-src="" data-preview-group="2" />
+											</div>
+										</div>
+									</div>
+								</div>
+								<!--<div>
+									<span style="color: green;" class="mui-pull-right">当已有音频后点击mic录制修改上传</span>
+									<h5 class="mui-content-padded">音频认证</h5>
+
+									<div class="card" style=" height: 66px; text-align: center;">
+										<button type="button" id="recording" class="mui-icon mui-icon-mic" style=" float: left; margin: 10px 10%;  border: 1px solid gray; border-radius: 90px; padding: 10px;"></button>
+										<span style="line-height: 66px;  float: left; ">点击左侧mic录制语音</span>
+										<div id="recordShow" style=" visibility: hidden; float: right; text-align: center; height: 66px; width: 25%; ">
+											<div>
+												<button type="button" id="recordPlay" class="mui-icon mui-icon-mic" style="  border: 1px solid gray; margin-top: 5px; border-radius: 90px; padding: 5px;"></button>
+											</div>
+											<span style="color: red;">未审核</span>
+										</div>
+									</div>
+								</div>
+								<div>
+									<span style="color: green;" class="mui-pull-right">当已有视频后点击录制修改上传</span>
+									<h5 class="mui-content-padded">视频认证</h5>
+
+									<div class="card" style=" height: 66px; text-align: center;">
+										<button type="button" id="ed_video" class="mui-icon mui-icon-videocam" style=" float: left; margin: 10px 10%;  border: 1px solid gray; border-radius: 90px; padding: 10px;"></button>
+										<span style="line-height: 66px;  float: left;">点击左侧进行视频认证</span>
+										<div id="VideoShow" style=" visibility: hidden; float: right; text-align: center; height: 66px; width: 25%; ">
+											<div>
+												<button type="button" id="vidoPlay" class="mui-icon mui-icon-mic" style="  border: 1px solid gray; margin-top: 5px; border-radius: 90px; padding: 5px;"></button>
+											</div>
+											<span style="color: red;">未审核</span>
+										</div>
+									</div>
+								</div>-->
+								<div>
+									<h5 class="mui-content-padded">收到的礼物</h5>
+									<div class="card">
+										<div style="padding: 10px; text-align: center;">
+											<img style="width: 50px !important; height: 50px !important ;" src="../../img/travel_2.jpg" />
+											<img style="width: 50px !important; height: 50px !important ;" src="../../img/guide_1.jpg" />
+											<img style="width: 50px !important; height: 50px !important ;" src="../../img/travel_2.jpg" />
+											<img style="width: 50px !important; height: 50px !important ;" src="../../img/guide_1.jpg" />
+											<img style="width: 50px !important; height: 50px !important ;" src="../../img/travel_2.jpg" />
+										</div>
+									</div>
+								</div>
+								<div>
+									<h5 class="mui-content-padded">其他信息</h5>
+									<div class="card">
+
+										<ul class="mui-table-view">
+											<li class="mui-table-view-cell">
+												<span>会员等级</span>
+												<span style="float: right; color: blue;">高级会员</span>
+											</li>
+											<li class="mui-table-view-cell" id="ed_job">
+												<span>职业认证</span>
+												<span style="float: right; color: blue;">未认证</span>
+											</li>
+											<li class="mui-table-view-cell">
+												<span>Vip信息</span>
+												<span style="float: right; color: blue;">Vip3级会员</span>
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							
+							
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		
+							<nav class="mui-bar mui-bar-tab" style="box-shadow: 0 0 0 rgba(0,0,0,.85);">
+								<div style="text-align: center;">
+									<button id= "sendBtn" type="button" style="width: 50%;" class="mui-btn mui-btn-blue">
+										<span class="mui-icon mui-icon-weixin"  style="font-size: 1.2em !important">
+											发送消息
+										</span>
+										
+									</button>
+
+								</div>
+							</nav>
+	</body>
+
+</html>
