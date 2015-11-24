@@ -5,8 +5,8 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
 		<title></title>
-		<script src="../../js/mui.min.js"></script>
-		
+		<script src="../../js/mui.min.js"></script> 
+		<script type="text/javascript" src="../../js/lvai.base/localStorageUtils.js" ></script>
 		<script type="text/javascript" src="../../js/lvai.data/config.js" ></script>
 		<script type="text/javascript" src="../../js/lvai.data/WebService2.js" ></script>
 		<script type="text/javascript" src="../../js/lvai.base/JsonTools.js" ></script>
@@ -17,9 +17,27 @@
 			#scroll{
 				padding-bottom: 45px;
 			}
+			.mui-card{
+				float: left;
+				width: 98% !important;
+				margin:  0 auto;
+			}
+			.card>li{
+				height: 25px;
+				width: 88%;
+				text-align: left;
+				
+				padding: 2px;
+				padding-left: 5%;
+			}
+			.card>li.mui-active{
+				background: none !important;
+			}
 		</style>
 		<script type="text/javascript" charset="utf-8">
+		    var friendList = "";//所有好友信息
 		    var userInfo = {}; //用户信息
+		    var topInfo = {};
 			/*MUI页面初始化*/
 			mui.init({
 				gestureConfig: {
@@ -33,10 +51,10 @@
 				//获得手机号
 				window.addEventListener('info',function(event){
 				    //通过event.detail可获得传递过来的参数内容
-				    userInfo.user_telphone = event.detail.obj.id;//手机号
-				    userInfo.user_nikeName = event.detail.obj.nickName//昵称
-				    userInfo.user_photo = event.detail.obj.headImg//头像
-					/*页面渲染  */
+				    topInfo.user_telphone = event.detail.obj.id;//手机号
+				    topInfo.user_nikeName = event.detail.obj.nickName//昵称
+				    topInfo.user_photo = event.detail.obj.headImg//头像
+//					/*页面渲染  */
 				    PageRender();
 				});
 			}
@@ -48,7 +66,7 @@
 				/*页面渲染*/
 				//PageRender();
 				//请求网络数据以便判断一致性并渲染文字资料
-				getNetData();
+				//getNetData();
 			});
 			
 			/*页面初始化，加载页面元素*/
@@ -62,16 +80,47 @@
 			function pageOnload(){
 				//初始化控件事件
 				menuInit();
+				//所有好友数据拿到
+				friendListInfoOnload();
 			}
 			/*页面渲染*/
 		    function PageRender(){
-		    	document.getElementById("txtName").innerHTML = userInfo.user_nikeName;
-		    	document.getElementById("headImg").src = userInfo.user_photo;
+		    	//找到这个好友的信息
+				if(!getUserInfo()){
+					mui.toast("没有改好友信息");
+					return;
+				}
+		    	//昵称
+		    	document.getElementById("txtName").innerHTML = topInfo.user_nikeName;
+		    	//头像
+		    	document.getElementById("headImg").src = topInfo.user_photo;
+		    	//背景
+		    	var bgSrc = userInfo.personcenter_bg?ResourcesServerUrl+userInfo.personcenter_bg:"../../img/reg_Log.jpg";
+		    	var backImg = document.getElementById("backImg");
+			    	backImg.style.background = "url("+bgSrc+ ") no-repeat center center";
+					backImg.style.backgroundSize = "100%";
+				
 		    }
 			//请求网络数据以便判断一致性并渲染文字资料
 			function getNetData(){
 				
 			}
+			 //呈现用户基础信息。
+			function renderUserInfoData() {
+				//找到登录时   在服务器  获取到的 用户信息
+				document.getElementById("txtName").innerHTML = !userInfo.user_nikeName ? "昵称：未填" : userInfo.user_nikeName;
+				document.getElementById("user_height").innerHTML = !userInfo.user_height ? "身高：未填" : userInfo.user_height;
+				document.getElementById("user_weight").innerHTML = !userInfo.user_weight ? "体重：未填" : userInfo.user_weight;
+				document.getElementById("user_income").innerHTML = !userInfo.user_income ? "收入：未填" : userInfo.user_income;
+				document.getElementById("user_address").innerHTML = !userInfo.user_address ? "地址：未填" : userInfo.user_address;
+				document.getElementById("user_job").innerHTML = !userInfo.user_job ? "工作：未填" : userInfo.user_job;
+				if (!userInfo.user_birthday) {
+					document.getElementById("user_age").innerHTML = "年龄：未填"
+				} else {
+					var Newtime = new Date();
+					document.getElementById("user_age").innerHTML = Newtime.getFullYear() - new Date(userInfo.user_birthday).getFullYear() + 1 + "岁";
+				}
+			};
 			//ui初始化
 			function uiInit(){
 				//减速系数
@@ -81,10 +130,29 @@
 					indicators: false  //去除滚动条
 				});
 			}
+			
+			
 			//获取用户信息
 			function getUserInfo(){
-				//new UserDAL().getUserInfo();//////////
+				for(var i in friendList){
+					var friend = friendList[i];
+					if(friend.user_telphone == topInfo.user_telphone){
+						userInfo = friend;
+						return true;
+					}
+				}
+				return false;
 			}
+			
+			//所有好友数据拿到
+			function friendListInfoOnload(){
+				friendList = new localStorageUtils().getItem("friendList");
+				if(friendList){
+					friendList = new JsonTools().stringToJson(friendList);
+				}
+			}
+			
+			
 			//初始化控件事件
 			function menuInit(){
 				//发送消息按钮
@@ -130,110 +198,10 @@
 							</div>
 						</div>
 					</div>
-					<div id="slider" class="mui-slider">
-						<!--<div class="mui-slider-group">
-							<div id="item1mobile" style="background-color:gainsboro" class="mui-slider-item mui-control-content mui-active">-->
-								<div class=""><div><div>
-									<h5 class="mui-content-padded">基本信息</h5>
-									<div class="card">
-										<div id="userInfoDiv" style="background: white; text-align: center; visibility:visible ; ">
-											<span id="user_age">年龄：未填</span>|
-											<span id="user_height">身高：未填</span>|
-											<span id="user_weight">体重：未填</span>|
-											<span id="user_income">收入：未填</span>|
-											<br />
-											<span id="user_address">地址：未填</span>|
-											<span>单身</span>|
-											<span id="user_job">工作：未填</span>
-										</div>
-									</div>
-								</div>
-								<div>
-									<h5 class="mui-content-padded">车辆信息</h5>
-									<div class="card">
-										<div style="background: white; text-align: center;">
-											<span id="car_brand">车辆：未填</span>|
-											<span id="car_type">级别：未填</span>|
-											<span id="car_level">价值：未填</span>
-											<span style="border: 1px solid black; border-radius: 20px; background: gainsboro;">
-												已认证
-											</span>
-											<div id="loveCarPhoto">
-												<img src="" data-preview-src="" data-preview-group="2" />
-												<img src="" data-preview-src="" data-preview-group="2" />
-												<img src="" data-preview-src="" data-preview-group="2" />
-											</div>
-										</div>
-									</div>
-								</div>
-								<!--<div>
-									<span style="color: green;" class="mui-pull-right">当已有音频后点击mic录制修改上传</span>
-									<h5 class="mui-content-padded">音频认证</h5>
-
-									<div class="card" style=" height: 66px; text-align: center;">
-										<button type="button" id="recording" class="mui-icon mui-icon-mic" style=" float: left; margin: 10px 10%;  border: 1px solid gray; border-radius: 90px; padding: 10px;"></button>
-										<span style="line-height: 66px;  float: left; ">点击左侧mic录制语音</span>
-										<div id="recordShow" style=" visibility: hidden; float: right; text-align: center; height: 66px; width: 25%; ">
-											<div>
-												<button type="button" id="recordPlay" class="mui-icon mui-icon-mic" style="  border: 1px solid gray; margin-top: 5px; border-radius: 90px; padding: 5px;"></button>
-											</div>
-											<span style="color: red;">未审核</span>
-										</div>
-									</div>
-								</div>
-								<div>
-									<span style="color: green;" class="mui-pull-right">当已有视频后点击录制修改上传</span>
-									<h5 class="mui-content-padded">视频认证</h5>
-
-									<div class="card" style=" height: 66px; text-align: center;">
-										<button type="button" id="ed_video" class="mui-icon mui-icon-videocam" style=" float: left; margin: 10px 10%;  border: 1px solid gray; border-radius: 90px; padding: 10px;"></button>
-										<span style="line-height: 66px;  float: left;">点击左侧进行视频认证</span>
-										<div id="VideoShow" style=" visibility: hidden; float: right; text-align: center; height: 66px; width: 25%; ">
-											<div>
-												<button type="button" id="vidoPlay" class="mui-icon mui-icon-mic" style="  border: 1px solid gray; margin-top: 5px; border-radius: 90px; padding: 5px;"></button>
-											</div>
-											<span style="color: red;">未审核</span>
-										</div>
-									</div>
-								</div>-->
-								<div>
-									<h5 class="mui-content-padded">收到的礼物</h5>
-									<div class="card">
-										<div style="padding: 10px; text-align: center;">
-											<img style="width: 50px !important; height: 50px !important ;" src="../../img/travel_2.jpg" />
-											<img style="width: 50px !important; height: 50px !important ;" src="../../img/guide_1.jpg" />
-											<img style="width: 50px !important; height: 50px !important ;" src="../../img/travel_2.jpg" />
-											<img style="width: 50px !important; height: 50px !important ;" src="../../img/guide_1.jpg" />
-											<img style="width: 50px !important; height: 50px !important ;" src="../../img/travel_2.jpg" />
-										</div>
-									</div>
-								</div>
-								<div>
-									<h5 class="mui-content-padded">其他信息</h5>
-									<div class="card">
-
-										<ul class="mui-table-view">
-											<li class="mui-table-view-cell">
-												<span>会员等级</span>
-												<span style="float: right; color: blue;">高级会员</span>
-											</li>
-											<li class="mui-table-view-cell" id="ed_job">
-												<span>职业认证</span>
-												<span style="float: right; color: blue;">未认证</span>
-											</li>
-											<li class="mui-table-view-cell">
-												<span>Vip信息</span>
-												<span style="float: right; color: blue;">Vip3级会员</span>
-											</li>
-										</ul>
-									</div>
-								</div>
-							</div>
-							
-							
-						</div>
+					
+					<div>
+						
 					</div>
-
 				</div>
 			</div>
 		</div>
@@ -241,8 +209,8 @@
 							<nav class="mui-bar mui-bar-tab" style="box-shadow: 0 0 0 rgba(0,0,0,.85);">
 								<div style="text-align: center;">
 									<button id= "sendBtn" type="button" style="width: 50%;" class="mui-btn mui-btn-blue">
-										<span class="mui-icon mui-icon-weixin"  style="font-size: 1.2em !important">
-											发送消息
+										<span class="mui-icon mui-icon-chat"  style="font-size: 1.2em !important">
+											发消息
 										</span>
 										
 									</button>

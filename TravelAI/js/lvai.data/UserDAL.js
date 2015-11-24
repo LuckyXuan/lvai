@@ -618,7 +618,7 @@ var UserDAL = function() {
 			mui.toast("相册服务器连接失败");
 		}
 	}
-
+	
 	/**
 	 * 删除一个相册
 	 * tel :手机号
@@ -653,6 +653,74 @@ var UserDAL = function() {
 		function errorCallback(e) {
 			//mui.toast(JSON.stringify(e));
 			mui.toast("相册服务器连接失败");
+		}
+	}
+
+	/* 2015-11-23 newsning
+	 * 获取一个其他用户的信息
+	 */
+	this.getOtherUserInfo = function(tel,callbackHandler, faildHandler){
+		var ws = new WebService(mui);
+		ws.setUrl(WebServiceURL);
+		ws.setOpName("getOtherUserInfo");
+		ws.setParas({
+			tel: tel
+		});
+		ws.setCallBack(callback);
+		ws.setErrorCall(errorCallback);
+		ws.LoadData();
+
+		//成功的回调
+		function callback(data) {
+			var msg = eval(data);
+			msg = msg.d;
+
+			msg = new JsonTools().stringToJson(msg);
+			if (msg.status == "faild") {
+				faildHandler(msg.msg);
+				return;
+			}
+			callbackHandler(msg);
+		}
+
+		//失败的提示
+		function errorCallback(e) {
+			//mui.toast(JSON.stringify(e));
+			mui.toast("服务器连接失败");
+			faildHandler();
+		}
+	},
+	/* 2015-11-24 newsning
+	 * 获取好友列表信息
+	 */
+	this.getMyFriendList = function(tel,callbackHandler, faildHandler){
+		var ws = new WebService(mui);
+		ws.setUrl(WebServiceURL);
+		ws.setOpName("getMyFriendList");
+		ws.setParas({
+			tel: tel
+		});
+		ws.setCallBack(callback);
+		ws.setErrorCall(errorCallback);
+		ws.LoadData();
+
+		//成功的回调
+		function callback(data) {
+			var msg = eval(data);
+			msg = msg.d;
+
+			msg = new JsonTools().stringToJson(msg);
+			if (msg.status == "faild") {
+				faildHandler(msg.msg);
+				return;
+			}
+			callbackHandler(msg);
+		}
+
+		//失败的提示
+		function errorCallback(e) {
+			mui.toast("服务器连接失败");
+			faildHandler();
 		}
 	}
 }
